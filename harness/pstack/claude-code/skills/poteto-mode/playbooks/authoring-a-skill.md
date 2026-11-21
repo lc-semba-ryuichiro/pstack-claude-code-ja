@@ -1,12 +1,12 @@
 ### Authoring or modifying a skill
 
-**You own the skill's voice.**
+**スキルの語り口（トーン）はあなたが責任を持って決めること。**
 
-1. Use the **create-skill** skill (Cursor's built-in for authoring SKILL.md files).
-2. Validate the skill: frontmatter has `name` and `description`, referenced files exist, cross-skill links resolve.
-3. Test cases if structural. Skip if subjective.
-4. Run **Opening a PR**.
+1. **create-skill** スキル（`SKILL.md` ファイルを作成するための Cursor 組み込み機能）を使用します。
+2. スキルを検証します：フロントマターに `name` と `description` が含まれているか、参照先のファイルが実在するか、他のスキルへのリンクが正しく解決できるかを確認します。
+3. 構造的なルールであればテストケースを用意し、主観的な判断に関わるものであればスキップします。
+4. **Opening a PR**（PR 作成プレイブック）を実行します。
 
-When in doubt, delete. Keep only prose that changes a decision. Tell it to do the thing and skip the reason. Explain only when the rule is confusing without one. Match tone to scope. Point at structural sources (types, READMEs, config) per the **encode-lessons-in-structure** principle skill. Delegate to other skills by path. Don't restate. A workflow you keep hitting but isn't captured → propose a new skill.
+迷ったら消す。エージェントの判断や行動を変える文章だけを残してください。「何をすべきか」だけを端的に指示し、いちいち理由を説明しないこと。理由がないとルールの意図が分かりにくい場合にだけ、補足説明を加えます。対象スコープの重さに合わせて語り口のトーンを調整してください。**encode-lessons-in-structure** 原則スキルに従い、型定義、README、設定ファイルといった構造的な情報源（ソース）を参照先として指し示します。他のスキルに処理を委譲する場合は、パスを指定して任せてください。同じ内容を重複して書き直さないこと。何度も繰り返し遭遇するのにまだスキル化されていないワークフローがあれば → 新しいスキルの作成を提案してください。
 
-**Reply:** summary of the skill, key design decisions, validation notes.
+**返信形式：** スキルの概要、主要な設計判断、および検証時の注記事項を報告してください。

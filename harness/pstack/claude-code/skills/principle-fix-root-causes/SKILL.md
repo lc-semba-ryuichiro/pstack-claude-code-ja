@@ -1,14 +1,14 @@
 ---
 name: principle-fix-root-causes
-description: "Apply when debugging. Trace each symptom back to the first place the system went wrong and fix it there. A guard is a fix only when the state it handles is legitimate."
+description: "デバッグ時に適用します。各症状を、システムが最初に間違った場所まで追跡し、そこで修正します。ガードが修正として成立するのは、それが処理する状態が正当な場合のみです。"
 disable-model-invocation: true
 ---
 
 # Fix Root Causes
 
-Fix the fault, not the place where it surfaced. The root cause is the first place the system did something it should not do, or failed to handle a state it should handle.
+表面化した場所ではなく、障害そのものを修正すること。根本原因とは、システムが本来すべきでないことをした最初の場所、または処理すべき状態を処理できなかった最初の場所のことです。
 
-- Reproduce first. Ask "why" until the answer is a wrong decision in the code. When stuck, instrument and read the actual state.
-- Ask whether the state that triggered the symptom is legitimate. If it is, handle it where the code broke. If it should never exist, a check there hides the bug, so find what produced it. Guards, retries, swallowed errors, clamped values, and discarded state are the usual ways to hide a bug.
-- Fix the pattern, not the instance. Find every place with the same fault.
-- If the deciding fact took a deep dig, propose the cheap, always-on signal that would have shown it at first look.
+- まず再現する: 答えが「コード内の誤った判断」にたどり着くまで「なぜ」を繰り返します。行き詰まったら、計装（instrument）して実際の状態を読み取ります。
+- 症状を引き起こした状態が正当なものかどうかを問う: 正当であれば、コードが壊れた場所で処理します。絶対に存在してはならない状態であれば、そこでのチェックはバグを隠すことになるため、何がそれを生成したのかを見つけます。ガード、リトライ、握りつぶされたエラー、クランプされた値、破棄された状態などは、バグを隠す典型的な手法です。
+- インスタンスではなく、パターンを修正する: 同じ障害を持つすべての場所を見つけます。
+- 決定的な事実を見つけるのに深く掘り下げる必要があった場合、一目でそれがわかるような安価で常時稼働のシグナルを提案します。

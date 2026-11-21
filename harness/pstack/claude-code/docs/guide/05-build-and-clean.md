@@ -1,83 +1,83 @@
-# Build the change and clean the diff
+# 変更を構築し、差分をクリーンにする
 
-The build playbooks share one discipline. Say what you observed, and let the playbook demand the evidence. This page shows what to put in the prompt for each common build task, then the cleanup habit that keeps diffs reviewable.
+開発系のプレイブックには共通する1つの規律があります。観察した事実をそのまま伝え、証拠の提示はプレイブックに要求させることです。このページでは、よくある各開発タスクのプロンプトに何を含めるべきかと、差分をレビューしやすい状態に保つクリーンアップの習慣について解説します。
 
-## Prompt each build playbook with what you know
+## すでに分かっていることを各開発プレイブックに伝える
 
-A bug prompt states the symptom and asks for a reproduction first:
-
-```text
-/poteto-mode this command emits two records after a retry. repro first, then fix and verify.
-```
-
-A feature prompt states the behavior and what must not change:
+バグ修正のプロンプトでは、症状を伝えたうえでまず再現を求めます：
 
 ```text
-/poteto-mode add a --json flag. text output stays byte-identical. verify both forms.
+/poteto-mode リトライ後にこのコマンドが2件のレコードを出力してしまう。まず再現させてから、修正して検証して。
 ```
 
-A refactoring prompt pins behavior before structure moves:
+機能開発のプロンプトでは、求める挙動と「変えてはいけないもの」を指定します：
 
 ```text
-/poteto-mode move parsing into one module, zero behavior change. record the current output first and prove it's unchanged after.
+/poteto-mode --json フラグを追加して。テキスト出力はバイト単位で完全に同じ状態を維持すること。両方の形式を検証して。
 ```
 
-A perf prompt states the measurement, not an impression:
+リファクタリングのプロンプトでは、構造を動かす前に現在の挙動を固定します：
 
 ```text
-/poteto-mode startup takes 1.8s on this fixture. trace it, fix the measured cause, show me before and after.
+/poteto-mode パース処理を1つのモジュールにまとめて。挙動は一切変えないこと。まず現在の出力を記録し、変更後も出力が変わっていないことを証明して。
 ```
 
-Each of these routes to its playbook ([Bug fix](../../skills/poteto-mode/playbooks/bug-fix.md), [Feature](../../skills/poteto-mode/playbooks/feature.md), [Refactoring](../../skills/poteto-mode/playbooks/refactoring.md), [Perf issue](../../skills/poteto-mode/playbooks/perf-issue.md)), and the playbook supplies the steps you didn't type: reproduce before fixing, name the data shape before implementing, pin behavior before restructuring, profile before optimizing.
-
-For sustained improvement of one number, there's the [Hillclimb playbook](../../skills/poteto-mode/playbooks/hillclimb.md). Give it the metric, a target, and a floor on attempts, and it loops one hypothesis at a time with a frozen measurement harness. It keeps wins and reverts everything else.
-
-Both perf playbooks run [`/benchmark-checklist`](../../skills/benchmark-checklist/SKILL.md) on their numbers. Perf issue vets its baseline and every number after it, and Hillclimb vets its harness before freezing it. [Verify and ship](./06-verify-and-ship.md#vet-a-measured-number-with-benchmark-checklist) shows when to type it yourself.
-
-Sometimes you want the cause before any fix. For a live symptom, such as a leak, an idle CPU spin, or a visual glitch, the [Runtime forensics playbook](../../skills/poteto-mode/playbooks/runtime-forensics.md) instruments the running process. For a profile you already captured, the [Trace forensics playbook](../../skills/poteto-mode/playbooks/trace-forensics.md) reads the artifact and maps the hot frame to source. Both return a diagnosis, not a fix:
+パフォーマンス改善のプロンプトでは、主観的な印象ではなく計測値を伝えます：
 
 ```text
-/poteto-mode here's a cpuprofile from the slow startup. tell me where the time goes and which source lines own it. no fix yet.
+/poteto-mode このテストデータ（フィクスチャ）で起動に1.8秒かかっている。トレースして計測された原因を修正し、修正前後の数値を提示して。
 ```
 
-## Write the failing test first with `/tdd`
+これらはそれぞれ対応するプレイブック（[Bug fix](../../skills/poteto-mode/playbooks/bug-fix.md)、[Feature](../../skills/poteto-mode/playbooks/feature.md)、[Refactoring](../../skills/poteto-mode/playbooks/refactoring.md)、[Perf issue](../../skills/poteto-mode/playbooks/perf-issue.md)）にルーティングされ、あなたが入力しなかった必須ステップ（修正前に再現する、実装前にデータ構造を定義する、構造変更前に挙動を固定する、最適化前にプロファイリングする）をプレイブック側が補ってくれます。
 
-When a bug has a cheap local test path, the whole prompt can be two words:
+単一の数値を継続的に改善したい場合は、[Hillclimb プレイブック](../../skills/poteto-mode/playbooks/hillclimb.md)があります。メトリクス、目標値、最低試行回数を指定すると、固定された計測ハーネスを使って1つずつ仮説検証のループを回します。改善が認められたものだけを採用し、それ以外はすべて元に戻します（revert）。
+
+パフォーマンス系のプレイブックはどちらも、計測した数値に対して [`/benchmark-checklist`](../../skills/benchmark-checklist/SKILL.md) を実行します。Perf issue はベースラインとその後のすべての数値を精査し、Hillclimb は計測ハーネスを固定する前にその妥当性を精査します。自分で直接入力すべきタイミングについては [検証とシッピング](./06-verify-and-ship.md#benchmark-checklist-で計測値を精査する) を参照してください。
+
+修正に着手する前に、まず原因の診断だけが欲しい場合もあります。メモリリーク、アイドル時の CPU スピン、描画の乱れといった実行中の症状には、[Runtime forensics プレイブック](../../skills/poteto-mode/playbooks/runtime-forensics.md) が動作中のプロセスに計装（インストルメンテーション）を組み込みます。すでにキャプチャ済みのプロファイルがある場合は、[Trace forensics プレイブック](../../skills/poteto-mode/playbooks/trace-forensics.md) がそのアーティファクトを読み取り、負荷の高いホットフレームをソースコードの該当箇所にマッピングします。どちらも修正は行わず、診断結果のみを返します：
 
 ```text
-/tdd implement
+/poteto-mode 起動が遅かったときの cpuprofile を渡す。どこに時間がかかっているのか、どのソース行が原因なのかを教えて。まだ修正はしないで。
 ```
 
-In context, that's enough. [`/tdd`](../../skills/tdd/SKILL.md) writes the smallest test that fails for the intended reason, then the fix, then reruns the test. If a test would need broad harness setup or brittle mocks, the skill says so and uses the closest executable check instead. Don't force a test where a real command is stronger evidence.
+## `/tdd` で失敗するテストを先に書く
 
-## Load the TypeScript rules by name
-
-[`typescript-best-practices`](../../skills/typescript-best-practices/SKILL.md) turns the type-system principles into concrete rules: discriminated unions, `unknown` at boundaries, exhaustive variants, schema-derived types. It doesn't load on its own, so type `/typescript-best-practices` when a task touches `.ts` or `.tsx` files.
-
-## Clean before you commit
-
-The [Opening a PR playbook](../../skills/poteto-mode/playbooks/opening-a-pr.md) runs `/deslop` on the diff before each commit, and poteto-mode applies [`/unslop`](../../skills/unslop/SKILL.md) to the PR description and commit bodies. `/deslop` ships in the `cursor-team-kit` plugin, not in pstack. If you don't have it, ask for the same outcome in plain words: remove narrating comments, unsupported guards, dead compatibility paths, and unrelated edits.
-
-For prose, `/unslop` takes a target and any extra rules you have:
+バグに対して低コストで実行できるローカルテスト環境がある場合、プロンプト全体はたった2語で済みます：
 
 ```text
-/unslop the readme changes, no emdashes
+/tdd 実装して
 ```
 
-You'll develop your own shorthand. The skill reads intent fine from terse prompts like `unslop that, tighten it`.
+会話のコンテキストが共有されていれば、それだけで十分です。[`/tdd`](../../skills/tdd/SKILL.md) は意図した理由で失敗する最小限のテストを書き、次に修正を行い、テストを再実行します。大掛かりなテストハーネスの構築や壊れやすいモックが必要になる場合は、スキルがその旨を伝えたうえで、代わりに最も近い実行可能なチェック手段を使用します。実際のコマンド実行のほうが強力な証拠になる場面では、無理にテストを書かないでください。
 
-## Strip the comments with `/no-comments`
+## TypeScript ルールを名前を指定して読み込む
 
-Comments need their own pass, and not from the agent that wrote them. An author defends its comments the way you'd defend yours. So before review, hand them to fresh eyes:
+[`typescript-best-practices`](../../skills/typescript-best-practices/SKILL.md) は、型システムの原則を具体的なルール（判別可能なユニオン型、境界での `unknown` 使用、バリアントの網羅性チェック、スキーマから導出された型など）へと落とし込みます。このスキルは自動的には読み込まれないため、`.ts` や `.tsx` ファイルを触るタスクでは `/typescript-best-practices` と入力してください。
+
+## コミット前にクリーンアップする
+
+[Opening a PR プレイブック](../../skills/poteto-mode/playbooks/opening-a-pr.md) は、各コミットの前に差分に対して `/deslop` を実行し、`poteto-mode` は PR の説明文とコミットメッセージ本文に [`/unslop`](../../skills/unslop/SKILL.md) を適用します。なお、`/deslop` は pstack ではなく `cursor-team-kit` プラグインに同梱されています。インストールしていない場合は、同じ結果になるよう平易な言葉で指示してください（状況説明だけのコメント、根拠のないガード処理、使われていない互換性パス、無関係な編集を削除するなど）。
+
+文章に対しては、`/unslop` に対象と追加のルールを指定できます：
 
 ```text
-/no-comments the diff
+/unslop README の変更箇所を整えて。全角ダッシュ（emダッシュ）は使わないで
 ```
 
-[`/no-comments`](../../skills/no-comments/SKILL.md) spawns [Comment Sicko](../../agents/comment-sicko.md), a read-only reviewer with a short keep list: license headers, doc comments on a public API, links that explain what code can't, behavior forced by an external dependency you can't reshape. Everything else goes. A surprise in your own code gets no such pass. The comment comes back as a refactor flag, and `/no-comments` fixes the flags it accepts at the root cause. When a comment claims a constraint, "do not remove", the skill offers to encode the claim as a type, test, or lint. Either way, the comment comes out.
+使っていくうちに自分なりの短縮表現が身についていきます。「そこを unslop して、引き締めて（unslop that, tighten it）」のような簡潔な指示でも、スキルは意図を問題なく読み取ります。
 
-The division of labor is worth keeping straight. `/deslop` cleans slop out of the code, `/unslop` cleans it out of prose, and `/no-comments` hands the comments to a reviewer who didn't write them.
+## `/no-comments` で不要なコメントを取り除く
 
-**Pitfall:** cleanup is not optional polish. A diff with narrating comments and defensive dead weight reads as unfinished to reviewers, and the extra code is where the next bug hides. If the diff feels padded, say `deslop it` before you commit, not after review calls it out.
+コメントには専用のチェック工程が必要です。しかも、それを書いた本人（エージェント）以外の目で行うべきです。書いた本人は、人間が自分のコメントを擁護するのと同じように自分のコメントを正当化してしまうからです。そのため、レビューに出す前に新鮮な視点へ委ねます：
 
-Next: [Verify and ship](./06-verify-and-ship.md).
+```text
+/no-comments 今回の差分をチェックして
+```
+
+[`/no-comments`](../../skills/no-comments/SKILL.md) は、最小限の許可リスト（ライセンスヘッダー、パブリック API のドキュメントコメント、コードだけでは説明できない背景を示すリンク、書き換え不可能な外部依存関係によって強制される挙動）だけを持つ読み取り専用レビュアー [Comment Sicko](../../agents/comment-sicko.md) を起動します。それ以外のコメントはすべて削除対象です。自分のコード内の「意外な挙動」であっても免除されません。そうしたコメントはリファクタリング対象のフラグとして差し戻され、`/no-comments` は受け入れた指摘を根本原因から修正します。コメントが「削除禁止（do not remove）」などの制約を主張している場合は、その主張を型、テスト、または Lint ルールとしてコードに組み込む方法を提案します。いずれにせよ、コメント自体は削除されます。
+
+役割分担は明確に覚えておくと便利です。`/deslop` はコードから冗長なゴミ（slop）を取り除き、`/unslop` は文章から AI 臭さを取り除き、`/no-comments` はコメントを書いた本人ではないレビュアーにコメントの精査を委ねます。
+
+**落とし穴（Pitfall）：** クリーンアップは「余裕があればやる仕上げ」ではありません。状況説明だけのコメントや防衛的なデッドコードが残った差分は、レビュアーの目には未完成品に映りますし、その余分なコードこそが次のバグの温床になります。差分が水増しされていると感じたら、レビューで指摘されるのを待つのではなく、コミットする前に「deslop して（deslop it）」と指示してください。
+
+次へ：[検証とシッピング](./06-verify-and-ship.md)

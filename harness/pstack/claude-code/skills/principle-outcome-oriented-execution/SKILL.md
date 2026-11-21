@@ -1,21 +1,21 @@
 ---
 name: principle-outcome-oriented-execution
-description: "Apply during planned rewrites and migrations with explicit phase boundaries. Converge on the target architecture; don't preserve smooth intermediate states with throwaway compatibility code."
+description: "明確なフェーズ境界のある計画的な書き換えやマイグレーションの際に適用します。ターゲットのアーキテクチャに収束（converge）させます。使い捨ての互換性コードでスムーズな中間状態を維持しないこと。"
 disable-model-invocation: true
 ---
 
 # Outcome-Oriented Execution
 
-Optimize for the intended, verifiable end state rather than preserving smooth intermediate states.
+スムーズな中間状態を維持するよりも、意図された検証可能な最終状態に向けて最適化すること。
 
-**Why:** Keeping every intermediate step fully stable often creates temporary compatibility code that becomes long-lived debt. Converge on the target architecture and prove correctness at explicit verification boundaries.
+**なぜ（Why）:** すべての中間ステップを完全に安定させようとすると、一時的な互換性コードが長期的な負債になりがちです。ターゲットのアーキテクチャに収束（converge）させ、明示的な検証境界で正確性を証明します。
 
-**Core rule:**
-- Prioritize end-state integrity over transitional stability
-- Intermediate breakage is acceptable when it is planned, scoped, and reversible
+**コアルール:**
+- 過渡期の安定性よりも最終状態の整合性を優先する
+- 計画的でスコープが限定され、可逆的であれば、中間での破損（breakage）は許容されます。
 
-**Guardrails:**
-- Use this for planned rewrites and migrations with explicit phase boundaries
-- Declare where temporary breakage is acceptable
-- Keep high-signal checks for actively touched areas while migrating
-- Require full static and runtime verification at plan completion
+**ガードレール（Guardrails）:**
+- これを明示的なフェーズ境界のある計画的な書き換えやマイグレーションに使用します。
+- 一時的な破損が許容される場所を宣言します。
+- 移行中は、積極的に触れている領域に対して高いシグナルのチェックを維持します。
+- 計画の完了時に完全な静的およびランタイムの検証を要求します。

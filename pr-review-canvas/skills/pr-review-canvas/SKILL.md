@@ -1,66 +1,62 @@
 ---
 name: pr-review-canvas
 description: >-
-  Render a PR diff review as a Cursor Canvas that groups changes by
-  reviewer importance, separates boilerplate from core logic, and
-  highlights tricky or unexpected code. Use when reviewing a pull
-  request, summarizing a diff for review, or when the user asks for a
-  PR review canvas, diff walkthrough, or change-set overview.
+  PR の差分レビューを、レビュアーにとっての重要度でグループ化し、ボイラープレートをコアロジックから分離し、複雑または予期せぬ挙動をするコードを強調表示する Cursor Canvas としてレンダリングします。プルリクエストのレビュー時、レビュー用の差分要約時、またはユーザーが PR レビューキャンバス、差分のウォークスルー、変更セットの概要を求めたときに使用します。
 ---
 
 # PR Review Canvas
 
-Build a canvas that presents a PR diff reorganized for reviewer comprehension — not in file-tree order.
+PR の差分を、ファイルツリー順ではなくレビュアーの理解しやすさを重視して再構成した Canvas として構築します。
 
-## Prerequisites
+## 前提条件
 
-Read `~/.cursor/skills-cursor/canvas/SKILL.md` first. It contains the generation policy, design guidance, slop rules, self-check, and file-path conventions you must follow. The full component and hook surface is declared in `~/.cursor/skills-cursor/canvas/sdk/index.d.ts` and its sibling `.d.ts` files — read them to discover exact exports and prop shapes rather than guessing.
+最初に `~/.cursor/skills-cursor/canvas/SKILL.md` を読み込んでください。ここには、遵守すべき生成ポリシー、デザイン指針、slop ルール（低品質・冗長な出力の防止規則）、セルフチェック項目、ファイルパスの規約が記載されています。コンポーネントおよびフックの完全な仕様は `~/.cursor/skills-cursor/canvas/sdk/index.d.ts` とその同階層の `.d.ts` ファイルで宣言されています。推測で書かず、必ずこれらを読んで正確なエクスポート名や props の型を確認してください。
 
-## Gather the diff
+## 差分の収集
 
-Expect a GitHub PR link (a full URL like `https://github.com/<owner>/<repo>/pull/<n>`, or an equivalent `gh`-resolvable reference). Use `gh pr diff <pr>` to collect every file's path, additions, deletions, and hunks.
+GitHub の PR リンク（`https://github.com/<owner>/<repo>/pull/<n>` のような完全な URL、または `gh` コマンドで解決可能な同等の参照）が指定されることを前提とします。`gh pr diff <pr>` を使用して、すべてのファイルのパス、追加行、削除行、および変更ブロック（hunk）を収集してください。
 
-**If the user didn't provide a PR link, stop and ask.** Do not guess at the current branch, infer from recent history, or fall back to a local `git diff`. Ask the user which diff they want to review — a specific PR URL or number — and wait for their reply before continuing.
+**ユーザーが PR リンクを指定していない場合は、処理を停止して質問してください。** 現在のブランチから推測したり、直近の履歴から判断したり、ローカルの `git diff` にフォールバックしたりしてはいけません。レビューしたい差分（具体的な PR の URL または番号）をユーザーに尋ね、返答を待ってから続行してください。
 
-## Group changes for comprehension
+## 理解しやすさを重視した変更のグループ化
 
-Do **not** present files in alphabetical or tree order. Reorganize into sections ordered by reviewer value:
+ファイルをアルファベット順やツリー順で提示してはいけません。レビュアーにとっての価値が高い順にセクションを再構成してください。
 
-1. **Core logic** — New behavior, algorithm changes, state transitions, API surface changes. Show full diffs with surrounding context.
-2. **Wiring & integration** — Route registration, dependency injection, config plumbing that connects the core logic. Condensed — enough to confirm correctness.
-3. **Boilerplate & mechanical** — Import reordering, renames, generated code, formatting, type re-exports. Summarize as a list of file names and stats. No inline diffs unless specifically relevant.
+1. **コアロジック（Core logic）** — 新しい挙動、アルゴリズムの変更、状態遷移、API サーフェスの変更。前後のコンテキストを含めた完全な差分を表示します。
+2. **結線と統合（Wiring & integration）** — コアロジックを接続するためのルーティング登録、依存性の注入（DI）、設定のつなぎ込み。正しさを確認できる程度に要点を凝縮して表示します。
+3. **ボイラープレートと機械的な変更（Boilerplate & mechanical）** — インポート順の並び替え、リネーム、自動生成コード、フォーマット調整、型の再エクスポート。ファイル名と変更統計のリストとして要約し、特別な関連がない限りインライン差分は表示しません。
 
-Lead with core logic. The reviewer's attention is freshest at the top.
+まずはコアロジックから提示してください。レビュアーの集中力は冒頭で最も高くなります。
 
-## Distill complex logic into pseudocode
+## 複雑なロジックの擬似コードへの要約
 
-When a core change involves dense or intricate logic — deeply nested conditions, state machines, retry/backoff flows, multi-step transformations — add a short pseudocode summary next to the diff. The pseudocode should strip away language syntax, error handling, and boilerplate to expose the essential algorithm or control flow in a few lines. This lets the reviewer confirm intent before reading the real code.
+コアの変更に高密度で複雑なロジック（深いネストの条件分岐、ステートマシン、リトライ／バックオフ処理、多段階のデータ変換など）が含まれる場合は、差分の横に短い擬似コードの要約を追加してください。擬似コードでは言語固有の構文、エラーハンドリング、ボイラープレートを削ぎ落とし、本質的なアルゴリズムや制御フローを数行で表現します。これにより、レビュアーは実際のコードを読む前に意図を素早く確認できます。
 
-Only do this when the actual diff is hard to scan. Straightforward changes don't need a pseudocode mirror.
+この手法は、実際の差分が読み解きにくい場合にのみ使用してください。単純明快な変更に擬似コードを並べる必要はありません。
 
-## Trace tricky logic on a concrete example
+## 具体例を用いた複雑なロジックのトレース
 
-Pseudocode shows the shape of the change; an example trace shows it executing. When a hunk changes behavior in a way that's hard to predict from reading it — reordered effects, new short-circuits, altered edge cases — pick a concrete input and walk it through both the old and new code paths side-by-side, highlighting the step where they diverge and what the observable outcome is. Keep the input small and realistic.
+擬似コードが変更の「構造」を示すのに対し、実行トレースの例は変更の「実際の動き」を示します。変更ブロックによって挙動が読み取りにくい形で変化している場合（副作用の順序変更、新しいショートサーキット条件、エッジケースの挙動変化など）は、具体的な入力値を1つ選び、変更前と変更後のコードパスを並べてステップごとに追い、両者が分岐する箇所と観測可能な結果の違いを強調表示してください。入力データは小さく現実的なものにします。
 
-Use this for genuinely surprising behavior changes, not every core hunk.
+これは本当に意外性のある挙動変更にのみ使用し、すべてのコア変更ブロックに対して行う必要はありません。
 
-## Call attention to tricky things
+## 注意すべき箇所の強調（コールアウト）
 
-When a hunk contains something surprising, risky, or easy to miss, visually separate it from the surrounding diff and pair it with a short tag (e.g. "Subtle", "Breaking", "Race condition", "Perf") and a one-sentence explanation so the reviewer sees the concern and the code together.
+変更ブロックに意外性のある処理、リスクの高い変更、見落としやすい点が含まれている場合は、周囲の差分と視覚的に切り離し、短いタグ（例：`Subtle`、`Breaking`、`Race condition`、`Perf`）と1文の解説を添えて、レビュアーが懸念点とコードを同時に把握できるようにしてください。
 
-Reserve these callouts for genuinely tricky items — overuse destroys signal.
+これらのコールアウトは本当に注意が必要な箇所に限定してください。多用すると重要なシグナルが埋もれてしまいます。
 
-## Tone and content
+## トーンと内容
 
-Write reviewer-facing commentary, not a changelog. Focus on:
-- **Why** something changed, not just what changed.
-- Interactions between files — e.g. "The new validator in `core.ts` is invoked by the route added in `routes.ts`."
-- Anything the diff alone doesn't make obvious.
+単なる変更履歴（Changelog）ではなく、レビュアーに向けた解説を書いてください。以下の点に焦点を当てます。
+- 何が変わったかだけでなく、**なぜ**変わったのか。
+- ファイル間の相互作用（例：「`core.ts` に追加された新しいバリデータは、`routes.ts` で追加されたルートから呼び出されます」）。
+- 差分を見ただけでは明らかにならない背景や意図。
 
-Keep commentary terse. One or two sentences per note.
+解説は簡潔に保ち、1つの注釈につき1〜2文に収めてください。
 
-## Be creative
+## 柔軟な表現の工夫
 
-The sections above are a floor, not a ceiling. The goal is the fastest possible path for the reviewer to understand this specific change — so look at the diff in front of you and ask what representation would actually help. A tiny state diagram, a before/after call graph, a table of input→output pairs, a timeline of commits, a confidence annotation per file, a single large callout with everything else collapsed — whatever fits the change.
+上記のセクション構成は最低限の基準であり、上限ではありません。目的は、目の前の特定の変更をレビュアーが最短経路で理解できるようにすることです。提示された差分を見て、どのような表現方法が本当に役立つかを考えてください。小さな状態遷移図、変更前後のコールグラフ、入力と出力の対応表、コミットのタイムライン、ファイルごとの確信度アノテーション、あるいは他をすべて折りたたんだ単一の大きなコールアウトなど、その変更に最も適した形を選んでください。
 
-The canvas SDK has charts, tables, diff views, DAG layout, cards, stats, interactive state, and more. Reach for whichever components best serve the change at hand. A review of a refactor looks different from a review of a bug fix looks different from a review of a new feature — let the canvas reflect that.
+Canvas SDK には、チャート、テーブル、差分ビュー、DAG レイアウト、カード、統計表示、インタラクティブな状態管理など、多彩なコンポーネントが用意されています。目の前の変更を伝えるのに最適なコンポーネントを積極的に活用してください。リファクタリングのレビュー、バグ修正のレビュー、新機能のレビューではそれぞれ見せ方が異なるはずです。その違いを Canvas 上に反映させてください。

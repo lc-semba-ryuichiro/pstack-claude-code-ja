@@ -1,29 +1,29 @@
 ---
 name: ketchup-video
-description: "Catch the user up like /ketchup, with a short subtitled video of slides for what happened and the waiting calls as text under it. Use for /ketchup-video."
+description: "`/ketchup` と同様にユーザーの状況をキャッチアップしますが、何が起きたかの要約を字幕付きの短いスライド動画で提示し、その下に判断待ちの項目をテキストで並べます。/ketchup-video で使用します。"
 disable-model-invocation: true
 ---
 
 # Ketchup video
 
-Follow [`/ketchup`](../ketchup/SKILL.md), but show what happened in a short subtitled video instead of its summary and visuals. Its window starts at the last message the user wrote before `/ketchup-video`, not before any earlier `/ketchup`. Writing and rendering the video, outside the repo, is the one exception to its read-only rule. The reply is ketchup's opening sentence, the embedded video, one line naming any work left that you can do yourself, and the action items. When the video shows a call's options, call each option by the name the video gives it. If the render fails, say so in one line and give only the calls.
+[`/ketchup`](../ketchup/SKILL.md) のルールに従いつつ、何が起きたかの要約とビジュアルの代わりに、字幕付きの短いスライド動画で経過を示します。対象となる期間（ウィンドウ）は、以前実行された `/ketchup` の前ではなく、今回の `/ketchup-video` の直前にユーザーが書き込んだ最後のメッセージからスタートします。リポジトリの外側で動画を書き出してレンダリングする作業だけが、読み取り専用（read-only）ルールの唯一の例外となります。返信の構成は、`ketchup` と同じ冒頭の1文、埋め込んだ動画、あなた自身で進められる残作業を1行で示した文、そしてアクションアイテム（判断待ち項目）の順になります。動画内で判断の選択肢を提示した場合は、テキスト側でも動画内で付けた名前と同じ呼び方で各選択肢を参照してください。レンダリングに失敗した場合は、その旨を1行で伝え、判断待ち項目だけを提示します。
 
-## Slides
+## スライドの構成
 
-Use the screenshots, recordings, diffs, and data the work produced, not the chat's prose about them. Before you draw, write the one sentence the user should leave with and one line per slide. Drop each slide that does not change what the user knows. Use at most 10 slides, and fewer is better. Neither note goes in the reply.
+チャット上の説明文ではなく、作業の中で実際に生成されたスクリーンショット、録画、差分（diff）、データを使用してください。描画を始める前に、「ユーザーが最終的に持ち帰るべき1文の結論」と「スライド1枚ごとの1行メモ」を書き出してください。ユーザーの認識を新たに変えることのないスライドはすべて削ぎ落とします。スライド枚数は最大10枚までとし、少なければ少ないほど優れています。なお、これらの事前メモは最終的な返信には含めません。
 
-Each slide makes one point. Build the slides on one picture and change it from slide to slide, rather than cut to an unrelated one. A color or shape means the same thing on every slide. Show the work in pictures, such as how a system works, a PR stack with each PR's state, a before and after of a fix, or options side by side. Point at what changed with arrows, highlights, and motion. A slide is never a bullet list, a status list, a table, or boxes with nothing connecting them.
+スライド1枚につき、伝えるポイントは1つだけに絞ります。まったく無関係な絵に次々と切り替えるのではなく、1つのベースとなる図解を軸にして、スライドが進むごとにその図を変化・発展させていってください。色や図形が持つ意味は、すべてのスライドを通じて一貫させます。システムの仕組み、各 PR の状態を示した PR スタック、修正のビフォー・アフター、選択肢の並列比較など、作業の成果を視覚的な絵で見せてください。何が変化したのかを、矢印、ハイライト、動き（モーション）を使って指し示します。箇条書きのリスト、ステータス一覧、表（テーブル）、あるいは線がつながっていない箱を並べただけのスライドは絶対に作らないでください。
 
-Keep text to the minimum. Put each label on the thing it names, in plain words a person would say, not tags like "Tests: pass". Never caption what a picture shows, and never give a fact twice, across slides or in the text under them.
+テキストは最小限に抑えます。各ラベルはそれが指し示す対象そのものの上に配置し、「テスト：合格」のようなタグ表記ではなく、人が口頭で話すような平易な言葉で書いてください。図が示している内容をキャプションで説明してはいけません。また、スライド間や動画下のテキストとの間で同じ事実を二度繰り返してはいけません。
 
-Show what came of each thing the user asked for, and whether it is done, still running, failed, or not checked. Never show something done that still waits on the user. Show any bug found and fixed on the way. If a visible change has no screenshot, say so on its slide and name what changed on screen. Draw only from facts you have. Never invent a number, and never draw a screen you did not capture.
+ユーザーが依頼した各事項がどうなったか、そしてそれが「完了」「実行中」「失敗」「未確認」のどれにあるのかを示します。まだユーザーの判断待ちであるものを「完了」として見せてはいけません。途中で見つけて修正したバグがあれば、それも示してください。画面上の見た目に変化があるのにスクリーンショットがない場合は、そのスライド上に「スクリーンショットなし」と明記し、画面上で何がどう変わったかを言葉で記載します。手元にある事実だけをもとに描画してください。数値を捏造したり、実際にキャプチャしていない画面の想像図を描いたりすることは厳禁です。
 
-## Subtitles
+## 字幕のルール
 
-Give each slide one short subtitle line, about ten words, that says its point the way you would tell the user, from only what that slide shows. Say what the picture means rather than read out its labels. Put the subtitle in a strip below the slide, the same height on every slide and empty except for the subtitle, so it never covers the slide. Set it small, but readable when the video plays at chat size.
+各スライドに、英語10語前後の短い1行字幕を付けます。そのスライドに表示されている内容だけをもとに、ユーザーに直接語りかけるような自然な口調で要点を伝えてください。図中のラベルをそのまま読み上げるのではなく、「その図が何を意味しているのか」を言葉にしてください。字幕はスライドの下部に設けた専用の帯（ストリップ）領域に配置します。すべてのスライドで同じ高さに統一し、字幕以外の要素は一切置かないことで、スライド本体の図解に絶対にかぶらないようにしてください。文字サイズは控えめにしつつ、チャットの表示サイズで再生したときに無理なく読める大きさに設定します。
 
-## Render
+## レンダリングと品質チェック
 
-Render one silent landscape video, such as an mp4, with motion between slides. Every frame is the slide itself, edge to edge, above its subtitle strip. Make the frames from the slides, never by recording a screen, and burn each subtitle into its slide's frames so it stays on screen for the slide's whole hold. The hold is the time a slide is fully on screen, not counting the motion into or out of it. Hold each slide long enough to read the words it adds, at least one second for each three words. A slide adds its subtitle and each word that was not on the slide before it, including a label it changes. The first slide adds all its words. Words inside a screenshot do not count.
+スライド間にトランジション（動き）を入れた、音声なしの横長動画（mp4 など）を1本レンダリングします。すべてのフレームは、字幕帯の上部にスライド本体が画面端まで（エッジ・トゥ・エッジで）ぴったり収まる構成にします。画面録画ではなくスライドデータから直接フレームを生成し、各スライドの静止表示時間（ホールド）中ずっと画面に表示され続けるよう、字幕をフレームに直接焼き込んでください。ホールド時間とは、スライドイン・スライドアウトのアニメーション時間を除いた「スライドが完全に画面上に静止している時間」を指します。そのスライドで新たに追加されたテキストを読み切るのに十分な時間——英語3語あたり最低1秒以上——はホールドさせてください。「新たに追加されたテキスト」には、そのスライドの字幕と、1つ前のスライドには存在しなかったすべての単語（書き換えられたラベルも含む）がカウントされます。最初のスライドはすべての単語が新規追加扱いになります。ただし、スクリーンショット画像内の文字はカウントに含めません。
 
-Before you embed the video, check the rendered file. Look at one frame from each slide at chat size, and check that its subtitle is readable and covers nothing. Measure each hold by matching the file's frames to the slide, not with a still-frame detector, which counts the faint ends of a fade as still. Count the words each slide adds against its measured hold. Fix any slide you cannot read in that time, render again, and check again.
+動画をチャットに埋め込む前に、レンダリング済みのファイルを必ず検品してください。各スライドから1フレームを取り出してチャット表示サイズで確認し、字幕が問題なく読めること、およびスライドの内容に一切かぶっていないことを確かめます。各ホールド時間の計測は、フェードイン・フェードアウトの微かな変化の終わりまで「静止」と誤認してしまう静止画検出器（still-frame detector）ではなく、動画ファイルの各フレームと元スライド画像の一致判定によって正確に測ってください。実測したホールド時間と、各スライドで追加された単語数を照らし合わせます。その時間内に読み切れないスライドがあれば修正し、再度レンダリングして再チェックを行ってください。

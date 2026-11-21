@@ -1,127 +1,127 @@
-# Design before you write code
+# コードを書く前に設計する
 
-One attempt at a hard design locks in the first shape the model thought of. `/architect` settles types and boundaries before implementation. `/arena` runs several attempts at the same brief and merges the best parts. `/interrogate` has other models try to break the result. When the job is coverage rather than design synthesis, `/swarm` fans out slices or races and aggregates their results.
+難しい設計を1回の試行だけで済ませようとすると、モデルが最初に思いついた形に固定されてしまいます。`/architect` は実装前に型と境界を確定させます。`/arena` は同じ指示書に対して複数の試行を並列実行し、それぞれの最も優れた部分を統合します。`/interrogate` は他のモデルに成果物を破壊させようと（問題点を見つけさせようと）します。設計の統合ではなく網羅性の確保が目的である場合は、`/swarm` が対象領域（スライス）や競争（レース）を並列展開し、その結果を集約します。
 
-The two most common design mistakes are taking the agent's first design and polishing a plan that no code has tested. This page fixes both. You plan through code. Prototypes answer the open questions, a README or tutorial sets the target, and the written plan comes last.
+設計で最もよくある2つの失敗は、エージェントが最初に出した設計をそのまま採用してしまうことと、コードで一度も検証されていない計画書を磨き上げることです。このページではその両方を解決します。計画は「コードを通じて」立てるのです。プロトタイプが未解決の疑問に答えを出し、README やチュートリアルが目標を定め、文書としての計画書は最後に作成します。
 
-![Three robots draft competing bridge models at their own tables under /architect, /arena, and /interrogate panels, while a judge robot with a clipboard inspects skeptically.](./images/design.jpg)
+![/architect、/arena、/interrogate のパネルの下で、3体のロボットがそれぞれの作業台で競合する橋のモデルを設計しており、クリップボードを持った審査員ロボットが懐疑的な目で検査している様子。](./images/design.jpg)
 
-## Settle the shape with `/architect`
-
-```text
-/architect design the import pipeline before writing any code. i care most about how callers use it.
-```
-
-[`/architect`](../../skills/architect/SKILL.md) traces every system the change touches first. Then it sketches two different shapes, each with types, signatures, and module boundaries, and picks the one where each piece of state has one owner, each task has one way to do it, and callers need to know least. For a large or contested design, it runs `/arena` instead of sketching alone. If you want to see the design before any code, say so in the prompt.
-
-The design isn't sacred once code starts. If the same workaround keeps coming back, `/architect` redesigns instead of patching around it.
-
-## Fan out attempts with `/arena`
+## `/architect` で構造を確定させる
 
 ```text
-/arena take my prompt to the arena verbatim. i want to compare their proposals with yours.
+/architect コードを書く前にインポートパイプラインを設計して。呼び出し側がどのように使うかを最も重視している。
 ```
 
-[`/arena`](../../skills/arena/SKILL.md) is the general tool underneath. N subagents attempt the same design or code brief in parallel, each writing to its own worktree or directory. A read-only judge from a different model vendor scores every candidate against a rubric. When no model from another vendor can run, the coordinator skips the judge and picks the base itself. The coordinator reads each candidate end to end, picks a base, grafts in the best ideas from the losers, and verifies the result.
+[`/architect`](../../skills/architect/SKILL.md) はまず、その変更が影響するすべてのシステムをトレースします。次に、型、シグネチャ、モジュール境界を備えた2つの異なる構造案をスケッチし、「各状態に単一の所有者がいること」「各タスクの実行方法が1通りに定まっていること」「呼び出し側が知るべき知識が最小限であること」を満たす案を選択します。大規模な設計や意見が分かれる設計の場合は、単独でスケッチする代わりに `/arena` を実行します。コードを書く前に設計を確認したい場合は、プロンプトにその旨を明記してください。
+
+いったんコードを書き始めたからといって、設計が神聖不可侵になるわけではありません。同じような場当たり的対応（ワークアラウンド）が何度も発生するようであれば、`/architect` はその場しのぎのパッチを当てるのではなく、設計そのものをやり直します。
+
+## `/arena` で複数の試行を並列展開する
+
+```text
+/arena 私のプロンプトをそのまま一字一句変えずにアリーナにかけて。他の候補の提案とあなたの提案を比較したい。
+```
+
+[`/arena`](../../skills/arena/SKILL.md) はその裏側で動く汎用ツールです。N 個のサブエージェントが同じ設計またはコードの指示書に並列で取り組み、それぞれが専用の worktree またはディレクトリに書き出します。異なるモデルベンダーの読み取り専用審査員（judge）が、評価基準（ルーブリック）に沿ってすべての候補を採点します。他ベンダーのモデルを実行できない場合は、コーディネーターが審査員ステップをスキップし、自らベース案を選択します。コーディネーターは各候補を端から端まで読み込み、ベースとなる案を1つ選んだうえで、選ばれなかった候補からも最良のアイデアを移植（graft）し、結果を検証します。
 
 ```mermaid
 flowchart LR
-    A[One task] --> B[Configured panel]
-    B --> C[Candidate 1]
-    B --> D[Candidate 2]
-    B --> E[Candidate N]
-    C --> F[Cross-judge]
+    A[1つのタスク] --> B[設定されたパネル]
+    B --> C[候補 1]
+    B --> D[候補 2]
+    B --> E[候補 N]
+    C --> F[クロス審査]
     D --> F
     E --> F
-    F --> G[Pick a base]
-    G --> H[Graft the best parts]
-    H --> I[Verify]
+    F --> G[ベース案を選択]
+    G --> H[最良の部分を移植]
+    H --> I[検証]
 ```
 
-The panel comes from your [`/setup-pstack`](../../skills/setup-pstack/SKILL.md) configuration, and you can adjust it per task. Ask for more candidates when the decision matters, fewer when it doesn't:
+パネルの構成は [`/setup-pstack`](../../skills/setup-pstack/SKILL.md) の設定から読み込まれますが、タスクごとに調整することもできます。重要な意思決定のときは候補数を増やし、そうでないときは減らしてください：
 
 ```text
-/arena this, 5 candidates. the cache key format is expensive to change later.
+/arena これを5つの候補で試して。キャッシュキーの形式は後から変更するコストが高いから。
 ```
 
-## Cover slices and races with `/swarm`
+## `/swarm` で領域の網羅と競争（レース）をカバーする
 
 ```text
-/swarm check every package under packages/ against its check.sh. one worker per package. one report.
+/swarm packages/ 配下のすべてのパッケージをそれぞれの check.sh でチェックして。パッケージごとに1ワーカーを割り当てて、1つのレポートにまとめて。
 ```
 
-[`/swarm`](../../skills/swarm/SKILL.md) fans N workers across independent slices, coverage matrices, gauntlet lanes, exploration partitions, or declared race arms. Each worker gets its own scope and check, then reports `PASS`, `ISSUES`, or `BLOCKED`. The parent waits for the workers and returns one compact report with any gaps or dropouts.
+[`/swarm`](../../skills/swarm/SKILL.md) は、独立した対象領域（スライス）、カバレッジマトリクス、一連の検証レーン（gauntlet lanes）、探索パーティション、あるいは事前に宣言された競争（レース）の各アームに対して N 個のワーカーを並列展開します。各ワーカーには専用のスコープとチェック項目が与えられ、実行後に `PASS`、`ISSUES`、または `BLOCKED` を報告します。親エージェントはワーカーの完了を待ち、抜け漏れや脱落（ドロップアウト）があればそれも含めて1つのコンパクトなレポートにまとめて返します。
 
-Reach for it when parallelism buys coverage or lets independent checks race. `/arena` gives every worker the same design or code brief, then picks a base and grafts the best parts. `/swarm` covers slices or runs a race with a selection rule declared up front. It does not use the base-selection and grafting ceremony.
+並列化によって網羅性を高めたいときや、独立したチェック同士を競わせたいときに使ってください。`/arena` がすべてのワーカーに同じ設計・コード指示書を与えてベース案の選択とアイデアの移植を行うのに対し、`/swarm` は領域を分担して網羅するか、事前に宣言された選択ルールに基づいて競争を実行します。ベース案の選択や移植といったプロセスは行いません。
 
-## Break it with `/interrogate`
+## `/interrogate` で徹底的にアラを探す
 
 ```text
-/interrogate the whole branch, but skeptically. no nitpicks unless it's an actual bug or regression.
+/interrogate ブランチ全体を懐疑的な視点で徹底的に検証して。実際のバグやリグレッションでない限り、細かい重箱の隅をつつくような指摘は不要。
 ```
 
-[`/interrogate`](../../skills/interrogate/SKILL.md) gives the change and its intent to adversaries on the configured models, and each tries to break it with a run against the real code. Adversaries find different failures. A finding survives only when rerunning its command shows a failure that breaks the intent. The report lists every verified finding with the adversaries that found it, then what each adversary dropped and why, and applies nothing.
+[`/interrogate`](../../skills/interrogate/SKILL.md) は、変更内容とその意図を設定済みの各モデルの敵対的レビュアー（adversaries）に渡し、それぞれに実際のコードを実行させて破綻させようと試みさせます。モデルによって見つける不具合は異なります。指摘事項として生き残るのは、その再現コマンドを再実行した際に「本来の意図を破綻させる失敗」が実際に示されたものだけです。レポートには、検証済みのすべての指摘事項（発見したモデル名付き）と、各モデルが取り下げた指摘およびその理由が記載され、コードへの変更は一切適用されません。
 
-Read the Dropped list too. You can override the verdict.
+取り下げられた指摘（Dropped）のリストにも目を通してください。あなた自身の判断でその判定を覆すこともできます。
 
-## Prototype instead of debating
+## 議論する代わりにプロトタイプを作る
 
-Never take the first design. Ask for a few, and pick from evidence you can see:
+最初の設計案をそのまま採用してはいけません。いくつか案を出させ、目で見て確認できる証拠に基づいて選んでください：
 
 ```text
-/poteto-mode prototype a few options for the new dropdown menu. take screenshots or videos for me to compare.
+/poteto-mode 新しいドロップダウンメニューの案をいくつかプロトタイプで作って。比較できるようにスクリーンショットか動画を撮っておいて。
 ```
 
-The [Prototype playbook](../../skills/poteto-mode/playbooks/prototype.md) builds throwaway sketches in a scratch directory, puts the variants behind one switcher, drives each one, and captures screenshots or timings. It also works for behavior and algorithms, not just UI. Prototypes are planning with code. They let the agent answer its own open questions by running something instead of asking you, and they leave room for an option you wouldn't have thought of.
+[Prototype プレイブック](../../skills/poteto-mode/playbooks/prototype.md) は、一時作業用ディレクトリに使い捨てのスケッチを構築し、1つのスイッチャーで各バリエーションを切り替えられるようにしたうえで、それぞれを実際に動かしてスクリーンショットや処理時間を記録します。これは UI だけでなく、振る舞いやアルゴリズムの検討にも有効です。プロトタイプは「コードを使った計画立案」です。あなたに質問する代わりに実際に動かしてみることでエージェント自身が未解決の疑問に答えを出せるようになり、あなた自身も思いつかなかったような選択肢が生まれる余地を作ります。
 
-The same idea scales up to a real design. Pair `/architect` with prototypes and keep a review gate:
+この同じ考え方は本格的な設計にも応用できます。`/architect` とプロトタイプを組み合わせ、レビューゲート（承認の関門）を設けてください：
 
 ```text
-/poteto-mode we need rate limiting for external webhooks. /architect it first, and answer open questions with prototypes. let me review before proceeding.
+/poteto-mode 外部 Webhook 向けのレート制限が必要だ。まず /architect で設計し、未解決の疑問点はプロトタイプを作って答えを出して。次に進む前に私にレビューさせて。
 ```
 
-Don't spend adversaries on an abstract plan. `/interrogate` drops every finding a run does not prove, so a plan with no code behind it gives them little to break. Let prototypes settle the questions, then review what got built.
+抽象的な計画書に対して敵対的レビュアー（adversaries）を投入しないでください。`/interrogate` は実際の実行で証明できない指摘をすべて除外するため、裏付けとなるコードがない計画書では壊す対象がほとんどありません。まずはプロトタイプで疑問点に決着をつけ、実際に構築されたものをレビューしてください。
 
-## Write the README first for shared code
+## 共有コードはまず README から書く
 
-For a package or API that other code will use, start with the doc a user would read:
+他のコードから利用されるパッケージや API を作る場合は、利用者が最初に読むドキュメントから書き始めてください：
 
 ```text
-/poteto-mode write a tutorial for how i would use the new config package first. then /teach me why it beats the current one.
+/poteto-mode まず新しい設定（config）パッケージの使い方を解説するチュートリアルを書いて。そのあと、なぜそれが現在のものより優れているのか /teach で教えて。
 ```
 
-Writing the tutorial first forces the caller's view. You describe the API to a hypothetical user and work back to the implementation. The doc also becomes a concrete target the agent checks its own work against. Name [`/technical-writing`](../../skills/technical-writing/SKILL.md) when the doc itself matters, so a tutorial stays a tutorial instead of drifting into reference and explanation at once.
+最初にチュートリアルを書くことで、呼び出し側（利用者）の視点が強制されます。仮想のユーザーに向けて API を説明し、そこから逆算して実装へと落とし込むのです。また、そのドキュメントはエージェントが自身の作業を照らし合わせてチェックするための具体的なターゲットにもなります。ドキュメント自体の品質が重要な場合は [`/technical-writing`](../../skills/technical-writing/SKILL.md) を指定してください。そうすることで、チュートリアルがリファレンスや解説と混ざり合うことなく、純粋なチュートリアルとして保たれます。
 
-## Plan after the design settles
+## 設計が固まった後に計画を立てる
 
-pstack has no planning skill, on purpose. When you do want a written plan, ask for it once the design is settled:
+pstack には意図的にプランニング専用スキルを用意していません。文書としての計画書が欲しい場合は、設計が固まった段階で依頼してください：
 
 ```text
-/poteto-mode turn this design into a plan. small verifiable PRs, each with its own verification steps.
+/poteto-mode この設計を計画書に落とし込んで。それぞれ独自の検証ステップを備えた、小さく検証可能な PR 単位に分割して。
 ```
 
-The [Multi-phase plan playbook](../../skills/poteto-mode/playbooks/multi-phase-plan.md) settles any remaining open questions by prototype, then writes one section per PR, each ending in proof that the change works. A passing test suite alone doesn't count as that proof. The plan is the deliverable. The playbook doesn't implement it, and execution starts only when you say go.
+[Multi-phase plan プレイブック](../../skills/poteto-mode/playbooks/multi-phase-plan.md) は、残っている未解決の疑問をプロトタイプで解消したうえで、PR ごとに1つのセクションを記述し、各セクションの末尾に「その変更が機能することの証明方法」を記載します。単にテストスイートがパスするだけでは、その証明としては認められません。ここでの成果物は計画書そのものです。このプレイブックでは実装は行わず、あなたが「進めて（go）」と指示したときにのみ実行が開始されます。
 
-For a migration, state the bar in the prompt:
+マイグレーションの場合は、プロンプトで達成基準を明示してください：
 
 ```text
-/poteto-mode plan the migration of our ui library to the new styling system. small verifiable PRs, each with visual regression checks. the result must match the original exactly, bugs included.
+/poteto-mode UI ライブラリを新しいスタイリングシステムへ移行する計画を立てて。それぞれ視覚的リグレッションチェックを備えた、小さく検証可能な PR 単位にして。バグも含めて元の挙動と完全に一致する結果にすること。
 ```
 
-"bugs included" keeps the migration from quietly fixing things on the way, which would make the old and new output impossible to compare. For a project that spans many days, you can commit the plan to the repo for a while so other agents see the work in progress. Delete it when the work lands.
+「バグも含めて（bugs included）」と指定することで、移行の途中でこっそり不具合を直してしまい、新旧の出力比較ができなくなる事態を防げます。数日にわたるプロジェクトの場合は、他のエージェントが作業の進行状況を把握できるよう、しばらくの間その計画書をリポジトリにコミットしておいても構いません。作業が完了（マージ）したら削除してください。
 
-## How much design work does a task deserve?
+## タスクに対してどれだけの設計作業をかけるべきか？
 
-You might be wondering whether every change needs this. No. Most changes need none of it. A rough ladder:
+すべての変更にこれほどの設計作業が必要なのか疑問に思うかもしれません。答えは「いいえ」です。大半の変更にはまったく不要です。おおよその目安（段階）は次の通りです：
 
-- A small, finished change you're unsure about needs `/interrogate` alone.
-- A change that crosses function boundaries or moves ownership earns `/architect`, which brings `/arena` with it when the design is large or contested.
-- A standalone decision where independent attempts would help, like naming, formats, or an algorithm, is `/arena` directly.
-- A coverage matrix, set of parallel checks, or race with declared arms is `/swarm`.
-- An open question you could answer by running something, like a layout, a timing, or an approach, gets a prototype, not a debate.
-- A contested design that's expensive to reverse gets `/architect`, then `/interrogate` before shipping.
-- Work that spans several PRs gets a plan, written after the design settles.
+- すでに完成している小さな変更で、少し不安がある場合は `/interrogate` だけで十分です。
+- 関数の境界をまたぐ変更や所有権の移動を伴う変更には `/architect` が適しています。設計が大規模だったり意見が分かれたりする場合は、自動的に `/arena` も併用されます。
+- 命名規則、データフォーマット、アルゴリズムの選定など、独立した複数の試行が役立つ単体の意思決定には、直接 `/arena` を使います。
+- カバレッジマトリクス、並列チェック群、あるいは条件を明示した競争（レース）には `/swarm` を使います。
+- レイアウト、タイミング、実装アプローチなど、実際に動かしてみれば答えが出る未解決の疑問には、議論ではなくプロトタイプを使います。
+- 後から覆すコストが高く、意見が分かれる設計には `/architect` を使い、リリース前に `/interrogate` で検証します。
+- 複数の PR にまたがる作業には、設計が固まった後に計画書を作成します。
 
-`/poteto-mode` already applies this ladder. Boundary-crossing work triggers `/architect` on its own, so you reach for these directly mainly when you want more or less scrutiny than the default.
+`/poteto-mode` はすでにこの基準を自動的に適用しています。境界をまたぐ作業であれば自律的に `/architect` を起動するため、あなたがこれらのスキルを直接呼び出すのは、主にデフォルトよりも厳密に（あるいは手短に）検証したいときだけです。
 
-Next: [Build and clean the change](./05-build-and-clean.md).
+次へ：[変更の構築とクリーンアップ](./05-build-and-clean.md)

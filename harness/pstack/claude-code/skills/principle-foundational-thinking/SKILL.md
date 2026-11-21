@@ -1,13 +1,13 @@
 ---
 name: principle-foundational-thinking
-description: "Apply before writing logic: choosing core types and data structures, sequencing scaffold-vs-feature work, asking what concurrent actors share. Get the data structures right so downstream code becomes obvious."
+description: "ロジックを書く前に適用します。コアな型とデータ構造の選択、足場固め（scaffold）と機能実装の順序付け、並行アクターが何を共有するかの確認を行います。データ構造を正しく設計し、下流のコードを明白なものにします。"
 disable-model-invocation: true
 ---
 
 # Foundational Thinking
 
-Get the data shape right before writing logic. Define core types early, trace every access pattern, and choose structures that match the dominant paths. DRY the structure, not every line.
+ロジックを書く前にデータの形状を正しくすること。早い段階でコアな型を定義し、すべてのアクセスパターンをトレースし、主要なパスに合った構造を選択します。すべての行ではなく、構造を DRY（Don't Repeat Yourself）にします。
 
-Before sharing state between actors, ask what happens if another actor modifies it concurrently. If the answer is not "nothing", isolate.
+アクター間で状態を共有する前に、別のアクターが並行してそれを変更した場合に何が起きるかを問うこと。答えが「何も起きない」でない場合は、分離（isolate）します。
 
-Scaffold first. Whatever helps every later phase (CI, tests, shared types) goes first, after removing dead code. Keep commits small and single-purpose.
+まず足場を固めること。後のすべてのフェーズに役立つもの（CI、テスト、共有型など）は、デッドコードを削除した上で真っ先に実装します。コミットは小さく、単一の目的に保ちます。

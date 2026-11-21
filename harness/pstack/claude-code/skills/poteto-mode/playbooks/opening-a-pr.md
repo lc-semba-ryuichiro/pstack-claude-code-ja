@@ -1,9 +1,9 @@
 ### Opening a PR
 
-Invoked at the end of every other playbook.
+他のすべてのプレイブックの最後に呼び出されます。
 
-Work from a git worktree off trunk, and keep unrelated work out of it. Rebase into small, landable commits. Run `/deslop` from `cursor-team-kit` over the diff before commit.
+トランク（trunk）から切った git ワークツリーで作業し、無関係な作業を混ぜないようにします。着地可能な小さなコミットにリベースし、コミット前に diff 全体に対して `cursor-team-kit` の `/deslop` を実行します。
 
-Title: `type(scope): subject`, naming a real symbol when one carries the change. Body: a one-minute briefing under 40 lines with these `##` headings in order, dropping empty ones: `## Why`, `## What changed`, `## Scope`, `## Tradeoffs` (only rejected alternatives a reviewer would otherwise ask about), `## Blast Radius`, `## Verification`.
+タイトル：`type(scope): subject` の形式とし、変更の核となる実際のシンボル名があればそれを記載します。本文：40行以内の1分で読めるブリーフィングとし、空のセクションは省いた上で以下の `##` 見出しをこの順序で配置します：`## Why`、`## What changed`、`## Scope`、`## Tradeoffs`（そう書かないとレビュアーが質問してくるような却下された代替案のみ）、`## Blast Radius`、`## Verification`。
 
-Stack follow-ups by base branch. Open PRs ready, through the run's PR tool with `draft: false`. Without one, use `gh pr create` without `--draft`, or `origin pr create --status open` when Origin's CLI resolves the repository. Opening a PR does not start a babysit.
+フォローアップはベースブランチごとにスタックします。PR は実行環境の PR ツールで `draft: false` を指定して準備完了（ready）状態で開きます。専用ツールがない場合は、`--draft` を付けずに `gh pr create` を使用するか、Origin の CLI がリポジトリを解決できる場合は `origin pr create --status open` を使用します。PR を開いても babysit は自動的に開始されません。

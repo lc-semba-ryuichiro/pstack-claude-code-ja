@@ -1,7 +1,7 @@
 # pstack harness tree
 
-This folder is generated from `pstack/skills`, `pstack/agents`, `pstack/docs/guide`, `pstack/docs/harness/claude-code.md`, `pstack/README.md`, `pstack/LICENSE`, and `pstack/plugin.json`. Do not edit it by hand.
+このフォルダは、`pstack/skills`、`pstack/agents`、`pstack/docs/guide`、`pstack/docs/harness/claude-code.md`、`pstack/README.md`、`pstack/LICENSE`、および `pstack/plugin.json` から自動生成されています。手動で編集しないでください。
 
-Cursor uses `pstack/` directly, and Claude Code installs `claude-code/`. The tree leaves out the rest of `pstack/`, such as `pstack/automations` and `pstack/assets`. A relative link to a pstack file that the tree leaves out points at that file on GitHub `main` instead.
+Cursor は `pstack/` を直接使用し、Claude Code は `claude-code/` をインストールします。このツリーでは、`pstack/automations` や `pstack/assets` など、`pstack/` 内のその他のディレクトリは除外されています。ツリーから除外された pstack 内のファイルへの相対リンクは、代わりに GitHub の `main` ブランチ上の該当ファイルを指すようになっています。
 
-After editing those sources, run `node scripts/generate-pstack-harness-trees.mjs` from the repository root and commit the result.
+上記のソースファイルを編集した後は、リポジトリのルートディレクトリから `node scripts/generate-pstack-harness-trees.mjs` を実行し、生成された結果をコミットしてください。

@@ -1,17 +1,17 @@
 ---
 name: principle-type-system-discipline
-description: "Apply when designing types, reviewing a function signature, or writing code in any statically-typed language. Make illegal states unrepresentable, brand semantic primitives, parse external data at boundaries, exhaust variants, derive from authoritative schemas."
+description: "型を設計するとき、関数シグネチャをレビューするとき、または静的型付け言語でコードを書くときに適用します。不正な状態を表現不可能にし、セマンティックなプリミティブをブランド化（brand）し、境界で外部データをパースし、バリアントを網羅し、信頼できるスキーマから型を派生させます。"
 disable-model-invocation: true
 ---
 
 # Type System Discipline
 
-In Claude Code, read [the Claude Code adapter](../../docs/harness/claude-code.md) once per session before you follow this skill. It maps the Cursor names in pstack skills to Claude Code.
+Claude Code では、このスキルに従う前にセッションごとに一度 [the Claude Code adapter](../../docs/harness/claude-code.md) を読んでください。ここには pstack スキル内の Cursor の名前と Claude Code のマッピングが記載されています。
 
-Make the compiler reject impossible states, mismatched primitives, and unhandled variants.
+あり得ない状態、プリミティブの不一致、未処理のバリアントをコンパイラに弾かせること。
 
-- **Brand semantic primitives.** If two arguments share a primitive type but mean different things, give each its own type. Validate once at creation.
-- **External data is untyped until parsed.** JSON, RPC payloads, CLI args, config, environment variables, and database rows go through a parse function at the boundary that returns the typed model.
-- **Derive types from authoritative schemas.** When a schema file owns a shape, derive the type from it instead of hand-rolling a parallel one.
+- **セマンティックなプリミティブをブランド化（brand）する:** 2つの引数が同じプリミティブ型を共有していても意味が異なる場合、それぞれに独自の型を与えます。生成時に一度だけバリデーションを行います。
+- **外部データはパースされるまで型なしとして扱う:** JSON、RPC ペイロード、CLI 引数、設定、環境変数、データベースの行などは、境界のパース関数を通し、型付けされたモデルを返すようにします。
+- **信頼できるスキーマから型を派生させる:** スキーマファイルがデータ形状を管理している場合、並行して手動で型を定義するのではなく、スキーマから型を派生させます。
 
-For TypeScript syntax, see the **typescript-best-practices** skill.
+TypeScript の構文については、**typescript-best-practices** スキルを参照してください。

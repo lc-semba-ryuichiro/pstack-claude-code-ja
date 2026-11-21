@@ -1,33 +1,33 @@
 ---
 name: interrogate
-description: "Use for \"interrogate\", \"adversarial review\", \"multi-model review\", \"challenge this\", \"stress test this code\", \"find blind spots\", or \"tear this apart\". Adversaries try to break a change or design, and only findings proven by a run survive."
+description: "「interrogate」「敵対的レビュー（adversarial review）」「マルチモデルレビュー」「この案に挑んで（challenge this）」「このコードに負荷テストをかけて」「盲点を探して」「徹底的に粗探しして（tear this apart）」といった指示に使用します。攻撃側（アドバーサリー）が変更や設計を壊そうと試み、実際の実行によって証明された指摘事項だけを生き残らせます。"
 disable-model-invocation: true
 ---
 
 # Interrogate
 
-In Claude Code, read [the Claude Code adapter](../../docs/harness/claude-code.md) once per session before you follow this skill. It maps the Cursor names in pstack skills to Claude Code.
+Claude Code で使用する場合は、このスキルに従う前にセッションごとに1回 [Claude Code アダプター](../../docs/harness/claude-code.md) を読み込んでください。pstack スキル内の Cursor 固有の名称を Claude Code 用にマッピングします。
 
-Adversaries try to break a change or a design. A finding survives only when a run proves it. Report the findings. Do not apply fixes.
+攻撃側（アドバーサリー）が変更や設計の破綻を試みます。指摘事項が生き残るのは、実際の実行（run）によってその不具合が証明された場合のみです。指摘事項を報告するだけで、コードの修正は適用しないでください。
 
-## Frame
+## Frame（対象範囲と意図の設定）
 
-The scope is what the user names. Otherwise it is the branch diff from its merge base with the base branch, through the working tree. State the intent with the **in-your-own-words** skill, from the user's message, the commits, and the PR description. Ask the user when the intent is unclear.
+対象スコープは、ユーザーが明示した範囲とします。指定がない場合は、ベースブランチとのマージベースから現在のワーキングツリーに至るまでのブランチ差分全体を対象とします。ユーザーのメッセージ、コミット履歴、PR の説明文をもとに、**in-your-own-words** スキルを使って「この変更の意図」を言語化してください。意図が不明確な場合は、ユーザーに質問して確認してください。
 
-## Fan out
+## Fan out（並列展開）
 
-Run Phase A steps 3 and 4 and Phase B of the **arena** skill, with four changes. Read the `interrogate reviewers` line in place of `arena runners`. Copy the scope's uncommitted changes into each worktree. Spawn each adversary as `generalPurpose`. In place of the arena task and rationale, give each adversary the scope, the intent, and this brief:
+**arena** スキルのフェーズ A（ステップ 3 と 4）およびフェーズ B を、以下の4点だけ変更して実行します。`arena runners` の代わりに `interrogate reviewers` 行を読み込んでください。対象スコープ内の未コミットの変更も、各 worktree にコピーしてください。各アドバーサリーは `generalPurpose` として起動します。arena のタスク内容と設計根拠（rationale）の代わりに、各アドバーサリーには「対象スコープ」「変更の意図」、そして以下のブリーフ（指示書）を渡してください：
 
-> Break this change. Prove each finding with a run against the real code, such as a failing test, a repro script, or command output that shows the wrong behavior. For a design or plan, run a prototype or probe the current tree. Keep repros in your own worktree. Report each finding with a title, the exact command, the output it printed, and the output the intent requires. Leave out anything you did not run. That covers style, naming, structure, and risks that need a future change to matter. No findings is a valid result.
+> この変更を壊してみてください。各指摘事項について、失敗するテスト、再現スクリプト、誤った挙動を示すコマンド出力など、実際のコードを実行した結果をもって証明してください。設計や計画書が対象の場合は、プロトタイプを動かすか、現在のコードツリーに対して検証用のプローブを実行してください。再現コードは必ず自分専用の worktree 内に留めてください。各指摘事項は「タイトル」「実行した正確なコマンド」「実際に出力された結果」「本来の意図が要求する正しい出力」の4点を添えて報告してください。実際に実行して確かめていない事柄はすべて除外してください。コーディングスタイル、命名、構造への好み、あるいは将来別の変更が加わらない限り問題にならないような仮定のリスクも対象外です。「指摘事項なし（No findings）」も立派な有効な結果です。
 
-## Verify
+## Verify（検証）
 
-Verify each finding per arena Phase F by rerunning its command. Keep a finding when the output shows the failure and the failure breaks the intent. Drop the rest. Merge findings that share a root cause.
+arena のフェーズ F に従い、提示されたコマンドを再実行して各指摘事項を検証します。出力結果が実際に不具合を示しており、かつその不具合が「変更の意図」を損なう場合にのみ、その指摘を残します。それ以外はすべて却下してください。根本原因が同じ指摘事項は1つに統合します。
 
-Skip arena Phases C, D, and E. Adversaries find different failures, so the verdict keeps every verified finding, not one adversary's list.
+arena のフェーズ C、D、E はスキップします。アドバーサリーごとに異なる不具合を見つけ出すため、最終判定では特定の1体のリストを選ぶのではなく、検証を通過したすべての指摘事項を採用します。
 
-## Output
+## 出力
 
-- **Intent**: the restatement.
-- **Findings**: for each verified finding, the command, its output, how it breaks the intent, and the adversaries that found it. Say "no verified findings" when none survive.
-- **Dropped**: for each adversary, the count of dropped findings and why.
+- **意図（Intent）：** 言語化した変更の意図。
+- **検証済みの指摘事項（Findings）：** 生き残った各指摘について、実行コマンド、その出力結果、それがどのように意図を損なうか、およびその指摘を見つけたアドバーサリーを記載します。1件も残らなかった場合は「検証済みの指摘事項なし（no verified findings）」と記載してください。
+- **却下した指摘（Dropped）：** アドバーサリーごとに、却下した指摘の件数とその理由を記載します。

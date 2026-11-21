@@ -1,11 +1,11 @@
 ---
 name: principle-boundary-discipline
-description: "Apply when wiring validation, error handling, or framework adapters. Concentrate guards at system boundaries (CLI, config, network, external APIs); trust internal types and keep business logic in pure functions."
+description: "バリデーション、エラーハンドリング、またはフレームワークアダプタを接続する際に適用します。ガードをシステム境界（CLI、設定、ネットワーク、外部 API）に集中させます。内部の型を信頼し、ビジネスロジックは純粋関数に保ちます。"
 disable-model-invocation: true
 ---
 
 # Boundary Discipline
 
-Validate, narrow types, and handle errors where data crosses a system boundary (CLI args, config files, external APIs, network). Inside, trust the types: no re-validation and no redundant nil checks. Parse raw data into domain types at the boundary, and keep transport and framework types out of the public surface. Business logic lives in pure functions with no framework dependencies. The shell that calls them is thin.
+データがシステム境界（CLI引数、設定ファイル、外部API、ネットワーク）を越える場所で、バリデーション、型の絞り込み、エラーハンドリングを行います。内部では型を信頼し、再バリデーションや冗長な nil チェックは行わないこと。生データは境界でドメイン型にパースし、トランスポートやフレームワークの型をパブリックな表面に出さないようにします。ビジネスロジックはフレームワークに依存しない純粋関数の中に配置します。それらを呼び出すシェルは薄く保ちます。
 
-Two tests. Is this data crossing a boundary right now? If not, the validation is redundant. Can this be a pure function the shell just calls? If yes, extract it.
+テストは2つ。今、このデータは境界を越えているか？ もしそうでないなら、そのバリデーションは冗長です。シェルが呼び出すだけの純粋関数にできるか？ もしできるなら、それを抽出します。

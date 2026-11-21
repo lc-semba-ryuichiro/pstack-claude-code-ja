@@ -1,13 +1,13 @@
 ### Autonomous run
 
-**You own the exit condition. Define done, then drive to it without stopping.**
+**終了条件（exit condition）の責任者はあなた自身です。「完了の定義」を明確に定めたら、そこに到達するまで止まらずに突き進んでください。**
 
-1. State the exit condition as a checkable predicate before the first iteration (tests green, repro fixed, all N PRs merged, pixel-diff zero).
-2. Pick the wake mechanism using Cursor's `/loop` command (a built-in, not a pstack skill). An event to watch (CI, a merge, a ref advancing) gets a watcher subagent that wakes you on the event, with a long time-based heartbeat as fallback. No event gets a fixed-interval heartbeat sized to when the result is worth re-checking. Pick each subagent's reasoning level for the job, per the Subagents section.
-3. Each iteration makes the smallest change the evidence justifies, verifies it against the predicate, commits if it advanced, discards changes that didn't help. Belt-and-suspenders that "might help" gets reverted, not left to ride.
-   Sequence the work via the **sequence-verifiable-units** principle skill, verifying each unit before the next instead of batching checks at the end.
-4. Mid-run discoveries that support the goal are yours. Address broken skills, related bugs, flaky verifiers, review noise, tooling failures, orphaned follow-ups, and fixable drift yourself via poteto-mode. Put out-of-band fixes in their own PR. Do not park reversible work for the human or use `AskQuestion`. Surface only irreversible actions, genuine product or preference calls no experiment can settle, or a real dead end. Keep the predicate as the main drive, and return to it after each side fix.
-5. Checkpoint every iteration via the **show-me-your-work** skill, a row for what changed and whether the predicate moved.
-6. Stop when the predicate is met. A plateau is not a stop, so keep going and pivot your approach to push past it. Surface a genuine dead end rather than spinning, and never relax the predicate to declare victory.
+1. 最初のイテレーションに入る前に、終了条件を客観的に判定可能な述語（テストがすべてパスする、再現バグが修正される、全 N 件の PR がマージされる、ピクセル差分がゼロになる、など）として明言します。
+2. Cursor の `/loop` コマンド（pstack のスキルではなく Cursor の組み込み機能）を使って、再起動（ウェイク）の仕組みを選択します。監視すべき特定のイベント（CI の完了、マージ、Git ref の更新など）がある場合は、イベント発生時にあなたを起こすウォッチャー（監視役）サブエージェントを配置し、フォールバックとして長めの間隔の定期ハートビートを設定します。監視すべきイベントがない場合は、「結果が再チェックに値するタイミング」に合わせた固定間隔のハートビートを設定してください。各サブエージェントの推論レベルは、Subagents セクションの基準に従ってタスクの性質に合わせて選択します。
+3. 各イテレーションでは、根拠（エビデンス）によって正当化される最小限の変更だけを加え、終了条件（述語）に対して検証し、前進していればコミットし、役に立たなかった変更は即座に破棄します。「念のために入れておけば助けになるかも」といった二重保険的なコードは、そのまま残さず必ずリバートしてください。
+   作業の順序立てには **sequence-verifiable-units** 原則スキルを適用し、最後にまとめてチェックするのではなく、1つの作業ユニットを検証し終えてから次のユニットに着手します。
+4. 実行の途中で見つかった「ゴールの達成を支える課題」は、すべてあなた自身が引き受けて対処してください。壊れたスキル、関連するバグ、不安定（フレーキー）な検証ツール、レビューのノイズ、ツーリングの不具合、放置されたフォローアップ項目、修正可能なズレ（ドリフト）などは、poteto-mode を使って自力で解決します。本来のスコープ外（アウトオブバンド）の修正は、専用の別 PR に切り出してまとめてください。後から取り消せる（可逆な）作業を人間待ちとして保留したり、`AskQuestion` を使ったりしてはいけません。人間に判断を仰ぐのは、取り消しの効かない不可逆な操作、どんな実験を行っても決着がつかない純粋なプロダクト方針・好みの判断、あるいは本当にどうしようもない手詰まり（デッドエンド）に陥った場合のみに限ります。あくまで終了条件（述語）の達成を主軸に据え、脇道の修正が終わったら必ず本筋のループに戻ってください。
+5. イテレーションごとに **show-me-your-work** スキルでチェックポイントを記録し、「何を変更したか」と「終了条件に向けて前進したか」を1行ずつ書き残します。
+6. 終了条件を満たしたら停止します。進捗が停滞（プラトー）しているだけでは停止の理由になりません。アプローチを切り替えて停滞を突破し、前進を続けてください。ただし、同じ場所を空転し続けるのではなく、本当の手詰まり（デッドエンド）に達したときは正直にエスカレーションしてください。また、勝利宣言をするために終了条件の基準を勝手に緩めることは絶対に厳禁です。
 
-**Reply:** the exit condition, iterations run, what landed, what was discarded, final predicate state.
+**返信形式：** 終了条件、実行したイテレーション回数、採用（マージ／コミット）された変更、破棄された変更、および終了条件の最終的な判定結果を報告してください。

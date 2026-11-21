@@ -1,26 +1,26 @@
 ---
 name: no-comments
-description: "Spawn Comment Sicko, fix accepted findings, and offer encodings for claimed constraints."
+description: "Comment Sicko を起動し、妥当と認めた指摘事項を修正したうえで、コメントで主張されている制約事項をコードや仕組みに落とし込む（エンコードする）案を提示します。"
 disable-model-invocation: true
 ---
 
 # No comments
 
-In Claude Code, read [the Claude Code adapter](../../docs/harness/claude-code.md) once per session before you follow this skill. It maps the Cursor names in pstack skills to Claude Code.
+Claude Code で使用する場合は、このスキルに従う前にセッションごとに1回 [Claude Code アダプター](../../docs/harness/claude-code.md) を読み込んでください。pstack スキル内の Cursor 固有の名称を Claude Code 用にマッピングします。
 
-Spawn Comment Sicko. Act on accepted findings.
+Comment Sicko を起動し、妥当と判定した指摘事項に対処します。
 
-Defer to Comment Sicko's fresh perspective.
+先入観のない Comment Sicko のフレッシュな視点を尊重してください。
 
-## Scope
+## 対象スコープ（Scope）
 
-Use the caller's files or diff. Otherwise use the current diff against the base branch, default `main`, including the working tree.
+呼び出し元からファイルや差分（diff）が指定されていればそれを使用します。指定がない場合は、ベースブランチ（デフォルトは `main`）に対する現在の差分（ワーキングツリーの未コミット変更を含む）を対象とします。
 
-## Steps
+## 手順
 
-1. Spawn `Task` with `subagent_type: "comment-sicko"`. Pass the scope. Pick each subagent's reasoning level for the job, per the Subagents section of the **poteto-mode** skill. Do not restate its rules.
-2. Inspect its report and diff. Reject application-code edits, scope escapes, exception-protected deletions, misstated `MUST KILL` reasons, and flags that treat kept intentional code as guilty. Reshape flags on our-code surprises stay actionable. Do not restore those comments. A keep survives only with proof it is about something we cannot change. Audit missed scoped lint and TypeScript suppressions. Correctness or safety suppressions stay actionable `MUST KILL`s. Restore deletions only with exact exceptions and scoped proof. Before accepting thin `IMPORTANT` or `do not remove` kills or keeps, trace their symbol or run `/why` on it. If a kill is ambiguous, do not restore. If a keep is refuted or still ambiguous, delete it. Revert and rerun one rejected report with the failure named. Reject a second, report it open, and fail `/no-comments`.
-3. Fix trivial accepted flags directly by deleting a dead path, dropping a parameter, or using the real API. If any fix needs a shape, run `/architect` once for the accepted set and surrounding code. Stop at the sketch. Architect shapes. Step 4 implements.
-4. Implement the smallest root-cause fix in scope. Remove every named workaround. If the root cause is out of scope, land the smallest in-scope fix and report the rest open. The **principle-fix-root-causes** and **principle-redesign-from-first-principles** skills guide intent only. Neither authorizes widening the fence nor fixing instances outside it. Never bolt on symptom guards.
-5. Constraint comments say `do not remove`, `do not change wording`, or `talk to X before changing`. Leave keeps about things we cannot change. Offer the cheapest in-scope type, runtime, test, or CI lint. Wait for interactive approval. Unattended and eval require caller pre-approval. If approved, encode then delete. Otherwise delete, report the constraint open, and sketch out-of-scope work.
-6. Report the deletion count, restored comments, reruns, architect sketch, fixes, encoding offers, encodings, unenforced constraints, and other open work.
+1. `subagent_type: "comment-sicko"` を指定して `Task` サブエージェントを起動し、対象スコープを渡します。各サブエージェントの推論レベルは、**poteto-mode** スキルの Subagents セクションに従ってタスクの性質に合わせて選択してください。`comment-sicko` 自身のルールをプロンプトで言い直さないでください。
+2. サブエージェントのレポートと差分（diff）を精査します。アプリケーションコード自体の編集、対象スコープからの逸脱、例外ルールで保護されているコメントの削除、誤った理由による `MUST KILL` 判定、そして意図的に残された正常なコードを「悪」とみなすような指摘は却下してください。自分たちのコード内の「意外な挙動（surprise）」に付けられた再設計フラグ（リネーム・抽出・型付け・再設計を求める `MUST KILL`）は有効なアクション対象として維持し、該当するコメントは復元しないでください。存続判定（`keep`）が生き残るのは、「自分たちでは変えられない外部要因などに関するコメントである」という明確な証拠がある場合に限られます。スコープ内で見落とされている Lint や TypeScript の警告抑制（suppression）がないかも監査し、正当性や安全性に関わる抑制コメントは対処すべき `MUST KILL` として扱います。削除されたコメントを復元してよいのは、明確な例外規定に該当し、かつスコープ内の証拠が揃っている場合のみです。根拠の薄い `IMPORTANT` や `do not remove` に対する削除（kill）または存続（keep）の判定を受け入れる前に、対象シンボルの参照元を辿るか `/why` を実行して背景を確認してください。削除の妥当性が曖昧な場合は復元せずそのままにし、逆に存続（keep）の根拠が反証されたり曖昧なままだったりする場合はそのコメントを削除してください。レポートを却下した場合は変更をリバートし、不備の内容を明示したうえで 1 回だけ再実行させます。2 回目も却下となった場合は、その項目を未解決（open）として報告し、`/no-comments` 全体を失敗（fail）として終了してください。
+3. 妥当と認めた指摘のうち、デッドコードのパス削除、不要なパラメータの削除、本来の正しい API への置き換えといった軽微な修正はその場で直接直します。設計や構造の整理が必要な修正が含まれる場合は、採択した指摘セットと周辺コードを対象に `/architect` を 1 回だけ実行してください。ここでは設計のスケッチを描くところまでで止めます。設計の形を作るのが `/architect` の役割であり、実際の実装はステップ 4 で行います。
+4. 対象スコープ内で最小限の根本原因修正（root-cause fix）を実装します。指摘されたワークアラウンド（場当たり的な回避策）はすべて取り除いてください。根本原因がスコープの外にある場合は、スコープ内で可能な最小限の修正だけを反映し、残りは未解決（open）として報告します。**principle-fix-root-causes** と **principle-redesign-from-first-principles** の各スキルはあくまで設計意図の指針であり、対象範囲の柵を勝手に広げたり、スコープ外の箇所まで修正したりする権限を与えるものではありません。表面的な症状だけを抑え込む対症療法的なガード処理を継ぎ足すことは絶対にしないでください。
+5. 制約コメントとは、`do not remove`（削除禁止）、`do not change wording`（文言変更禁止）、`talk to X before changing`（変更前に X に相談すること）といった制約を主張するコメントを指します。「自分たちでは変えられない外部要因」に関する正当な `keep` コメントはそのまま残してください。それ以外の制約については、スコープ内で実装可能な最も低コストな型定義、ランタイムチェック、テスト、または CI の Lint ルールによる強制手段（エンコーディング案）を提示し、対話形式での承認を待ちます（無人実行や評価モードでは呼び出し元の事前承認が必要です）。承認された場合は、その制約をコードや仕組みにエンコードしたうえでコメントを削除します。承認されなかった場合は、コメントを削除したうえでその制約を未解決（open）として報告し、スコープ外で必要となる対応の概略（スケッチ）を提示してください。
+6. 削除したコメント数、復元したコメント、再実行の回数、`/architect` による設計スケッチ、実施した修正内容、提示したエンコーディング案、実際にエンコードした項目、未強制のまま残った制約事項、およびその他の未解決タスクをまとめて報告してください。

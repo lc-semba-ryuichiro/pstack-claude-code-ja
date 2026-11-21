@@ -1,11 +1,11 @@
 ### Multi-phase or multi-PR plan
 
-**You own the plan, not the code. The plan is a checklist an owner runs box by box and the operator audits from the evidence.** The plan is the deliverable. Do not implement.
+**コードではなく、計画はあなたが所有します。計画とは、オーナーがチェックボックスを1つずつ実行し、オペレーターが証拠をもとに監査するためのチェックリストです。** 成果物は計画書そのものであり、実装は行いません。
 
-1. When the change is one or two files with an obvious approach, skip the plan. Say so and stop.
-2. Settle open questions by prototype before you write, per `playbooks/prototype.md`. Ask the operator only about a product or preference call that no run can settle.
-3. Write the plan file. Open with what changes, the PR ids in landing order, and the dependency graph, which says which PRs are independent and branch from trunk, which wait for which, and the files each may touch. Then one section per PR. One PR is one change with its own evidence (the **sequence-verifiable-units** principle skill). Each section has checkboxes for what it depends on, the files it edits, the one change it builds, the result you see, and its verification.
-4. Tests alone are not sufficient verification. A PR is verified only when its unit, live, and perf boxes are all checked. Each live box drives the real surface with a concrete scenario and a pass predicate. The perf box names the metric, the probe, the trunk baseline measured first, and the number that fails. A PR that changes an interaction waits for the operator's review before merge.
-5. Hand back the plan path and stop. Execution starts on the operator's explicit go.
+1. 変更が1〜2ファイルでアプローチが明白な場合は、計画をスキップします。その旨を伝えて停止します。
+2. 計画を書く前に、`playbooks/prototype.md` に従ってプロトタイプで未決の疑問に決着をつけます。実行（run）では決着がつかないプロダクト上の判断や好みの問題についてのみ、オペレーターに尋ねます。
+3. 計画ファイルを作成します。冒頭に変更内容、着地順の PR ID、および依存関係グラフ（どの PR が独立していてトランク（trunk）から分岐するか、どの PR がどれを待つか、各 PR が触れてよいファイル）を記載します。その後、PR ごとに1つのセクションを設けます。1つの PR は独自の証拠を持つ1つの変更です（`sequence-verifiable-units` 原則スキル）。各セクションには、依存対象、編集するファイル、構築する1つの変更内容、観測できる結果、および検証方法のチェックボックスを含めます。
+4. テストだけでは十分な検証になりません。PR は、ユニット、ライブ、パフォーマンスのすべてのチェックボックスにチェックが入ったときにのみ検証済みとなります。各ライブボックスでは、具体的なシナリオと合格述語（pass predicate）を用いて実際のサーフェスを駆動します。パフォーマンスボックスでは、メトリクス、プローブ、最初に測定したトランクのベースライン、および不合格となる数値を明記します。インタラクションを変更する PR は、マージ前にオペレーターのレビューを待ちます。
+5. 計画ファイルのパスを返して停止します。実行はオペレーターの明示的な GO サインによって開始されます。
 
-**Reply:** the plan path, the PR ids with their dependencies and the review-gated set, and what stays unproven.
+**返信形式：** 計画ファイルのパス、依存関係とレビューゲート対象セットを明記した PR ID 一覧、および未証明のまま残っている事項。

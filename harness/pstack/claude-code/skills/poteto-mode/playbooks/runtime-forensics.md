@@ -1,11 +1,11 @@
 ### Runtime forensics
 
-**You own the diagnosis. Instrument the live process, don't theorize from source.** The deliverable is a cited diagnosis, not a fix.
+**診断はあなたが所有します。ソースから推測するのではなく、ライブプロセスを計装（instrument）すること。** 成果物は修正ではなく、引用付きの診断です。
 
-1. Capture the live signal on the matching surface via the control skill: a CPU profile for a spinning process, a heap snapshot for a leak, a CDP trace for a visual glitch. A real artifact, not a guess.
-2. Reduce the artifact to the smoking gun: the function on the hot path, the retainer chain from the leaked object to a GC root, the loop firing without input. Parse large artifacts in a subagent (the **guard-the-context-window** principle skill), keep the reduced finding in the main thread. Pick each subagent's reasoning level for the job, per the Subagents section.
-3. Prove the mechanism before believing it. Inject instrumentation via CDP eval on the running process, or hotfix the live code without reloading, to confirm the hypothesis cheaply.
-4. Map the finding back to source: file, symbol, the line that allocates or schedules.
-5. Throughput checkpoint stays one line: `throughput checkpoint: n/a, read-only forensics`.
+1. コントロールスキルを介して、一致するサーフェス上でライブシグナルを捕捉します（スピンしているプロセスには CPU プロファイル、リークにはヒープスナップショット、視覚的なグリッチには CDP トレース）。推測ではなく本物のアーティファクトを取得します。
+2. アーティファクトを決定的な証拠（smoking gun：ホットパス上の関数、リークしたオブジェクトから GC ルートへの保持チェーン、入力なしで発火しているループ）まで絞り込みます。大きなアーティファクトはサブエージェントでパースし（`guard-the-context-window` 原則スキル）、絞り込まれた発見だけをメインスレッドに保持します。ジョブに応じた各サブエージェントの推論レベルは、Subagents セクションに従って選択します。
+3. メカニズムを信じる前に証明します。実行中のプロセスに対して CDP eval 経由で計装を注入するか、リロードせずにライブコードをホットフィックスして、仮説を安価に裏付けます。
+4. 発見をソースコードにマッピングします（ファイル、シンボル、割り当てやスケジューリングを行っている行）。
+5. スループットチェックポイントは1行で記載します：`throughput checkpoint: n/a, read-only forensics`。
 
-**Reply:** the signal captured, the reduced finding, how you proved the mechanism, the source location, artifact paths. No fix unless asked. Hand back to Bug fix or Perf once the cause is known.
+**返信形式：** 捕捉したシグナル、絞り込まれた発見、メカニズムを証明した方法、ソース上の場所、アーティファクトのパス。求められない限り修正は行わず、原因が判明したら Bug fix または Perf に引き渡します。

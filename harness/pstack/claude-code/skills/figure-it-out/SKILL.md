@@ -1,54 +1,54 @@
 ---
 name: figure-it-out
-description: "Design an auditable playbook when no narrower one fits: a large migration, an ambitious multi-part change, or work a human reviews after stepping away. Scales rigor to the task, runs a hypothesis loop, and logs decisions. Use for /figure-it-out or 'figure it out'."
+description: "既存の特化型プレイブックが当てはまらない規模の作業——大規模なマイグレーション、複数の領域にまたがる野心的な変更、あるいは人間が席を外した後にレビューする作業など——に対して、監査可能なプレイブックを設計します。タスクの重要度に応じて厳格さ（リガー）を調整し、仮説検証ループを回しながら意思決定の軌跡を記録します。/figure-it-out または 'figure it out' の指示時に使用します。"
 disable-model-invocation: true
 ---
 
 # Figure it out
 
-In Claude Code, read [the Claude Code adapter](../../docs/harness/claude-code.md) once per session before you follow this skill. It maps the Cursor names in pstack skills to Claude Code.
+Claude Code で使用する場合は、このスキルに従う前にセッションごとに1回 [Claude Code アダプター](../../docs/harness/claude-code.md) を読み込んでください。pstack スキル内の Cursor 固有の名称を Claude Code 用にマッピングします。
 
-When the task matches no playbook, design one. The deliverable before any code is the workflow itself: a sequence of phases that scales rigor to the task, runs the scientific method, and leaves a decision trail a human can audit after stepping away.
+既存のどのプレイブックにも当てはまらないタスクに直面したときは、そのタスク専用のプレイブックを自ら設計してください。コードを1行も書く前に提出すべき最初の成果物は、ワークフローそのものです。すなわち、タスクの重要度に応じて厳格さ（リガー）を調整し、科学的手法（仮説検証）を回し、人間が席を外した後でも後から監査できる意思決定の軌跡を残す一連のフェーズ設計です。
 
-## Start
+## 開始手順
 
-Open a todolist whose first item is to read the Principles section of the **poteto-mode** skill. Then add the phases below as todos.
+最初の項目に「**poteto-mode** スキルの Principles（原則）セクションを読む」を入れた Todo リストを作成してください。続けて、以下の各フェーズを Todo として追加します。
 
-## Phase A: Frame
+## フェーズ A：Frame（課題設定と枠組みの定義）
 
-Ground first, then commit. Don't start the run until you can state:
+まずは現状の調査・裏付け（グラウンディング）を行い、そのうえで方針を確定させます。以下の3点を明言できるまでは、実行フェーズに入ってはいけません：
 
-- The definition of done as a falsifiable predicate (the **prove-it-works** principle skill).
-- Scope, quantified: rough units and effort, plus the blockers grounding surfaced.
-- The rigor level, biased high. One-way doors and high blast radius get more. Reversible low-stakes steps get less. Rigor is gates and artifacts, not "try harder".
+- **完了の定義（Definition of Done）：** 反証可能な述語（真偽を客観的に判定できる条件）として記述された基準（**prove-it-works** 原則スキルを参照）。
+- **定量化されたスコープ：** おおよその作業単位数と工数感、さらに事前調査で浮かび上がったブロッカー（阻害要因）。
+- **厳格さ（リガー）のレベル：** 基本は高めに設定します。後からやり直しが効かない変更（ワンウェイドア）や影響範囲（blast radius）が大きい領域には高い厳格さを課し、後から覆せる低リスクなステップには軽めの基準を適用します。ここでいう厳格さとは「もっと気合いを入れて頑張る」ことではなく、具体的なゲート（関門）と成果物（アーティファクト）を設けることを指します。
 
-Present the framing and tradeoffs before committing to a long run. Reversible work proceeds (the **never-block-on-the-human** principle skill), but a multi-hour run earns one checkpoint.
+長時間の実行に入る前に、この枠組みとトレードオフをユーザーに提示してください。後から取り消せる（可逆な）作業は確認を待たずに進めて構いません（**never-block-on-the-human** 原則スキルを参照）が、数時間に及ぶような大規模な実行に入る前には、必ず1回のチェックポイント（事前確認）を挟んでください。
 
-## Phase B: Design the workflow
+## フェーズ B：Design the workflow（ワークフローの設計）
 
-Decompose into atomic, independently-landable units. Sequence riskiest-unknown-first. Scaffold and verification come before features (the **foundational-thinking** principle skill).
+作業を最小単位（アトミック）かつ独立してマージ可能なユニットに分解します。最もリスクが高く不確実性の大きいものから順に着手するよう順序立ててください。機能の実装よりも先に、土台（スキャフォールド）と検証基盤を構築します（**foundational-thinking** 原則スキルを参照）。
 
-- Build the verification harness before the work, with the baseline captured from the pre-change state, so the check reads as "old value vs new value".
-- For one-way-door design decisions, run the **architect** skill (it runs **arena**). Skip it for mechanical work whose shape is already concrete. A second arena over a settled design is over-engineering (the **laziness-protocol** principle skill).
-- Decide what fans out. Parallelize only across seams, and give each worker its own worktree or branch (the **separate-before-serializing-shared-state** principle skill). Don't over-fan. Pick each subagent's reasoning level for the job, per the Subagents section of the **poteto-mode** skill.
-- Write the designed phase list down. That list is what the human reviews.
+- 本作業に入る前に検証ハーネスを構築し、変更前の状態からベースラインを取得しておきます。これにより、すべての検証が「変更前の値 vs 変更後の値」の比較として明確に読み取れるようになります。
+- 後戻りが難しい重要な設計判断（ワンウェイドア）には **architect** スキル（内部で **arena** を実行します）を使用してください。すでに構造が具体的に固まっている機械的な作業ではスキップします。すでに決着がついた設計に対してもう一度 arena を回すのは過剰設計（オーバーエンジニアリング）です（**laziness-protocol** 原則スキルを参照）。
+- 並列展開（ファンアウト）する範囲を決めます。並列化はシステム上の明確な境界（シーム）ごとに限定し、各ワーカーには必ず専用の worktree またはブランチを割り当ててください（**separate-before-serializing-shared-state** 原則スキルを参照）。無闇に並列数を増やしすぎないこと。各サブエージェントの推論レベルは、**poteto-mode** スキルの Subagents セクションに従ってタスクの性質に合わせて選択します。
+- 設計したフェーズ一覧を明文化して書き出します。このリストこそが、人間がレビューする対象になります。
 
-Then execute the design. Add its steps to the todolist as concrete items between the Phase C and Phase D entries. Run each under the Phase C loop discipline, and weave the Phase D log through them, a row as each step lands, rather than saving the whole trail for the end.
+設計が固まったら実行に移ります。設計した各ステップを具体的な作業項目として、Todo リストのフェーズ C とフェーズ D の間に追加してください。各ステップはフェーズ C のループ規律に従って実行し、フェーズ D の意思決定ログは最後にまとめて書くのではなく、1ステップ完了するごとに1行ずつリアルタイムに織り込んで記録していきます。
 
-## Phase C: Run the loop
+## フェーズ C：Run the loop（仮説検証ループの実行）
 
-Each unit is an experiment. State the hypothesis, make the smallest change, measure against the predicate on the real artifact, keep it if it advanced, revert it if it didn't. Apply the **sequence-verifiable-units** principle skill, verifying each unit before starting the next instead of batching checks at the end.
+各作業ユニットを1つの「実験」として扱います。仮説を立て、最小限の変更を加え、実際の成果物に対して完了判定条件（述語）を測定し、前進していれば採用（キープ）、前進していなければ即座にリバート（破棄）してください。最後にまとめてチェックするのではなく、1つのユニットを検証し終えてから次のユニットに着手する **sequence-verifiable-units** 原則スキルを適用します。
 
-- Verify by inspecting the artifact, never a self-report. When something passes too easily, suspect the observation method before the system.
-- Pair delegated work with a judge. If a worker games the gate, reset and harden the contract. If the gate itself is wrong, fix the gate in its own change rather than routing around it.
-- A verdict is VERIFIED, NOT VERIFIED, or INCONCLUSIVE. Inconclusive is not a pass. Don't hide a negative.
+- 検証はエージェントの自己申告ではなく、実際の成果物を直接検査することで行います。あまりにもあっさりパスした場合は、システムが完璧だと喜ぶ前に、まず観測・計測方法に不備がないかを疑ってください。
+- 外部（サブエージェント）に委譲した作業には、必ず審査員（judge）をペアで組み合わせてください。ワーカーが関門（ゲート）をすり抜けるような小細工をした場合は、変更をリセットして契約（仕様）を厳格化します。逆にゲート側の判定ロジック自体が誤っている場合は、迂回策をとるのではなく、ゲート自体を独立した変更として修正してください。
+- 判定結果（verdict）は `VERIFIED`（検証済み）、`NOT VERIFIED`（未検証・不合格）、または `INCONCLUSIVE`（判断不能）のいずれかになります。判断不能は合格ではありません。ネガティブな結果を隠蔽してはいけません。
 
-## Phase D: Keep the audit trail
+## フェーズ D：Keep the audit trail（監査証跡の記録）
 
-Log the run via the **show-me-your-work** skill. figure-it-out's work is usually ambitious enough to commit the trail so the reviewer can read it in the PR. The trail plus the diff is what lets the human come back and trust the work.
+**show-me-your-work** スキルを通じて実行の軌跡をログに記録します。`figure-it-out` が扱う作業は通常かなり大掛かりなものになるため、レビュアーが PR 上で判断の経緯を追えるよう、このログファイルもリポジトリにコミットするのが基本です。意思決定の軌跡とコードの差分（diff）の2つが揃って初めて、席を外していた人間が戻ってきたときにその成果を信頼できるようになります。
 
-## Phase E: Verify and hand back
+## フェーズ E：Verify and hand back（全体検証と引き渡し）
 
-Check the whole against the Phase A predicate on the real product, not just the harness. Encode any recurring correction as a gate, a lint rule, a check, or a script (the **encode-lessons-in-structure** principle skill).
+テストハーネス上だけでなく、実際のプロダクト全体に対してフェーズ A で定めた完了判定条件を満たしているか最終確認を行います。作業中に繰り返し発生した修正事項があれば、ゲート、Lint ルール、チェック機構、またはスクリプトとして構造に組み込んでください（**encode-lessons-in-structure** 原則スキルを参照）。
 
-**Reply:** the playbook you designed, the rigor level and why, the decision-trail path, what's verified against the predicate, and what's still open.
+**返信形式：** 設計したプレイブック、設定した厳格さ（リガー）のレベルとその理由、意思決定ログ（監査証跡）のファイルパス、完了判定条件に対して検証が完了した項目、そして未解決のまま残っている課題を報告してください。

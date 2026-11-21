@@ -1,16 +1,16 @@
 ---
 name: sharpen
-description: "Make a task deeper, not bigger, then rewrite the prompt. Use for /sharpen."
+description: "タスクの規模を大きくするのではなく深さを掘り下げ、プロンプトを書き直します。/sharpen に使用します。"
 disable-model-invocation: true
 ---
 
-I want a deeper version of this task, not a bigger one. Before rewriting it, do four things:
+このタスクの「より大きなバージョン」ではなく、「より深いバージョン」を求めます。プロンプトを書き直す前に、以下の4つを行ってください。
 
-1. Say what a top professional in this field would do here that I'm not asking for.
-2. Name the rawest material they would start from instead of what has already been digested for me.
-3. Name the specific methods and tools they would use.
-4. Say what, other than you or me, would show the result is right.
+1. この分野のトッププロフェッショナルならここで行うであろうことで、私がまだ依頼していないことを挙げる。
+2. すでに私向けに要約・消化されたものではなく、彼らが最初に出発点とする最も生（raw）の一次資料を挙げる。
+3. 彼らが使用する具体的な手法とツールを挙げる。
+4. あなたや私以外の「何が」あれば、その結果が正しいと証明できるかを挙げる。
 
-Then rewrite my prompt to ask for exactly that.
+その上で、まさにそれを要求するように私のプロンプトを書き直してください。
 
-Have the rewritten prompt ask the agent to prototype any choice an experiment can settle and recommend an option based on what it observed. Leave product or preference choices that no experiment can settle for me to make.
+書き直したプロンプトでは、実験で決着がつく選択についてはプロトタイプを作成し、観測結果に基づいて推奨案を提示するようエージェントに求めてください。実験では決着がつかないプロダクト上の選択や好みの問題については、私が判断できるよう残しておいてください。

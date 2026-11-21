@@ -1,51 +1,51 @@
-# Prompts worth copying
+# コピペして使える実践プロンプト集
 
-Swap in the real paths, skills, and done checks. Informal wording works.
+実際のパス、スキル名、完了チェック条件に置き換えて使ってください。くだけた口語表現でも問題なく伝わります。
 
-## Understand
+## コードと文脈の理解（Understand）
 
-- `/poteto-mode read <thread>. restate the underlying issue in your own words, in plain english.`
-- `/in-your-own-words <long or messy ask>`
-- `/sharpen <the prompt you're about to send>`
-- `/poteto-mode investigate why <symptom>. give me what we know, what data you used, and your best hypotheses. don't change any code yet.`
-- `use /how to understand <subsystem>. then use /why to find out why it broke recently.`
-- `/recall my work on <topic> from last week, then read <issue>.`
-- `/teach me why you implemented it this way and not <other way>. what did you trade off?`
-- `/poteto-mode take over this branch. read the decision log, find what's done, and continue. don't redo finished work.`
+- `/poteto-mode <thread> を読んで、根本的な課題を自分の言葉・平易な日本語で言い直して。`
+- `/in-your-own-words <長文や雑多な依頼内容>`
+- `/sharpen <これから送ろうとしているプロンプト>`
+- `/poteto-mode なぜ <symptom> が起きているのか調査して。分かっている事実、参照したデータ、最も有力な仮説を教えて。まだコードは一切変更しないで。`
+- `/how を使って <subsystem> の仕組みを把握して。そのあと /why を使って最近なぜ壊れたのか背景を突き止めて。`
+- `/recall 先週自分が進めていた <topic> に関する作業を呼び出して、そのあと <issue> を読んで。`
+- `/teach <other way> ではなく、なぜこの方法で実装したのか教えて。どんなトレードオフがあった？`
+- `/poteto-mode このブランチを引き継いで。意思決定ログを読んでどこまで終わっているか把握し、続きを進めて。完了済みの作業はやり直さないで。`
 
-## Build
+## 実装と修正（Build）
 
-- Bug: `/poteto-mode <symptom>. repro first, then fix and verify.`
-- Bug in an app: `/poteto-mode repro this with /verify-<app>. if it repros on main, fix it and show me a video as proof.`
-- Bug with a cheap test: `/poteto-mode repro <bug> first. if there's a cheap test path, /tdd it. then fix and rerun.`
-- Feature: `/poteto-mode add <behavior>. <current output> stays byte-identical. verify both.`
-- Refactor: `/poteto-mode move <code> into one module, zero behavior change. record the current output first and prove it's unchanged after.`
-- Perf: `/poteto-mode <operation> takes <time> on <fixture>. trace it, fix the measured cause, show me before and after.`
+- バグ修正：`/poteto-mode <symptom>。まず再現させてから修正し、動作を検証して。`
+- アプリのバグ修正：`/poteto-mode /verify-<app> を使ってこの事象を再現させて。main でも再現するなら修正し、証拠として操作動画を見せて。`
+- 低コストなテストが書けるバグ：`/poteto-mode まず <bug> を再現させて。手軽にテストを書ける経路があるなら /tdd で進めて。そのあと修正して再実行して。`
+- 機能追加：`/poteto-mode <behavior> を追加して。<current output> はバイト単位で完全一致のまま維持すること。両方を検証して。`
+- リファクタリング：`/poteto-mode <code> を1つのモジュールにまとめて。外部から見た挙動は一切変えないこと。まず現在の出力を記録し、変更後もまったく変わっていないことを証明して。`
+- パフォーマンス改善：`/poteto-mode <fixture> 上で <operation> に <time> かかっている。トレースして実測ベースの原因を直し、ビフォー・アフターの数値を見せて。`
 
-## Design and plan
+## 設計と計画（Design and plan）
 
-- `/poteto-mode prototype a few options for <feature>. take screenshots or videos for me to compare.`
-- `/poteto-mode we need <feature>. /architect it first, and answer open questions with prototypes. let me review before proceeding.`
-- `/poteto-mode write a tutorial for how i would use <new package> first. then /teach me why it beats the current one.`
-- `ask /arena for a second opinion on this thread and our approach.`
-- `/poteto-mode turn this design into a plan. small verifiable PRs, each with its own verification steps.`
-- `/poteto-mode plan the migration of <library> to <target>. small verifiable PRs. the result must match the original exactly, bugs included.`
+- `/poteto-mode <feature> についていくつか別案のプロトタイプを作って。比較できるようにスクリーンショットか動画を撮って。`
+- `/poteto-mode <feature> が必要。まず /architect で設計を固めて、未確定の疑問点はプロトタイプを動かして答えを出して。次に進む前に一度レビューさせて。`
+- `/poteto-mode まず <new package> をどう使うかのチュートリアルを書いて。そのあと、なぜ現行のものより優れているのか /teach で解説して。`
+- `このスレッドの議論と私たちのアプローチについて、/arena でセカンドオピニオンを求めて。`
+- `/poteto-mode この設計を実装計画に落とし込んで。検証可能な小さな PR 単位に分割し、それぞれに専用の検証ステップを付けて。`
+- `/poteto-mode <library> から <target> へのマイグレーション計画を立てて。検証可能な小さな PR 単位に分けること。結果はバグの挙動も含めて元の実装と完全に一致させること。`
 
-## Review and ship
+## レビューと出荷（Review and ship）
 
-- `/interrogate the whole branch, but skeptically. don't change anything yet. no nitpicks unless it's a real bug or regression.` Read the Dropped list too.
-- `/create-formal-verification-skill prove <property> holds in <module>, even when <steps> interleave or retry.` After merges or refactors in that code: `/maintain-formal-verification-skill`.
-- `/swarm check every package under <dir> against its check script. one worker per package. one report.`
-- `/poteto-mode open the pr. small ordered commits, evidence in the description.`
-- `/poteto-mode babysit this pr. get it green.` For status only: `/poteto-mode check on pr <number>. anything outstanding?`
-- `/poteto-mode land the stack.`
+- `/interrogate ブランチ全体を疑いの目を持って徹底的に攻めて。まだ何も変更しないで。本物のバグやリグレッションでない限り、細かい重箱の隅つつきは不要。`（出力された Dropped（却下）リストにも必ず目を通してください）
+- `/create-formal-verification-skill <steps> が並行に割り込んだりリトライされたりしても、<module> 内で <property> が常に成り立つことを証明して。`（該当コードにマージやリファクタリングが入った後は `/maintain-formal-verification-skill` を実行します）
+- `/swarm <dir> 配下の全パッケージをそれぞれのチェックスクリプトで検証して。1パッケージにつきワーカー1体を割り当て、1つのレポートにまとめて。`
+- `/poteto-mode PR を作成して。順序立てられた小さなコミット群にし、PR の説明文に動作の証拠を記載して。`
+- `/poteto-mode この PR を監視（babysit）して、CI をグリーンにして。` ステータス確認だけをしたい場合：`/poteto-mode PR #<number> の状況を確認して。何か残課題はある？`
+- `/poteto-mode このスタック PR をマージ（着地）させて。`
 
-## Away and back
+## 席を外すとき・戻ったとき（Away and back）
 
-- `/poteto-mode im going to bed. <goal> in a fresh worktree off <base>. done means <checks>. keep a decision log. don't ask me before committing. /loop until done. if you're truly stuck after a few hours, stop and write up why.`
-- `/show-me-your-work catch me up on what you did last night.` Read its Attention section first.
-- `/ketchup` catches you up on this chat since your last message and lists every call that waits on you.
-- `/poteto-mode full autopilot on this queue. each item is independent.`
-- `/poteto-mode autopilot these changes, but don't merge. i'll land them.`
-- `/reflect capture what we learned so the next run doesn't repeat it.` Approve only edits that change a future decision.
-- `/bro` restates the last reply in plain words.
+- `/poteto-mode もう寝ます（im going to bed）。<base> から新しい worktree を切って <goal> を進めて。完了条件は <checks>。意思決定ログを残して。コミット前の確認は不要。完了するまで /loop を回して。数時間経っても本当に手詰まりになったら、停止して理由を書き出して。`
+- `/show-me-your-work 昨晩やった作業のキャッチアップをして。`（まず返信末尾の Attention セクションから確認してください）
+- `/ketchup` を使うと、あなたの最後のメッセージ以降にこのチャットで何が変化したかをキャッチアップし、判断待ちになっている全項目を一覧化できます。
+- `/poteto-mode このキューに対して完全自動運転（full autopilot）を実行して。各アイテムは互いに独立しています。`
+- `/poteto-mode これらの変更を自動運転（autopilot）で進めて。ただしマージはしないで、最終的なマージは自分で行います。`
+- `/reflect 次回の実行で同じ轍を踏まないよう、今回学んだ教訓をスキルに反映して。`（将来の判断を実際に変える編集内容だけを承認してください）
+- `/bro` を使うと、直前の返信内容を専門用語なしの平易な言葉で言い直してくれます。

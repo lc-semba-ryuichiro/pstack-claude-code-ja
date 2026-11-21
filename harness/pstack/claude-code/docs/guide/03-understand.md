@@ -1,79 +1,79 @@
-# Understand the code before changing it
+# コードを変更する前に理解する
 
-Editing code you don't understand is how subtle regressions ship, and that's as true for the agent as for you. Agents usually fail in one of two ways. They misread what you want, or they don't have the context to do the work right. [What goes in a prompt](./02-poteto-mode.md#what-goes-in-a-prompt) handles the first. This page handles the second.
+理解していないコードを編集することは、気づきにくいリグレッションを混入させる原因になります。これはあなた自身だけでなく、エージェントにとっても同じです。エージェントが失敗するパターンは通常 2 つのうちのどちらかです。あなたの意図を読み違えるか、作業を正しく行うためのコンテキストが不足しているかです。1 つ目については [プロンプトに含めるべき要素](./02-poteto-mode.md#プロンプトに含めるべき要素) で扱いました。このページでは 2 つ目を扱います。
 
-pstack gives you four ways in. `/how` explains what the code does now. `/why` digs up the reasons it's shaped that way. `/teach` blends both into one explanation. `/recall` rebuilds your own recent context on a topic. Each one also makes the agent explain itself in words you can check. That's how you supervise an agent that may know the code better than you do.
+pstack には 4 つの入り口が用意されています。`/how` は現在のコードが何をしているかを説明します。`/why` はコードがそのような形になっている理由を掘り起こします。`/teach` はその両方を 1 つの解説に融合させます。`/recall` は特定のトピックに関するあなた自身の直近のコンテキストを再構築します。また、これらはいずれも、あなたが検証できる言葉でエージェント自身に説明させる役割も果たします。これこそが、あなた以上にコードに詳しいかもしれないエージェントを監督するための方法です。
 
-![A detective studies a machine blueprint with a magnifying glass while robots fetch case files; the evidence board behind her links clues under /how and /why.](./images/understanding.jpg)
+![ロボットたちが事件ファイルを運んでくる中、探偵が虫眼鏡で機械の設計図を調べており、背後の証拠ボードでは /how と /why の下で手がかりが結び付けられている様子。](./images/understanding.jpg)
 
-## Start with a read-only investigation
+## 読み取り専用の調査から始める
 
-When the cause is unclear, ask for findings, not a fix:
-
-```text
-/poteto-mode investigate why background jobs time out every few hours. give me what we know, what data you used, and your best hypotheses. don't change any code yet.
-```
-
-"don't change any code yet" routes this to the [Investigation playbook](../../skills/poteto-mode/playbooks/investigation.md). It traces the code, adds `/why` for questions about motivation, and returns a cited explanation. For a choice between options, it returns a recommendation with a trade-offs table. Asking "what data you used" makes the agent separate its evidence from its guesses. When the findings point at a fix, start the fix as a new task.
-
-## Trace behavior with `/how`
+原因がはっきりしないときは、修正ではなく調査結果を求めてください：
 
 ```text
-/how do we dedupe notifications? is there an n+1 when we look up subscribers?
+/poteto-mode バックグラウンドジョブが数時間ごとにタイムアウトする原因を調査して。現時点で分かっていること、使用したデータ、そして最も有力な仮説を教えて。まだコードは一切変更しないで。
 ```
 
-Ask the question you actually have. [`/how`](../../skills/how/SKILL.md) reads the code and answers at the level of a senior engineer onboarding you onto the subsystem, with the runtime flow, the key types, and the non-obvious parts. It starts one read-only subagent that explores the code and writes the explanation.
+「まだコードは一切変更しないで（don't change any code yet）」と指定することで、このタスクは [Investigation プレイブック](../../skills/poteto-mode/playbooks/investigation.md) にルーティングされます。コードをトレースし、設計意図や背景に関する疑問には `/why` を組み合わせ、根拠を引用した解説を返します。複数の選択肢から選ぶ必要がある場合は、トレードオフの比較表とともに推奨案を提示します。「使用したデータ（what data you used）」と尋ねることで、エージェントに証拠と推測を明確に分けさせることができます。調査結果によって修正方針が定まったら、その修正は新しいタスクとして開始してください。
 
-## Dig up history with `/why`
+## `/how` で挙動をトレースする
 
 ```text
-/why was the retry limit set to five? does the reason still hold?
+/how 通知の重複排除はどのように行っている？購読者を検索するときに N+1 問題は発生していない？
 ```
 
-[`/why`](../../skills/why/SKILL.md) answers from the record, not the code. It reads the commits and PR discussions that introduced the code and each later change, and looks at other sources when that trail is thin. The answer cites what the authors wrote, marks the agent's own inferences as inferences, and says what the record does not answer, because "nobody wrote down why" is itself an answer.
+実際に抱いている疑問をそのまま尋ねてみてください。[`/how`](../../skills/how/SKILL.md) はコードを読み込み、シニアエンジニアがあなたにサブシステムのオンボーディングを行うのと同じレベルで、実行時のフロー、主要な型、そして一見して分かりにくい箇所を解説します。内部では読み取り専用のサブエージェントを 1 つ起動し、コードを探索させて解説を作成します。
 
-The two compose naturally. `do why first then how` is a good prompt when you suspect the history explains the mess.
-
-## Actually understand it with `/teach`
+## `/why` で経緯を掘り起こす
 
 ```text
-/teach me how this PR changes retries. convince me it fixes the cause and not the symptom.
+/why リトライ上限はなぜ 5 回に設定されているの？その理由は今でも有効？
 ```
 
-[`/teach`](../../skills/teach/SKILL.md) is for when a summary isn't enough. It runs `/how` and `/why`, for a small change maybe just one of them, and weaves the findings into a plain explanation that builds up diagram by diagram. The "convince me" framing is worth reusing. It turns the explanation into an argument you can test instead of a tour.
+[`/why`](../../skills/why/SKILL.md) は現在のコードではなく「記録」に基づいて回答します。そのコードを導入したコミットや PR の議論、およびその後の各変更履歴を読み込み、記録が薄い場合はその他の情報源も調査します。回答には作成者が実際に書いた内容が引用され、エージェント自身の推測は「推測」として明記されます。また、記録からは答えが得られない点もはっきりと伝えます。「誰も理由を書き残していなかった」という事実そのものが、1 つの重要な答えだからです。
 
-It works on the agent's own choices too:
+この 2 つは自然に組み合わせることができます。過去の経緯が現在の複雑さの理由を説明していそうだと疑われるときは、「まず why をやってから how をやって（do why first then how）」と指示するのが効果的です。
+
+## `/teach` で本質的に理解する
 
 ```text
-/teach me why you implemented it this way and not with a queue. what did you trade off, and why?
+/teach この PR でリトライ処理がどう変わるのか教えて。表面的な症状ではなく根本原因を直しているのだと納得させてほしい。
 ```
 
-Teaching helps the agent as much as you. An agent that has to explain its work must read the code and back each claim with evidence, instead of stating it confidently and moving on.
+[`/teach`](../../skills/teach/SKILL.md) は、単なる要約だけでは不十分なときに使います。`/how` と `/why`（小さな変更の場合はどちらか一方のみ）を実行し、得られた知見を、図解を 1 つずつ積み上げながら平易な解説へと編み上げます。「納得させて（convince me）」というフレーミングはぜひ使い回してみてください。これにより、単なるコードツアーではなく、あなたが妥当性を検証できる「論証」へと解説が変わります。
 
-## Rebuild your own context with `/recall`
+これは、エージェント自身の選択に対しても機能します：
 
 ```text
-/recall catch me up on the export work from last week
+/teach なぜキューを使わずにこの方法で実装したのか教えて。何をトレードオフにして、なぜその判断をしたの？
 ```
 
-[`/recall`](../../skills/recall/SKILL.md) mines your own recent chats plus the shared record (issues, prior fixes, errors still firing) and hands back a brief on where things stand and what's next. Your old chats hold context that a fresh agent lacks, so start new work on an old topic by loading it first, then hand over the new input:
+教えることは、あなただけでなくエージェント自身のためにもなります。自分の作業を説明しなければならない状況に置かれることで、エージェントは自信満々に断言して次へ進むのではなく、実際にコードを読み、すべての主張を証拠で裏付けるようになるからです。
+
+## `/recall` で自分自身のコンテキストを再構築する
 
 ```text
-/recall my work on the virtualized list from yesterday, then read this bug report.
+/recall 先週進めていたエクスポート機能の作業状況をキャッチアップさせて
 ```
 
-If you want to resume one specific chat, that's the Session pickup playbook below, not `/recall`.
-
-## Take over prior work with Session pickup
-
-When another agent (or you, last week) left a branch mid-flight:
+[`/recall`](../../skills/recall/SKILL.md) は、あなた自身の直近のチャット履歴と共有記録（Issue、過去の修正、現在も発生しているエラーなど）をマイニングし、現在の状況と次のステップをまとめたブリーフィングを返します。過去のチャットには新しいエージェントが持っていないコンテキストが詰まっているため、以前のトピックに関する新しい作業を始める際は、まず `/recall` でそれを読み込んでから新しい情報を渡してください：
 
 ```text
-/poteto-mode take over this branch. read the decision log, figure out what's done, and continue from there. don't redo finished work.
+/recall 昨日やっていた仮想化リストの作業内容を読み込んでから、このバグ報告を読んで。
 ```
 
-The [Session pickup playbook](../../skills/poteto-mode/playbooks/session-pickup.md) treats the prior trail as authoritative. It reconstructs the branch state and decisions, names the resume point, and verifies inherited claims against the original goal instead of re-deriving everything from scratch.
+特定の 1 つのチャット作業をそのまま再開したい場合は、`/recall` ではなく次に説明する Session pickup プレイブックを使用します。
 
-**Pitfall:** don't skip this page's skills because "the agent will read the code anyway." An agent that starts editing without a traced model tends to fix the symptom at the first plausible spot. `/how` first is cheaper than the second bug.
+## Session pickup で以前の作業を引き継ぐ
 
-Next: [Design the change](./04-design.md).
+別のエージェント（あるいは先週のあなた自身）が作業途中のブランチを残している場合は、次のように指示します：
+
+```text
+/poteto-mode このブランチの作業を引き継いで。意思決定ログを読んでどこまで完了しているか把握し、その続きから進めて。完了済みの作業はやり直さないで。
+```
+
+[Session pickup プレイブック](../../skills/poteto-mode/playbooks/session-pickup.md) は、残された作業の軌跡を信頼できる一次情報として扱います。ゼロからすべてを導き出し直すのではなく、ブランチの状態と意思決定の経緯を再構築し、再開ポイントを特定したうえで、引き継いだ前提や主張が本来のゴールと照らし合わせて正しいかを検証します。
+
+**落とし穴（Pitfall）：** 「どうせエージェントがコードを読むから」という理由で、このページのスキルを省略しないでください。挙動をトレースしたメンタルモデルを持たずに編集を始めるエージェントは、最初に見つけたそれらしい箇所で表面的な症状だけを対症療法的に直してしまいがちです。最初に `/how` を実行するほうが、2 つ目のバグを生み出すよりもはるかに低コストです。
+
+次へ：[変更を設計する](./04-design.md)

@@ -1,23 +1,23 @@
 ---
 name: how
-description: "Use for \"how does X work\", code walkthroughs before changing something, and placement / ownership / layering questions (\"where should this live\", \"which package owns this\", \"is this the right layer\"). Explains subsystem architecture, runtime flow, onboarding mental models. Use why for motivation."
+description: "「X はどう動いているのか？」という疑問や、変更を加える前のコードウォークスルー、配置場所・所有権・レイヤー分割に関する質問（「これはどこに置くべきか」「どのパッケージがこれを所有しているか」「このレイヤーで合っているか」）に使用します。サブシステムのアーキテクチャ、実行時の処理フロー、オンボーディング用のメンタルモデルを解説します。設計の背景や動機を知りたい場合は why スキルを使用してください。"
 disable-model-invocation: true
 ---
 
 # How
 
-In Claude Code, read [the Claude Code adapter](../../docs/harness/claude-code.md) once per session before you follow this skill. It maps the Cursor names in pstack skills to Claude Code.
+Claude Code で使用する場合は、このスキルに従う前にセッションごとに1回 [Claude Code アダプター](../../docs/harness/claude-code.md) を読み込んでください。pstack スキル内の Cursor 固有の名称を Claude Code 用にマッピングします。
 
-Explore the codebase to answer "how does X work?" questions.
+コードベースを探索して、「X はどのような仕組みで動いているのか？」という疑問に答えます。
 
-If the scope is ambiguous, state your interpretation and explore. The user can redirect.
+質問のスコープ（対象範囲）が曖昧な場合は、こちらでどう解釈したかを明言したうえで探索を開始してください。認識がズレていれば、ユーザー側から軌道修正できます。
 
-## 1. Explain
+## 1. 調査と解説の生成
 
-Spawn one Task subagent with `subagent_type: generalPurpose` and `readonly: true` that explores and explains in one pass. Give it the user's question and this brief:
+`subagent_type: generalPurpose` と `readonly: true` を指定して `Task` サブエージェントを1体起動し、探索と解説の作成をワンパスで実行させます。ユーザーの質問と、以下のブリーフ（指示書）を渡してください：
 
-> You are writing an architectural explanation for a senior engineer. Explore the codebase and write an explanation that a senior engineer unfamiliar with this area could read and walk away with a solid mental model. They should understand the architecture well enough to start working in it confidently. You have read-only access to the codebase.
+> あなたはシニアエンジニア向けのアーキテクチャ解説書を執筆しています。コードベースを探索し、この領域に馴染みのないシニアエンジニアが読んだときに、確固たるメンタルモデルを持ち帰れるような解説を書いてください。読み終えたエンジニアが、自信を持ってその領域の実装作業に取りかかれるレベルのアーキテクチャ理解を得られるようにすることがゴールです。なお、コードベースへのアクセスは読み取り専用（read-only）です。
 
-## 2. Present
+## 2. 結果の提示
 
-Present the subagent's output. Light edits for clarity or context from the conversation are fine. Do not substantially rewrite it.
+サブエージェントの出力をそのまま提示します。分かりやすさを高めるための軽微な編集や、これまでの会話の文脈を補う程度の調整は構いませんが、内容を大幅に書き換えてはいけません。

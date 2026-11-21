@@ -1,16 +1,16 @@
 ### Refactoring
 
-**You own the contract. The structure changes. The behavior does not.** Distinct from Feature, which adds behavior, and Bug fix, which corrects it.
+**契約（contract）はあなたが所有します。構造は変わりますが、振る舞いは変わりません。** 振る舞いを追加する Feature や、振る舞いを正す Bug fix とは明確に区別されます。
 
-If the cleanup reveals a missing feature or a real bug, split it out and ship the structural change first against the pinned contract. A redesign is allowed, but name it and route to Feature. Large or cross-cutting structural work belongs to the **figure-it-out** skill. This playbook is the focused-to-medium change.
+クリーンアップの途中で機能の欠落や本物のバグが見つかった場合は、それを切り出し、まず固定された契約に対して構造変更を出荷します。再設計（redesign）も許容されますが、その場合は名前を付けて Feature にルーティングします。大規模または横断的な構造作業は **figure-it-out** スキルに属し、このプレイブックは焦点の絞られた中規模までの変更を扱います。
 
-1. Pin the behavior contract first. Trace the affected subsystem to learn the contract, then write a characterization test, snapshot, or equivalence harness that captures current behavior before any structure moves. If the area has no coverage, write the pin before touching structure. Type check and lint are not a pin.
-2. Name the structure the code is missing per **principle-model-the-domain**. Boring code stays when the shape is already clear and local. The reshape must delete branches or invalid states, not add indirection.
-3. Name the target shape. State what the module layout, types, and call graph should be if built today (**principle-foundational-thinking**, **principle-redesign-from-first-principles**). If the target crosses a function boundary, run the **architect** skill for the shape before the move.
-4. Subtract before you add. Delete dead code, collapse one-caller wrappers, drop redundant validators, and remove orphan references before introducing the new shape (**principle-subtract-before-you-add**). The smallest change that reaches the target shape ships (**principle-laziness-protocol**). A speculative cleanup that "might help" gets reverted.
-5. Move in small behavior-preserving steps, each keeping the pin green. For API reshapes, migrate every caller and delete the old API in the same wave (**principle-migrate-callers-then-delete-legacy-apis**). No compatibility shims, no parallel old-and-new paths. Spot-check every rename against the actual files. Renames silently miss usages in strings, prose, and back-references. Delegate the mechanical edits to a subagent using your configured refactoring model (default `claude-opus-5-5-xhigh-fast`) with a specific scope (file paths, the names being moved, the behavior to hold). Pick each subagent's reasoning level for the job, per the Subagents section.
-6. Prove behavior is unchanged on the real artifact, not "it compiles" (**principle-prove-it-works**). For larger reshapes, run an equivalence check: a script that diffs old-vs-new outputs, a recorded baseline replayed against the new code, or a smoke run on the matching surface via the relevant control skill.
-7. Confirm the change is worth keeping. The success measure is reduced reader load (**principle-minimize-reader-load**). If the diff does not lower reader load somewhere, revert it.
-8. Rebase into small ordered commits. A subtraction commit, then the reshape, then any follow-on cleanup. Shape them with the **sequence-verifiable-units** principle skill, so each behavior-preserving slice stays green before the next. Run **Opening a PR**.
+1. 最初に振る舞いの契約を固定（pin）します。影響を受けるサブシステムをトレースして契約を把握し、構造を動かす前に現在の振る舞いを捕捉する特性テスト（characterization test）、スナップショット、または等価性ハーネス（equivalence harness）を書きます。その領域にカバレッジがない場合は、構造に触れる前に必ずピン留めテストを書いてください。型チェックや lint はピン留めになりません。
+2. `principle-model-the-domain` に従い、コードに欠けている構造を名指しします。すでに形状が明確で局所的である場合、退屈なコードはそのまま残します。再成形（reshape）は間接性（indirection）を増やすのではなく、分岐や不正な状態を削除するものでなければなりません。
+3. ターゲットの形状を明記します。今日ゼロから構築するとしたら、モジュールレイアウト、型、コールグラフはどうあるべきかを述べます（`principle-foundational-thinking`、`principle-redesign-from-first-principles`）。ターゲットが関数の境界を越える場合は、移動する前に形状設計のため **architect** スキルを実行します。
+4. 足す前に引く（Subtract before you add）。新しい形状を導入する前に、デッドコードの削除、呼び出し元が1つしかないラッパーの統合（collapse）、冗長なバリデーターの削除、孤立した参照の除去を行います（`principle-subtract-before-you-add`）。ターゲット形状に到達する最小限の変更のみを出荷し（`principle-laziness-protocol`）、「効くかもしれない」程度の推測によるクリーンアップはリバートします。
+5. ピン留めテストをグリーンに保ちながら、振る舞いを保存する小さなステップで移動します。API の再成形では、同じウェーブ内で新しい API へすべての呼び出し元を移行し、古い API を削除します（`principle-migrate-callers-then-delete-legacy-apis`）。互換性シム（shims）や新旧の並行パスは残しません。すべてのリネームを実際のファイルと照合してスポットチェックします（リネームは文字列、散文、逆参照内の使用箇所を静かに見落としがちです）。機械的な編集は、設定された refactoring モデル（デフォルトは `claude-opus-5-5-xhigh-fast`）を使用し、具体的なスコープ（ファイルパス、移動する名前、維持すべき振る舞い）を指定してサブエージェントに委譲します。ジョブに応じた各サブエージェントの推論レベルは、Subagents セクションに従って選択します。
+6. 「コンパイルが通った」ではなく、実際の成果物上で振る舞いが変わっていないことを証明します（`principle-prove-it-works`）。より大きな再成形では、新旧の出力を diff するスクリプト、新しいコードに対して記録済みベースラインをリプレイするテスト、または関連するコントロールスキルを介した一致サーフェス上でのスモーク実行などの等価性チェックを行います。
+7. 変更を残す価値があるか確認します。成功の尺度は「読者の負荷（reader load）の軽減」です（`principle-minimize-reader-load`）。diff によってどこかの読者負荷が下がっていなければ、リバートします。
+8. 小さく順序立てられたコミットにリベースします。まず削除（subtraction）のコミット、次に再成形（reshape）、その後にフォローアップのクリーンアップという順にします。**sequence-verifiable-units** 原則スキルを用いて整形し、振る舞いを保存する各スライスが次のスライスに進む前にグリーンであることを保証します。**Opening a PR** を実行します。
 
-**Reply:** the structure that changed, the pin you held it against, the equivalence proof, the reader-load delta, what shipped and what got reverted. No new behavior.
+**返信形式：** 変更された構造、基準としたピン留めテスト、等価性の証明、読者負荷の変化（delta）、出荷されたものとリバートされたもの。新しい振る舞いは含めないこと。

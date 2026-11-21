@@ -1,31 +1,31 @@
 ---
 name: typescript-best-practices
-description: TypeScript best practices. Use when reading or editing any .ts or .tsx file.
+description: TypeScript のベストプラクティス。あらゆる .ts または .tsx ファイルの読み取り・編集時に使用します。
 paths: ["**/*.ts", "**/*.tsx"]
 disable-model-invocation: true
 ---
 
 # TypeScript best practices
 
-Apply the **type-system-discipline** principle skill first.
+まず **type-system-discipline** 原則スキルを適用すること。
 
 | Rule | Summary |
 |------|---------|
-| Discriminated unions | Model variants with a `kind` literal discriminant so impossible states can't be represented. No optional-field bags. |
-| Branded types | Brand primitives with `& { readonly __brand: "X" }` so they can't be mixed up. Validate once at the boundary. A brand comes from a verifying type guard (`input is AgentId`), never from `as`. |
-| Constructive modeling | Build the shape so the illegal value can't be constructed. `[T, ...T[]]` for non-empty, `[T, T][]` for even length, `start` plus `duration` for a range. Not a runtime guard, not a wish for refinement types. |
-| Simplest total type | Keep `T[]` while every operation on it stays total. Strengthen to `NonEmpty<T>` only where the loose type forces `!`, a cast, or a "should never happen" throw. |
-| `unknown` over `any` | External data is `unknown`. |
-| Schemas before guards | Before hand-writing a property-by-property type guard, use the repository's runtime schema library and infer the type from the schema, such as `z.infer`. |
-| No `as` casts | Every `as` is a runtime crash waiting. Cast only after validation. |
-| Narrowing hierarchy | Discriminant switch > `in` operator > `typeof`/`instanceof` > user-defined type guard > `as`. |
-| Type guards | Must verify the claim. A lying guard is worse than `as` because the bug hides behind a name that says it's safe. Name them `isX` or `hasX`. |
-| Exhaustiveness | Inline `const _exhaustive: never = x;` in default arms so the compiler errors when a new variant is added. |
-| `satisfies` over `as` | Validates the value without widening literal types. |
-| Boundary validation | Parse where data crosses in, into a named domain type. `Record<string, unknown>` (however spelled) stops at that parse. Trust types inside. See the **boundary-discipline** principle skill. |
-| Schema-derived types | Reach for `Pick`/`Omit`/`Parameters`/`ReturnType`/`Awaited`/`typeof` before declaring a new interface. |
-| Object args | Pass objects, not positional, so argument order is self-documenting. Skip on hot paths (per-frame render, tokenizers, parsers). |
-| Real tests | Don't mock what you can run. Prefer the framework's real test primitives with leak/disposable checks, and verify UI in a running build. Mock only what you can't run locally. |
-| Structured telemetry | Prefer structured logger diagnostics with enough context to debug from an id. No `console.log` in shipped code. |
+| Discriminated unions（判別共用体） | 不可能な状態を表現できないよう、`kind` リテラル判別子でバリアントをモデル化する。オプショナルフィールドの寄せ集め（optional-field bags）は使わない。 |
+| Branded types（ブランド型） | プリミティブに `& { readonly __brand: "X" }` を付けて混同を防ぐ。境界で一度だけ検証する。ブランドは `as` ではなく検証用の型ガード（`input is AgentId`）から付与する。 |
+| Constructive modeling（構成的モデリング） | 不正な値を構築できない形状を作る。非空には `[T, ...T[]]`、偶数長には `[T, T][]`、期間には `start` と `duration` を使う。ランタイムガードや篩型（refinement types）への願望に頼らない。 |
+| Simplest total type（最もシンプルな全域型） | すべての操作が全域（total）である間は `T[]` のままにする。緩い型が `!`、キャスト、または「起こり得ないはずの」throw を強いる箇所でのみ `NonEmpty<T>` に強化する。 |
+| `unknown` over `any` | 外部データは `unknown` とする。 |
+| Schemas before guards（ガードより先にスキーマ） | プロパティごとの型ガードを手書きする前に、リポジトリのランタイムスキーマライブラリを使い、`z.infer` などでスキーマから型を推論する。 |
+| No `as` casts（`as` キャスト禁止） | すべての `as` は実行時クラッシュの予備軍である。検証後にのみキャストする。 |
+| Narrowing hierarchy（絞り込みの優先順位） | 判別子の switch > `in` 演算子 > `typeof`/`instanceof` > ユーザー定義型ガード > `as`。 |
+| Type guards（型ガード） | 主張内容を実際に検証しなければならない。嘘をつくガードは「安全」という名前の裏にバグを隠すため `as` より悪質である。名前は `isX` または `hasX` にする。 |
+| Exhaustiveness（網羅性チェック） | 新しいバリアントが追加されたときにコンパイルエラーになるよう、default アームに `const _exhaustive: never = x;` をインラインで書く。 |
+| `satisfies` over `as` | リテラル型を広げ（widening）ずに値を検証する。 |
+| Boundary validation（境界バリデーション） | データが入ってくる境界で名前付きドメイン型にパースする。`Record<string, unknown>`（どんな表記であれ）はそのパースで食い止め、内部では型を信頼する。**boundary-discipline** 原則スキルを参照。 |
+| Schema-derived types（スキーマ派生型） | 新しいインターフェースを宣言する前に `Pick`/`Omit`/`Parameters`/`ReturnType`/`Awaited`/`typeof` を使う。 |
+| Object args（オブジェクト引数） | 引数の順序が自己文書化されるよう、位置引数ではなくオブジェクトを渡す。ホットパス（フレームごとの描画、トークナイザー、パーサー）では省略する。 |
+| Real tests（実際のテスト） | 実行できるものをモックしない。リーク／破棄チェック付きのフレームワーク本来のテストプリミティブを優先し、UI は実行中のビルドで検証する。ローカルで実行できないものだけをモックする。 |
+| Structured telemetry（構造化テレメトリ） | ID からデバッグできる十分なコンテキストを備えた構造化ロガー診断を優先する。出荷コードに `console.log` を残さない。 |
 
 Examples: `references/patterns.md`.

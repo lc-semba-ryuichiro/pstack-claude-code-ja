@@ -1,66 +1,66 @@
-# Set up pstack
+# pstack のセットアップ
 
-In this page you install the plugin, pick which models pstack uses, and run your first task. Setup is one command plus a short conversation.
+このページでは、プラグインのインストール、pstack が使用するモデルの選択、そして最初のタスクの実行までを解説します。セットアップはコマンド1つと短い対話だけで完了します。
 
-## Install the plugin
+## プラグインのインストール
 
-In a Cursor chat, run:
+Cursor のチャットで以下を実行します：
 
 ```text
 /add-plugin pstack
 ```
 
-Cursor confirms the plugin is installed.
+プラグインがインストールされた旨の確認メッセージが表示されます。
 
-In Claude Code, run `/plugin marketplace add cursor/plugins`, then `/plugin install pstack@cursor-plugins`. Claude Code prefixes plugin commands, so each command in this guide takes a `pstack:` prefix there, such as `/pstack:setup-pstack`, which writes its model rule to `~/.claude/rules/pstack-models.md`. The [Claude Code adapter](../harness/claude-code.md) covers the other differences.
+Claude Code では、`/plugin marketplace add cursor/plugins` を実行し、続いて `/plugin install pstack@cursor-plugins` を実行します。Claude Code ではプラグインコマンドにプレフィックスが付くため、このガイド内の各コマンドは `/pstack:setup-pstack` のように `pstack:` プレフィックス付きで実行し、モデル設定ルールは `~/.claude/rules/pstack-models.md` に書き出されます。その他の違いについては [Claude Code アダプター](../harness/claude-code.md) を参照してください。
 
-## Pick your models
+## 使用モデルの選択
 
-Run:
+以下を実行します：
 
 ```text
 /setup-pstack
 ```
 
-[`/setup-pstack`](../../skills/setup-pstack/SKILL.md) detects the models you have access to, asks for a reasoning budget, shows you each role (code delegates, judgment, the review panels), and asks what you want. Answer the questions. It writes `~/.cursor/rules/pstack-models.mdc`, a small rule every pstack skill reads.
+[`/setup-pstack`](../../skills/setup-pstack/SKILL.md) はアクセス可能なモデルを検出し、推論バジェット（reasoning budget）を尋ね、各ロール（コードの委譲先、判断タスク、レビューパネル）を表示して希望のモデルを質問します。質問に答えると、すべての pstack スキルが読み込む小さなルールファイル `~/.cursor/rules/pstack-models.mdc` が書き出されます。
 
-The defaults are the same as the `large` budget. Code, prose, and judgment run on Opus 5.5 at `xhigh` reasoning, and the review panels and swarm workers run at `high`. No role runs above `xhigh`. Outside a review panel, Fable 5.2 runs only when you name it for a task or after two Opus 5.5 runs of the same brief fail their check. `medium` lowers each role one level and `small` lowers it two, and both spend fewer tokens.
+デフォルト設定は `large` バジェットと同じです。コード生成、文章作成、判断タスクは `xhigh` 推論の Opus 5.5 で実行され、レビューパネルとスウォームワーカーは `high` で実行されます。`xhigh` を超える設定で実行されるロールはありません。レビューパネル以外では、Fable 5.2 はタスクで明示的に指定したとき、または同じ指示で Opus 5.5 の実行が2回連続でチェックに失敗したときにのみ実行されます。`medium` を選ぶと各ロールの推論レベルが1段階下がり、`small` では2段階下がるため、いずれもトークン消費量を抑えられます。
 
-You only override what you care about. A role with no line in the rule keeps the skill's default. To restore a default, delete that role's line. A rerun of `/setup-pstack` keeps any role whose model differs from the default. When a default changes, a rule written before the change still pins the old default until you run `/setup-pstack` again. That run replaces the old defaults it recognizes, tells you which, and keeps your other choices. To drop a pin it does not recognize, delete that role's line or the file first.
+変更したい項目だけを上書きすれば問題ありません。ルールファイルに行が記載されていないロールには、スキルのデフォルト値がそのまま適用されます。デフォルトに戻したい場合は、そのロールの行を削除してください。`/setup-pstack` を再実行すると、デフォルトとは異なるモデルが設定されているロールは維持されます。デフォルト値がアップデートされた場合、変更前に作成されたルールは再度 `/setup-pstack` を実行するまで古いデフォルト値を固定し続けます。再実行すると、認識された古いデフォルト値は新しいものに置き換わり（どの項目が置き換わったかも通知されます）、その他の選択内容はそのまま保持されます。認識されない固定設定を解除したい場合は、先に該当ロールの行またはルールファイル自体を削除してください。
 
-You might be wondering what happens if you use Auto. Set a role to `inherit-parent` or `auto` and pstack omits the subagent `model` field, so the subagent inherits your parent chat model. Both values mean the same thing, and neither is a model slug. For a panel role the value is a list, and one subagent runs per entry, so the list length sets the panel size. Setup also configures `swarm workers`, the default model for every `/swarm` worker unless a race names a model for each arm.
+「Auto」を使った場合にどうなるか気になるかもしれません。ロールに `inherit-parent` または `auto` を設定すると、pstack はサブエージェントの `model` フィールドを省略するため、サブエージェントは親チャットのモデルをそのまま継承します。どちらの値も同じ意味を持ち、特定のモデルスラッグを指すものではありません。パネルロールの値はリスト形式になっており、エントリごとに1つのサブエージェントが起動するため、リストの長さがそのままパネルの人数になります。セットアップではさらに `swarm workers`（各アームに個別のモデルが指定されていない限り、すべての `/swarm` ワーカーが使用するデフォルトモデル）も設定します。
 
-## Accept the verification offers, or don't
+## 検証スキルの作成提案を受け入れる（またはスキップする）
 
-At the end of setup, `/setup-pstack` looks for a way to prove app behavior in your project, either a `verify-*` skill or an existing harness. If it finds neither, it offers once to generate one with [`/create-verification-skill`](../../skills/create-verification-skill/SKILL.md).
+セットアップの最後に、`/setup-pstack` はプロジェクト内にアプリの挙動を証明する手段（`verify-*` スキルまたは既存のテストハーネス）があるかを探します。どちらも見つからない場合、[`/create-verification-skill`](../../skills/create-verification-skill/SKILL.md) を使って検証スキルを自動生成するかどうかを一度だけ提案します。
 
-Say yes and it writes `.cursor/skills/verify-<app>/`, a project-local skill that teaches agents to drive your app the way a user does. It proves the skill works once before handing it over. Say no and setup moves on. You can run `/create-verification-skill` yourself any time. [Verify and ship](./06-verify-and-ship.md#create-a-project-verification-skill) covers it in depth.
+「はい」と答えると、ユーザーと同じようにアプリを操作する方法をエージェントに教えるプロジェクト固有のスキル `.cursor/skills/verify-<app>/` が作成されます。引き渡す前に、スキルが正しく動作することも一度検証されます。「いいえ」と答えるとそのままセットアップが続行されます。後からいつでも自分で `/create-verification-skill` を実行することも可能です。詳しくは [検証とシッピング](./06-verify-and-ship.md#プロジェクト固有の検証スキルを作成する) で解説しています。
 
-If you're new to pstack, say yes. An agent that can check its own work keeps going until the check passes. An agent that can't hands every result back to you to check by hand. Of everything in this guide, the verification skill pays off the most.
+pstack が初めての方は、「はい」と答えることをおすすめします。自分の作業を自ら検証できるエージェントは、チェックが通るまで自律的に作業を続けます。検証手段を持たないエージェントは、すべての結果をあなたに差し戻して手作業での確認を求めることになります。このガイドの内容の中でも、検証スキルは最も投資対効果が高い機能です。
 
-Then setup offers once to generate a formal verification skill with [`/create-formal-verification-skill`](../../skills/create-formal-verification-skill/SKILL.md), unless the project already has one. Tests check the cases someone thought to write. A formal verification skill checks one key property of your code, such as "a job never runs twice at once", in every case within a stated scope. Say yes when your code has concurrency, retries, a state machine, or a parser, where a bug is costly and tests rarely reach the case that breaks. Otherwise say no, and run it later if that changes. [Verify and ship](./06-verify-and-ship.md#prove-a-property-with-a-formal-verification-skill) covers it.
+続いて、プロジェクトにまだ存在しない場合、[`/create-formal-verification-skill`](../../skills/create-formal-verification-skill/SKILL.md) を使って形式検証スキルを生成するかどうかを一度だけ提案します。通常のテストは「誰かが思いついて書いたケース」しかチェックしませんが、形式検証スキルは「ジョブが同時に2回実行されることは決してない」といったコードの重要な性質（プロパティ）を、指定されたスコープ内のあらゆるケースについて網羅的に検証します。バグのコストが高く、通常のテストでは不具合の起きるケースにめったに到達できない並行処理、リトライ処理、ステートマシン、パーサーなどがコードに含まれる場合は「はい」と答えてください。そうでなければ「いいえ」を選び、必要になったときに後から実行すれば十分です。詳細は [検証とシッピング](./06-verify-and-ship.md#形式検証スキルでコードの性質を証明する) を参照してください。
 
-After setup, start a new chat. The model rule applies to new sessions.
+セットアップが完了したら、新しいチャットを開始してください。モデル設定ルールは新しいセッションから適用されます。
 
-## Keep the cost in check
+## コストを抑えるコツ
 
-pstack spends extra tokens on subagents and review panels. That's the price of the rigor. To spend fewer:
+pstack はサブエージェントやレビューパネルに追加のトークンを消費します。これは厳密さを担保するための代償です。消費量を抑えたい場合は以下を試してください：
 
-- Rerun `/setup-pstack` and pick a smaller reasoning budget or cheaper models. A strong model in the main chat with cheaper, faster models in the code roles is a good split.
-- Set a role to `auto` or `inherit-parent` so it runs on the chat's own model.
-- Shorten a panel list. Each entry runs one subagent.
-- Save `/poteto-mode` for work that needs rigor. A small, obvious edit doesn't.
+- `/setup-pstack` を再実行し、より小さな推論バジェットや安価なモデルを選択する。メインチャットには高性能なモデルを使い、コード担当ロールには安価で高速なモデルを割り当てるのがバランスの良い構成です。
+- ロールに `auto` または `inherit-parent` を設定し、チャット自身のモデルで実行させる。
+- レビューパネルのリストを短くする。エントリ1つにつき1つのサブエージェントが実行されます。
+- `/poteto-mode` は厳密さが求められる作業に絞って使う。小さくて自明な編集には不要です。
 
-## Run your first task
+## 最初のタスクを実行する
 
-Pick something real but small, and describe it the way you'd describe it to a colleague:
+小規模でも実用的なタスクを1つ選び、同僚に説明するような自然な言葉で指示を出してみてください：
 
 ```text
 /poteto-mode add a --json flag to this command. text output stays byte-identical. verify both.
 ```
 
-Watch the todo list. Its first items are the matched playbook's steps copied in, the Feature playbook for this prompt.
+Todo リストを見てみてください。先頭の項目には、このプロンプトにマッチしたプレイブック（この場合は Feature プレイブック）のステップがそのままコピーされています。
 
-From here you can type normal follow-ups. To keep `/poteto-mode` on for the whole chat, pick it from the `/` menu with Option+Enter (Mac) or Alt+Enter (Windows) instead of Enter. That makes it a [Custom Mode](https://cursor.com/docs/skills#using-a-skill-as-a-custom-mode), which stays in context on every turn until you exit it. Custom Modes are available in the Agents Window and the CLI. Plain Enter attaches the skill to one message, and it fades as the chat moves on.
+ここからは通常のフォローアップ指示を入力できます。チャット全体を通して `/poteto-mode` を有効にし続けたい場合は、`/` メニューから選択した際に Enter ではなく `Option+Enter`（Mac）または `Alt+Enter`（Windows）を押してください。これにより[カスタムモード](https://cursor.com/docs/skills#using-a-skill-as-a-custom-mode)として動作し、モードを終了するまで毎ターンのコンテキストに保持されます（カスタムモードは Agents ウィンドウおよび CLI で利用可能です）。通常の Enter キーではその1回のメッセージにのみ添付され、会話が進むにつれてコンテキストから薄れていきます。
 
-Next: [Route work through `/poteto-mode`](./02-poteto-mode.md).
+次へ：[「`/poteto-mode`」を通じて作業をルーティングする](./02-poteto-mode.md)

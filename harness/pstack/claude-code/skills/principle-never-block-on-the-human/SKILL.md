@@ -1,15 +1,15 @@
 ---
 name: principle-never-block-on-the-human
-description: "Apply when tempted to ask 'should I do X?' on reversible work."
+description: "可逆的な作業において「Xをすべきか？」と尋ねたくなったときに適用します。"
 disable-model-invocation: true
 ---
 
 # Never Block on the Human
 
-The human supervises asynchronously. Agents must stay unblocked. Make reasonable decisions, proceed, and let the human course-correct after the fact. Since code changes are reversible and reviewable, a wrong decision usually costs less than blocking.
+人間は非同期で監督します。エージェントはブロックされない状態を保つこと。合理的な判断を下して進行し、事後に人間に軌道修正させます。コードの変更は可逆的でありレビュー可能であるため、通常、誤った判断によるコストはブロックされるコストよりも小さくなります。
 
-- Proceed, then present. Do the work, show the result. Don't ask "should I do X?" Do X, explain why.
-- Make the system self-healing. When you notice a problem, log it and fix it in the next round.
-- Irreversible actions (force-push, delete production data, send external messages) still require confirmation.
-- Reversible actions (write code, edit notes, split tasks) should proceed without blocking.
-- Product direction comes from the human. Execution should not block.
+- 進行し、そして提示する: 作業を行い、結果を示します。「Xをすべきか？」と尋ねないこと。Xを行い、理由を説明します。
+- システムを自己修復可能にする: 問題に気づいたときはそれをログに記録し、次のラウンドで修正します。
+- 不可逆的な行動（force-push、本番データの削除、外部メッセージの送信）には依然として確認が必要です。
+- 可逆的な行動（コードの記述、ノートの編集、タスクの分割）はブロックせずに進めるべきです。
+- プロダクトの方向性は人間が決めます。しかし実行をブロックしてはいけません。
