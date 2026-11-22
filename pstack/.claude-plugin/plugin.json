@@ -2,7 +2,7 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "pstack",
   "version": "0.15.46",
-  "description": "速く進みたいなら、まず深く掘り下げること。pstack は、より少ないコード量でより高品質なコードを書く手助けをします。自信を持って並列化できる、厳格なエージェントワークフロー。",
+  "description": "速く進みたいなら、まず深く掘り下げること。pstack は、より少ないコード量でより高品質なコードを書く手助けをします。自信を持って並列化できる、厳格なエージェントワークフロー。（非公式の日本語版・Claude Code 専用）",
   "author": {
     "name": "Lauren Tan"
   },

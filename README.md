@@ -1,7 +1,7 @@
 # pstack 日本語版（Claude Code 専用）
 
 > [!NOTE]
-> このリポジトリは、[cursor/plugins](https://github.com/cursor/plugins) に含まれる `pstack` を日本語に訳した**非公式**の翻訳版です。Cursor／Anysphere とは関係ありません。著作権表示とライセンス文は [`pstack/LICENSE`](pstack/LICENSE) に原文のまま残しています。
+> このリポジトリは、[cursor/plugins](https://github.com/cursor/plugins) に含まれる `pstack` を日本語に訳した**非公式**の翻訳版です。Cursor／Anysphere とは関係ありません。[`pstack/LICENSE`](pstack/LICENSE) には、原文の著作権表示とライセンス文をそのまま残し、翻訳と改変を行った者の著作権表示を追記しています。翻訳と改変の部分も、同じ MIT ライセンスで提供します。
 
 pstack は Cursor 向けに書かれたスキル集ですが、このリポジトリでは Claude Code 専用に書き換えてあります。スキルの本文は Claude Code のツール名・パス・モデル指定で直接書かれており、Cursor では正しく動きません。pstack 以外のプラグインは含まれていません。
 
