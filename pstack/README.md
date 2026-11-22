@@ -17,13 +17,11 @@ AI が低品質で冗長なコード（slop code）を書きすぎていると�
 Claude Code で以下を実行します：
 
 ```bash
-/plugin marketplace add lc-semba-ryuichiro/cursor-plugins-translation-ja
-/plugin install pstack@cursor-plugins-ja
+/plugin marketplace add lc-semba-ryuichiro/pstack-ja
+/plugin install pstack@pstack-ja
 ```
 
-Claude Code ではサードパーティ製マーケットプレイスの自動更新がデフォルトでオフになっているため、pstack はインストール時のバージョンのまま維持されます。自動更新を有効にするには、`/plugin` を実行して **marketplaces** タブを開き、`cursor-plugins-ja` を選択して **enable auto-update** を選んでください。手動で1回だけ更新する場合は、`claude plugin update pstack@cursor-plugins-ja` を実行します。
-
-Claude Code は、リポジトリルートにある [`harness/pstack/`](https://github.com/lc-semba-ryuichiro/cursor-plugins-translation-ja/tree/main/harness/pstack) から自動生成された pstack のコピー（この README やガイドを含む）をインストールします。pstack を変更した後は、リポジトリルートから `node scripts/generate-pstack-harness-trees.mjs` を実行し、その結果をコミットしてください。自動生成されたコピーが古いままの状態では CI が失敗します。
+Claude Code ではサードパーティ製マーケットプレイスの自動更新がデフォルトでオフになっているため、pstack はインストール時のバージョンのまま維持されます。自動更新を有効にするには、`/plugin` を実行して **marketplaces** タブを開き、`pstack-ja` を選択して **enable auto-update** を選んでください。手動で1回だけ更新する場合は、`claude plugin update pstack@pstack-ja` を実行します。
 
 ## はじめに
 

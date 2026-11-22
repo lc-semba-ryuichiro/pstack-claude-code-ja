@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "front": {
-      "type": "http",
-      "url": "https://mcp.frontapp.com/mcp"
-    }
-  }
-}

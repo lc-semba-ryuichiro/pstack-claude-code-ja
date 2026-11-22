@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "hq": {
-      "type": "http",
-      "url": "https://hq-mcp.getindigo.ai/mcp"
-    }
-  }
-}

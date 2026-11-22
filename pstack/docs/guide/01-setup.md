@@ -7,8 +7,8 @@
 Claude Code で以下を実行します：
 
 ```text
-/plugin marketplace add lc-semba-ryuichiro/cursor-plugins-translation-ja
-/plugin install pstack@cursor-plugins-ja
+/plugin marketplace add lc-semba-ryuichiro/pstack-ja
+/plugin install pstack@pstack-ja
 ```
 
 プラグインがインストールされた旨の確認メッセージが表示されます。

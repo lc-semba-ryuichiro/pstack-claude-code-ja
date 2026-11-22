@@ -1,19 +1,14 @@
 {
-  "name": "cursor-plugins-ja",
+  "name": "pstack-ja",
   "owner": {
-    "name": "Cursor",
-    "email": "plugins@cursor.com"
+    "name": "lc-semba-ryuichiro"
   },
+  "description": "cursor/plugins の pstack を日本語に訳し、Claude Code 専用に書き換えた非公式版です。",
   "plugins": [
     {
-      "name": "origin-apps",
-      "source": "./origin-apps",
-      "description": "Skills for building on the Cursor Origin API. Fetch the live spec first, then follow the Origin rules for credentials, scopes, webhooks, paging, and errors. Includes a skill that plans the port of an existing GitHub App."
-    },
-    {
       "name": "pstack",
-      "source": "./harness/pstack/claude-code",
-      "description": "if you want to go fast, go deep first. pstack helps you write less, but higher quality code. rigorous agent workflows you can parallelize with confidence."
+      "source": "./pstack",
+      "description": "速く進みたいなら、まず深く掘り下げること。pstack は、より少ないコード量でより高品質なコードを書く手助けをします。自信を持って並列化できる、厳格なエージェントワークフロー。"
     }
   ]
 }
