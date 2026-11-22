@@ -1,6 +1,6 @@
 ---
 name: sharpen
-description: "タスクの規模を大きくするのではなく深さを掘り下げ、プロンプトを書き直します。/sharpen に使用します。"
+description: "タスクの規模を大きくするのではなく深さを掘り下げ、プロンプトを書き直します。/pstack:sharpen に使用します。"
 disable-model-invocation: true
 ---
 

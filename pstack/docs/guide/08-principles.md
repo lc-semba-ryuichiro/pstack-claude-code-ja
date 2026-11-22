@@ -1,6 +1,6 @@
 # 原則の名前を指定して舵を取る
 
-pstack には、個別のスキルとして24の原則が同梱されています。`/poteto-mode` は複数ステップからなるすべてのタスクの開始時にこれらのインデックスを読み込み、タスクに応じて該当する原則を適用し、適用した原則の名前と「それによってどの意思決定が変わったか」を返信の中で明記します。
+pstack には、個別のスキルとして24の原則が同梱されています。`/pstack:poteto-mode` は複数ステップからなるすべてのタスクの開始時にこれらのインデックスを読み込み、タスクに応じて該当する原則を適用し、適用した原則の名前と「それによってどの意思決定が変わったか」を返信の中で明記します。
 
 原則はコマンドのように直接呼び出すものではありません。その「名前」を使ってエージェントの軌道修正（舵取り）を行います。各原則の名前は、エージェントがすでに読み込んでいる詳細なルール全体を指し示しているため、長い指示文を何段落も書くよりも、そのフレーズを1つ伝えるだけで作業の方向性をより正確に修正できます。
 
@@ -56,7 +56,7 @@ pstack には、個別のスキルとして24の原則が同梱されていま�
 - [Fix Root Causes](../../skills/principle-fix-root-causes/SKILL.md)：コードを変更する前に事象を再現させ、根本原因までトレースします。
 - [Sequence Work into Verifiable Units](../../skills/principle-sequence-verifiable-units/SKILL.md)：小さな作業単位ごとにチェックを完了させてから、次の単位に着手します。
 - [Test Behavior, Not Implementation](../../skills/principle-test-behavior-not-implementation/SKILL.md)：コードの利用者が観測できる振る舞いをアサートすることで、その振る舞いが壊れたときにはテストが失敗し、内部実装だけの変更ではテストが落ちないようにします。
-- [Explain the Number](../../skills/principle-explain-the-number/SKILL.md)：計測した数値を信頼・報告する前に、何がその数値を制限しているかを特定し、意図した処理以外のものを測ってしまっている可能性を排除します。[`/benchmark-checklist`](../../skills/benchmark-checklist/SKILL.md) はこれを、実際の実行結果から答える7つの質問へと落とし込んだものです。
+- [Explain the Number](../../skills/principle-explain-the-number/SKILL.md)：計測した数値を信頼・報告する前に、何がその数値を制限しているかを特定し、意図した処理以外のものを測ってしまっている可能性を排除します。[`/pstack:benchmark-checklist`](../../skills/benchmark-checklist/SKILL.md) はこれを、実際の実行結果から答える7つの質問へと落とし込んだものです。
 
 委譲原則（delegation principles）は、並列作業を破綻させずに健全に保ちます：
 
@@ -65,7 +65,7 @@ pstack には、個別のスキルとして24の原則が同梱されていま�
 
 そしてメタ原則（meta principle）が1つあります：
 
-- [Encode Lessons in Structure](../../skills/principle-encode-lessons-in-structure/SKILL.md)：2回繰り返したアドバイスは、Lint ルール、チェック機構、またはスクリプトへと落とし込みます。[`/correct`](../../skills/correct/SKILL.md) はこれをリポジトリ全体に適用するスキルで、[自分好みにカスタマイズする](./09-make-it-yours.md#correct-で開発環境リポジトリ側を修正する) で詳しく解説しています。
+- [Encode Lessons in Structure](../../skills/principle-encode-lessons-in-structure/SKILL.md)：2回繰り返したアドバイスは、Lint ルール、チェック機構、またはスクリプトへと落とし込みます。[`/pstack:correct`](../../skills/correct/SKILL.md) はこれをリポジトリ全体に適用するスキルで、[自分好みにカスタマイズする](./09-make-it-yours.md#pstackcorrect-で開発環境リポジトリ側を修正する) で詳しく解説しています。
 
 このリストを丸暗記する必要はありません。今はざっと目を通すだけにしておき、エージェントが「ここの原則名を知っていれば防げたはずの動き」をしているのを見つけたときにまた戻ってきてください。そうやって使っていくうちに、自然と語彙として定着していきます。
 

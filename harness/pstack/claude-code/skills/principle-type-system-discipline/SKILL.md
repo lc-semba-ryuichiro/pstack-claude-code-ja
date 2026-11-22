@@ -6,12 +6,10 @@ disable-model-invocation: true
 
 # Type System Discipline
 
-Claude Code で使用する場合は、このスキルに従う前にセッションごとに1回 [Claude Code アダプター](../../docs/harness/claude-code.md) を読み込んでください。pstack スキル内の Cursor 固有の名称を Claude Code 用にマッピングします。
-
 あり得ない状態、プリミティブの不一致、未処理のバリアントをコンパイラに弾かせること。
 
 - **セマンティックなプリミティブをブランド化（brand）する:** 2つの引数が同じプリミティブ型を共有していても意味が異なる場合、それぞれに独自の型を与えます。生成時に一度だけバリデーションを行います。
 - **外部データはパースされるまで型なしとして扱う:** JSON、RPC ペイロード、CLI 引数、設定、環境変数、データベースの行などは、境界のパース関数を通し、型付けされたモデルを返すようにします。
 - **信頼できるスキーマから型を派生させる:** スキーマファイルがデータ形状を管理している場合、並行して手動で型を定義するのではなく、スキーマから型を派生させます。
 
-TypeScript の構文については、**typescript-best-practices** スキルを参照してください。
+TypeScript の構文については、[**typescript-best-practices** スキル](../typescript-best-practices/SKILL.md)を参照してください。

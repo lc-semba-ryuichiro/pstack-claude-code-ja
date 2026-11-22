@@ -12,4 +12,4 @@ disable-model-invocation: true
 - **外部データはパースされるまで型なしとして扱う:** JSON、RPC ペイロード、CLI 引数、設定、環境変数、データベースの行などは、境界のパース関数を通し、型付けされたモデルを返すようにします。
 - **信頼できるスキーマから型を派生させる:** スキーマファイルがデータ形状を管理している場合、並行して手動で型を定義するのではなく、スキーマから型を派生させます。
 
-TypeScript の構文については、**typescript-best-practices** スキルを参照してください。
+TypeScript の構文については、[**typescript-best-practices** スキル](../typescript-best-practices/SKILL.md)を参照してください。

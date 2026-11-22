@@ -1,6 +1,6 @@
 # TypeScript patterns
 
-`SKILL.md` の各ルールに対するコード例です。根底にある原則は言語に依存しません。**type-system-discipline** および **boundary-discipline** 原則スキルを参照してください。
+`SKILL.md` の各ルールに対するコード例です。根底にある原則は言語に依存しません。**type-system-discipline** および [**boundary-discipline** 原則スキル](../../principle-boundary-discipline/SKILL.md)を参照してください。
 
 ## Branded types（ブランド型）
 
@@ -273,7 +273,7 @@ const config = { theme: "dark", cols: 3 } satisfies Config;
 
 ## Boundary validation（境界バリデーション）
 
-データが入ってくる境界で一度だけ検証します。内部では型を信頼してください。**boundary-discipline** 原則スキルを参照。
+データが入ってくる境界で一度だけ検証します。内部では型を信頼してください。[**boundary-discipline** 原則スキル](../../principle-boundary-discipline/SKILL.md)を参照。
 
 - **ワイヤーフォーマット**（proto、JSON-RPC）: 前方互換性のある変更で古いクライアントが壊れないよう、`ignoreUnknownFields` でパースします。
 - **永続化された JSON:** パース処理を try/catch で囲んだバージョン付きブロブにします。

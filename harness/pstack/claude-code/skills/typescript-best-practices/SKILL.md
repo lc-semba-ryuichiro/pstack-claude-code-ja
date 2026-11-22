@@ -7,7 +7,7 @@ disable-model-invocation: true
 
 # TypeScript best practices
 
-まず **type-system-discipline** 原則スキルを適用すること。
+まず [**type-system-discipline** 原則スキル](../principle-type-system-discipline/SKILL.md)を適用すること。
 
 | Rule | Summary |
 |------|---------|
@@ -22,7 +22,7 @@ disable-model-invocation: true
 | Type guards（型ガード） | 主張内容を実際に検証しなければならない。嘘をつくガードは「安全」という名前の裏にバグを隠すため `as` より悪質である。名前は `isX` または `hasX` にする。 |
 | Exhaustiveness（網羅性チェック） | 新しいバリアントが追加されたときにコンパイルエラーになるよう、default アームに `const _exhaustive: never = x;` をインラインで書く。 |
 | `satisfies` over `as` | リテラル型を広げ（widening）ずに値を検証する。 |
-| Boundary validation（境界バリデーション） | データが入ってくる境界で名前付きドメイン型にパースする。`Record<string, unknown>`（どんな表記であれ）はそのパースで食い止め、内部では型を信頼する。**boundary-discipline** 原則スキルを参照。 |
+| Boundary validation（境界バリデーション） | データが入ってくる境界で名前付きドメイン型にパースする。`Record<string, unknown>`（どんな表記であれ）はそのパースで食い止め、内部では型を信頼する。[**boundary-discipline** 原則スキル](../principle-boundary-discipline/SKILL.md)を参照。 |
 | Schema-derived types（スキーマ派生型） | 新しいインターフェースを宣言する前に `Pick`/`Omit`/`Parameters`/`ReturnType`/`Awaited`/`typeof` を使う。 |
 | Object args（オブジェクト引数） | 引数の順序が自己文書化されるよう、位置引数ではなくオブジェクトを渡す。ホットパス（フレームごとの描画、トークナイザー、パーサー）では省略する。 |
 | Real tests（実際のテスト） | 実行できるものをモックしない。リーク／破棄チェック付きのフレームワーク本来のテストプリミティブを優先し、UI は実行中のビルドで検証する。ローカルで実行できないものだけをモックする。 |

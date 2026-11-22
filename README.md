@@ -2,6 +2,8 @@
 
 > [!NOTE]
 > このリポジトリは、[cursor/plugins](https://github.com/cursor/plugins) を日本語に訳した**非公式**の翻訳版です。Cursor／Anysphere とは関係ありません。各プラグインの著作権表示とライセンス文は、それぞれの `LICENSE` に原文のまま残しています。
+>
+> ただし `pstack` は Claude Code 専用に書き換えてあり、Claude Code のプラグインとしてインストールします（手順は [pstack/README.md](pstack/README.md#インストール) を参照）。
 
 よく使われる開発ツール、フレームワーク、SaaS 製品向けの Cursor 公式プラグイン集です。各プラグインはリポジトリ直下にある独立したディレクトリで、それぞれ専用の `.cursor-plugin/plugin.json` マニフェストを持ちます。
 

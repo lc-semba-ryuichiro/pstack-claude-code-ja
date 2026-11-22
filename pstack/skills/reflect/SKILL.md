@@ -14,4 +14,4 @@ disable-model-invocation: true
 
 Accepted（問題、提案、スキル）、Rejected（理由）、および Backlog を提示し、いずれかのスキルを編集する前に承認を待ちます。
 
-`plugins/cache/` 配下のスキルは絶対に編集しないこと。承認前に、コピー先となる `.cursor/skills/<skill>/` または `~/.cursor/skills/<skill>/` を提示します。承認後、スキルフォルダをそこにコピーし、そのコピーを編集します。決して PR を開いたり push したりしないこと。
+`~/.claude/plugins/cache/` 配下のスキル（インストール済みプラグインのコピー）は絶対に編集しないこと。承認前に、コピー先となる `.claude/skills/<skill>/` または `~/.claude/skills/<skill>/` を提示します。承認後、スキルフォルダをそこにコピーし、そのコピーを編集します。決して PR を開いたり push したりしないこと。

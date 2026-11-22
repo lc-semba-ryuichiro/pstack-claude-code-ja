@@ -1,6 +1,6 @@
 ---
 name: in-your-own-words
-description: "ユーザーのゴールは何であり、どんな問題を解決しようとしているのかを、自分の言葉で言い直します。/in-your-own-words で使用します。"
+description: "ユーザーのゴールは何であり、どんな問題を解決しようとしているのかを、自分の言葉で言い直します。/pstack:in-your-own-words で使用します。"
 disable-model-invocation: true
 ---
 

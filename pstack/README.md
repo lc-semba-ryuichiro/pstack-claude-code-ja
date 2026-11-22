@@ -4,61 +4,53 @@
 
 AI が低品質で冗長なコード（slop code）を書きすぎているという感覚が広まっています。私も同感です。20人の雑な開発者チームが作ったようなコードをリリースしたいとは思いません。品質を伴わないスループットは、私が目指すゴールではありません。速く進みたいなら、まず深く掘り下げるべきです。
 
-**pstack はそれに対する私なりの答えです。** これらは、私が Cursor で高品質なコードを日々リリースするために実際に使っているスキルそのものです。これを使うことで、Cursor が本物のエンジニアリングチームへと変わります。目的はコード行数（LOC）を最大化することではなく、むしろその逆です。pstack は、より少ないコード量で、より高品質なコードを書く手助けをします。
+**pstack はそれに対する私なりの答えです。** これらは、私が Cursor で高品質なコードを日々リリースするために実際に使っているスキルそのものです。これを使うことで、Claude Code が本物のエンジニアリングチームへと変わります。目的はコード行数（LOC）を最大化することではなく、むしろその逆です。pstack は、より少ないコード量で、より高品質なコードを書く手助けをします。
 
 **pstack は恐れることのない並列実行をもたらします。** 1つのエージェントで深く掘り下げ、検証可能で優れたコードを書いてくれると信頼できるようになれば、自信を持って真の並列作業が可能になります。`poteto-mode` で複数のエージェントを立ち上げ、彼らが厳格なエンジニアリング原則を仕事に適用してくれることを信頼して任せてみてください。
 
-**Cursor はすべての良いとこ取りを可能にします。** どの最先端モデルにも長所と短所があります。pstack では好きなモデルを使用できます。実際、私のスキルの多くはマルチモデルワークフローを採用しており、各モデル独自の強みを活かしています。
+**モデルを使い分けて、良いとこ取りができます。** どのモデルにも長所と短所があります。pstack では、ロールごとに好きなモデル（`opus`、`sonnet`、`haiku`、`fable`）を選べます。実際、私のスキルの多くはマルチモデルワークフローを採用しており、各モデル独自の強みを活かしています。
 
 フォークして、改善して、自分のものにしてください。PR も大歓迎です！
 
 ## インストール
 
-```bash
-/add-plugin pstack
-```
-
-Claude Code の場合：
+Claude Code で以下を実行します：
 
 ```bash
-/plugin marketplace add cursor/plugins
-/plugin install pstack@cursor-plugins
+/plugin marketplace add lc-semba-ryuichiro/cursor-plugins-translation-ja
+/plugin install pstack@cursor-plugins-ja
 ```
 
-Claude Code ではサードパーティ製マーケットプレイスの自動更新がデフォルトでオフになっているため、pstack はインストール時のバージョンのまま維持されます。自動更新を有効にするには、`/plugin` を実行して **marketplaces** タブを開き、`cursor-plugins` を選択して **enable auto-update** を選んでください。手動で1回だけ更新する場合は、`claude plugin update pstack@cursor-plugins` を実行します。
+Claude Code ではサードパーティ製マーケットプレイスの自動更新がデフォルトでオフになっているため、pstack はインストール時のバージョンのまま維持されます。自動更新を有効にするには、`/plugin` を実行して **marketplaces** タブを開き、`cursor-plugins-ja` を選択して **enable auto-update** を選んでください。手動で1回だけ更新する場合は、`claude plugin update pstack@cursor-plugins-ja` を実行します。
 
-Claude Code ではプラグインのコマンドやエージェントにプレフィックスが付くため、`/poteto-mode` は `/pstack:poteto-mode` になります。その他の Cursor 上の名称はすべて [Claude Code アダプター](./docs/harness/claude-code.md) によってマッピングされます。Claude Code で `/pstack:setup-pstack` を実行すると、選択したモデル設定が `~/.claude/rules/pstack-models.md` に書き込まれ、Bugbot や Automations といった Cursor 専用機能を必要とするステップは、1行の注記を残してスキップされます。
-
-Claude Code は、リポジトリルートにある [`harness/pstack/`](https://github.com/cursor/plugins/tree/main/harness/pstack) から自動生成された pstack のコピー（この README やガイドを含む）をインストールします。pstack を変更した後は、リポジトリルートから `node scripts/generate-pstack-harness-trees.mjs` を実行し、その結果をコミットしてください。自動生成されたコピーが古いままの状態では CI が失敗します。
+Claude Code は、リポジトリルートにある [`harness/pstack/`](https://github.com/lc-semba-ryuichiro/cursor-plugins-translation-ja/tree/main/harness/pstack) から自動生成された pstack のコピー（この README やガイドを含む）をインストールします。pstack を変更した後は、リポジトリルートから `node scripts/generate-pstack-harness-trees.mjs` を実行し、その結果をコミットしてください。自動生成されたコピーが古いままの状態では CI が失敗します。
 
 ## はじめに
 
 たった 2 ステップです：
 
-1. [`/setup-pstack`](./skills/setup-pstack/SKILL.md) を実行し、推論バジェット（reasoning budget）と使用したいモデルを選択します。
-2. 厳密さが求められる作業を行うときは、いつでも [`/poteto-mode`](./skills/poteto-mode/SKILL.md) を使用します。
+1. [`/pstack:setup-pstack`](./skills/setup-pstack/SKILL.md) を実行し、推論バジェット（reasoning budget）と使用したいモデルを選択します。
+2. 厳密さが求められる作業を行うときは、いつでも [`/pstack:poteto-mode`](./skills/poteto-mode/SKILL.md) を使用します。
 
-初めて使う方は、[pstack ガイド](./docs/guide/README.md) をご覧ください。セットアップやプロンプトの書き方から、検証や夜間の自律実行まで、最初の本格的なタスクを通して順を追って解説しています。行き詰まったときや、どのスキルが適しているか迷ったときは、[`/poteto-help`](./skills/poteto-help/SKILL.md) に尋ねてください。
+初めて使う方は、[pstack ガイド](./docs/guide/README.md) をご覧ください。セットアップやプロンプトの書き方から、検証や夜間の自律実行まで、最初の本格的なタスクを通して順を追って解説しています。行き詰まったときや、どのスキルが適しているか迷ったときは、[`/pstack:poteto-help`](./skills/poteto-help/SKILL.md) に尋ねてください。
 
-基本はこれだけです。他のスキルは状況に応じて使い分けるものであり、モードスキル（`poteto-mode`）が必要に応じて自動的に呼び出してくれます。初期状態では、コードの委譲（機能開発、リファクタリング、バグ修正、パフォーマンス改善、ヒルクライム）、文章作成、および判断タスクは `xhigh` 設定の `opus 5.5` に割り当てられており、`xhigh` を超える設定で実行されるロールはありません。レビューパネル以外では、`fable 5.2` はあなたが明示的に指定したとき、または同じ指示で `opus 5.5` の実行が2回失敗したときにのみ実行されます。デフォルトのレビューパネルは `fable 5.2 / opus 5.5 / gemini 4 neon` です。これらの設定はすべて [`/setup-pstack`](./skills/setup-pstack/SKILL.md) から変更できます。
+基本はこれだけです。他のスキルは状況に応じて使い分けるものであり、モードスキル（`poteto-mode`）が必要に応じて自動的に呼び出してくれます。初期状態では、コードの委譲（機能開発、リファクタリング、バグ修正、パフォーマンス改善、ヒルクライム）、文章作成、および判断タスクは `opus xhigh` に割り当てられており、`xhigh` を超える設定で実行されるロールはありません。レビューパネル以外では、`fable` はあなたが明示的に指定したとき、または同じ指示で `opus` の実行が2回失敗したときにのみ実行されます。デフォルトのレビューパネルは `fable high / opus high / sonnet xhigh` です。これらの設定はすべて [`/pstack:setup-pstack`](./skills/setup-pstack/SKILL.md) から変更できます。
 
 ## 使い方
 
-タスクの開始時に [`/poteto-mode`](./skills/poteto-mode/SKILL.md) を使用します。リクエスト内容を読み取り、一連のプレイブックから適切なものを選択し、各ステップの必要に応じて他のスキルを実行します。
+タスクの開始時に [`/pstack:poteto-mode`](./skills/poteto-mode/SKILL.md) を使用します。リクエスト内容を読み取り、一連のプレイブックから適切なものを選択し、各ステップの必要に応じて他のスキルを実行します。
 
-タスクを入力する前に `/` メニューから `/poteto-mode` を選択して、Cursor がメッセージにスキルを添付するようにしてください。
-
-### まずは [`/poteto-mode`](./skills/poteto-mode/SKILL.md) を使う
+### まずは [`/pstack:poteto-mode`](./skills/poteto-mode/SKILL.md) を使う
 
 このスキルがメインのショートカットです。エージェントに厳格なエンジニアリング作業をさせたいときは、いつもこれを使います。22種類のプレイブックが同梱されています：
 
 ```
-/poteto-mode this pr has a subtle bug where the scroll drifts every 750ms even when idle. repro
+/pstack:poteto-mode this pr has a subtle bug where the scroll drifts every 750ms even when idle. repro
 first, then fix and verify.
 ```
 
 ```
-/poteto-mode i'm going to bed. land the stack even if ci flakes. i want everything merged by
+/pstack:poteto-mode i'm going to bed. land the stack even if ci flakes. i want everything merged by
 morning.
 ```
 
@@ -100,20 +92,18 @@ morning.
 
 完全なルールとプレイブックは [`skills/poteto-mode/SKILL.md`](./skills/poteto-mode/SKILL.md) にあります。
 
-複数のターンにわたって [`/poteto-mode`](./skills/poteto-mode/SKILL.md) を有効にし続けたい場合は、`/` メニューから選択した後、Enter ではなく `Option+Enter`（Mac）または `Alt+Enter`（Windows）を押してください。これにより[カスタムモード](https://cursor.com/docs/skills#using-a-skill-as-a-custom-mode)（Agents ウィンドウおよび CLI で利用可能）として動作し、モードを終了するまで毎ターンのコンテキストに保持されます。通常の Enter キーでは、その1回のメッセージにのみ添付されます。
-
-[`/poteto-mode`](./skills/poteto-mode/SKILL.md) は Cursor の `/loop` コマンドと非常に相性が良く、厳密さを損なうことなく何時間でも連続して作業させることができます。
+[`/pstack:poteto-mode`](./skills/poteto-mode/SKILL.md) は Claude Code 組み込みの `/loop` と非常に相性が良く、厳密さを損なうことなく何時間でも連続して作業させることができます。
 
 ## スキル一覧
 
-[`/poteto-mode`](./skills/poteto-mode/SKILL.md) はステップの必要に応じて大半のスキル（`why`、`architect`、`arena`、`swarm`、`interrogate`、`unslop`、`no-comments`、`technical-writing`、`tdd`、および各種原則）を自動的に実行します。以下の表は、個別のスキルを直接呼び出したい場合の一覧です：
+[`/pstack:poteto-mode`](./skills/poteto-mode/SKILL.md) はステップの必要に応じて大半のスキル（`why`、`architect`、`arena`、`swarm`、`interrogate`、`unslop`、`no-comments`、`technical-writing`、`tdd`、および各種原則）を自動的に実行します。以下の表は、個別のスキルを直接呼び出したい場合の一覧です：
 
 ```
-/how do we cancel runs? do we have an n+1 when we look up every run to cancel?
+/pstack:how do we cancel runs? do we have an n+1 when we look up every run to cancel?
 ```
 
 ```
-/interrogate review this pr.
+/pstack:interrogate review this pr.
 ```
 
 <details>
@@ -121,98 +111,97 @@ morning.
 
 | スキル | 使用するタイミング |
 |---|---|
-| [`/poteto-mode`](./skills/poteto-mode/SKILL.md) | 単純ではないあらゆるタスクのデフォルトの入り口。 |
-| [`/poteto-help`](./skills/poteto-help/SKILL.md) | pstack を使い始めたばかりで、どのスキル、プレイブック、または原則が適しているか分からないとき。やりたいことをヒアリングして回答し、そのまま入力できるプロンプトを提示します。`/poteto-help` と入力したときのみ実行されます。 |
-| [`/in-your-own-words`](./skills/in-your-own-words/SKILL.md) | 作業を開始する前に、エージェント自身の言葉でゴールと課題を再確認させたいとき。`/in-your-own-words` と入力したときのみ実行されます。 |
-| [`/sharpen`](./skills/sharpen/SKILL.md) | 送信前のプロンプトを「肥大化」させるのではなく「深化」させたいとき。トッププロフェッショナルなら当然行うが指示されていなかったこと、出発点となる一次情報、手法とツール、結果の正しさを確かめる外部検証を組み込みます。実験で決着がつく選択はプロトタイプを作るよう指示し、プロダクトや好みの選択はユーザーに委ねる形で書き直したプロンプトを返します（タスク自体は実行しません）。`/sharpen` と入力したときのみ実行されます。 |
-| [`/how`](./skills/how/SKILL.md) | サブシステムがどのように動作するかのウォークスルーが欲しいとき。 |
-| [`/why`](./skills/why/SKILL.md) | なぜそのように作られたのか理由を知りたいとき。コードではなく記録（それを導入したコミットや PR の議論、その後の各変更履歴、記録が薄い場合はその他の情報源）に基づいて回答します。作成者の記述を引用し、エージェント自身の推測は明示し、記録からは分からない点も明確に伝えます。 |
-| [`/recall`](./skills/recall/SKILL.md) | 作業の開始時や再開時に、自分のチャット履歴と共有記録から特定のトピックに関する直近のコンテキストを再構築し、コンパクトな現状ブリーフィングとして受け取りたいとき。 |
-| [`/ketchup`](./skills/ketchup/SKILL.md) | 自分の最後のメッセージ以降にこのチャットで何が変化したかを、平易な言葉と小さな図解で把握したいとき。ユーザーの判断待ちとなっているすべての項目をリストアップし、返信が長くなったとしても、その返信を読むだけで意思決定できる状態にします。 |
-| [`/ketchup-video`](./skills/ketchup-video/SKILL.md) | `/ketchup` のキャッチアップ内容を字幕付きの短いスライド動画として受け取りたいとき。ユーザーの判断待ち項目は動画の下にテキストで記載されます。 |
-| [`/blast-radius`](./skills/blast-radius/SKILL.md) | 小さく見える変更が他にどこを壊す可能性があるかを知りたいとき。推測や断言ではなく、実際にコードを実行して証明された「安全である根拠となる1つの事実」とともに提示します。 |
-| [`/architect`](./skills/architect/SKILL.md) | 関数の境界をまたぐコードを書く前に、呼び出し側の使い方、型定義、モジュールの形状を先に固めたいとき。 |
-| [`/arena`](./skills/arena/SKILL.md) | 同じ課題に対して N 個の並列アプローチを試行させ、それぞれの最も優れた部分を取り入れたいとき。 |
-| [`/swarm`](./skills/swarm/SKILL.md) | 異なる領域や検証対象に対して N 個の並列ワーカーを走らせ、1つの統合レポートにまとめたいとき。 |
-| [`/interrogate`](./skills/interrogate/SKILL.md) | 差分（diff）に対して複数の異なるモデルに破壊テスト（問題点の指摘）を行わせ、実際の実行によって証明された指摘だけを残したいとき。 |
-| [`/automate-me`](./skills/automate-me/SKILL.md) | これまでの実際の作業履歴から、自分専用の `<自分の名前>-mode` スキルを起草したいとき。 |
-| [`/make-bot-ui`](./skills/make-bot-ui/SKILL.md) | ボタンを押すと Webhook 経由で Grok Bot を起動するページやダッシュボードを作成したいとき（sender-key の受け渡しや Tailscale の設定を含む）。 |
-| [`/setup-pstack`](./skills/setup-pstack/SKILL.md) | ロールごとに pstack が使用するモデルを選択したいとき。利用可能なモデルを検出し、設定ルールを書き出します。 |
-| [`/reflect`](./skills/reflect/SKILL.md) | 長時間のタスクが完了した後、そこで得た手順や教訓をスキルの編集内容として定着させたいとき。 |
-| [`/correct`](./skills/correct/SKILL.md) | エージェントの同じミスを何度も修正しているとき。履歴からミスのパターンを抽出し、機能する最も高いレイヤー（アーキテクチャ → 型・Lint・CI → テスト → 最後にドキュメント）で修正し、各ルールとそれを強制する仕組みを対応付けた表を維持します。 |
-| [`/teach`](./skills/teach/SKILL.md) | 単なる要約ではなく、変更やサブシステムの仕組みを本質的に理解したいとき。`how` と `why` を実行し、図解を1つずつ積み上げながら平易な解説を組み立てます。 |
-| [`/tdd`](./skills/tdd/SKILL.md) | バグ修正において、低コストで実行できるローカルテスト環境があるとき。まず失敗するテストを書き、その後に修正を行います。 |
-| [`/benchmark-checklist`](./skills/benchmark-checklist/SKILL.md) | ベンチマークを実行したり、高速化やリグレッションを計測したりしたとき。数値を報告したり意思決定に使ったりする前に、その数値の妥当性（ボトルネック要因、チューニング条件、エラー有無、反復実行、エンドツーエンドでの意義）を精査します。 |
-| [`/no-comments`](./skills/no-comments/SKILL.md) | レビュー前に不要なコメントを削除する。Comment Sicko を起動して指摘を精査し、受け入れた修正を適用したうえで、コメントに書かれていた制約をコードや型として表現する方法を提案します。 |
-| [`/typescript-best-practices`](./skills/typescript-best-practices/SKILL.md) | TypeScript を読んだり編集したりするとき。`type-system-discipline`（型システムの規律）の原則を具体的な構文レベルに落とし込みます。 |
-| [`/figure-it-out`](./skills/figure-it-out/SKILL.md) | 同梱されているどのプレイブックにも当てはまらないとき。そのタスク専用の厳格で監査可能なプレイブックを設計します。 |
-| [`/show-me-your-work`](./skills/show-me-your-work/SKILL.md) | レビュー可能な意思決定の軌跡を残したいとき。コミット可能な TSV ファイルに判断履歴を記録します。 |
-| [`/create-verification-skill`](./skills/create-verification-skill/SKILL.md) | プロジェクトにアプリの挙動を証明するスクリプト手段がないとき。あらゆる言語やプラットフォームに対応した、機能マップ付きのプロジェクト固有検証スキルを生成します。 |
-| [`/maintain-verification-skill`](./skills/maintain-verification-skill/SKILL.md) | 検証スキルの機能マップが現在のアプリと乖離してしまったとき。ソースコードの調査と1回の実機パスを実行し、証明された修正のみを含む最大1つの PR を作成します。 |
-| [`/create-formal-verification-skill`](./skills/create-formal-verification-skill/SKILL.md) | 競合状態、リトライ、ステートマシン、パーサー、アンセーフコードなどのバグに通常のテストでは到達できないとき。適切なツールで1つの性質を形式検証し、変更のたびに再チェックするプロジェクト固有スキルを生成します。 |
-| [`/maintain-formal-verification-skill`](./skills/maintain-formal-verification-skill/SKILL.md) | 形式検証の対象コードが前回のチェック以降に変更されたとき。コードに合わせてモデル、ハーネス、または検証性質を更新して再実行し、各失敗が検証側の乖離によるものかコードのバグによるものかを判定します。 |
-| [`/statechart`](./skills/statechart/SKILL.md) | 仕様書を読むのではなく、振る舞いのオーナーが視覚的に状態を理解する必要があるとき。TLA+ モデルをチェックし、ユーザーから見える挙動を Mermaid のステートチャートとして描画し、ルール違反となる各状態をマークしてそこへ至る最短パスを示します。 |
-| [`/unslop`](./skills/unslop/SKILL.md) | 文章をクリーンアップしたいとき。AI 特有の不自然な言い回し（AI tells）を取り除きます。 |
-| [`/bro`](./skills/bro/SKILL.md) | 直前のメッセージを、専門用語を使わない平易な人間の言葉で言い直してほしいとき。 |
-| [`/technical-writing`](./skills/technical-writing/SKILL.md) | ドキュメント、RFC、README、PR 説明文、コミットメッセージのための重層的なドキュメント基準（Diátaxis + Google developer style + STE + Global English）。 |
+| [`/pstack:poteto-mode`](./skills/poteto-mode/SKILL.md) | 単純ではないあらゆるタスクのデフォルトの入り口。 |
+| [`/pstack:poteto-help`](./skills/poteto-help/SKILL.md) | pstack を使い始めたばかりで、どのスキル、プレイブック、または原則が適しているか分からないとき。やりたいことをヒアリングして回答し、そのまま入力できるプロンプトを提示します。`/pstack:poteto-help` と入力したときのみ実行されます。 |
+| [`/pstack:in-your-own-words`](./skills/in-your-own-words/SKILL.md) | 作業を開始する前に、エージェント自身の言葉でゴールと課題を再確認させたいとき。`/pstack:in-your-own-words` と入力したときのみ実行されます。 |
+| [`/pstack:sharpen`](./skills/sharpen/SKILL.md) | 送信前のプロンプトを「肥大化」させるのではなく「深化」させたいとき。トッププロフェッショナルなら当然行うが指示されていなかったこと、出発点となる一次情報、手法とツール、結果の正しさを確かめる外部検証を組み込みます。実験で決着がつく選択はプロトタイプを作るよう指示し、プロダクトや好みの選択はユーザーに委ねる形で書き直したプロンプトを返します（タスク自体は実行しません）。`/pstack:sharpen` と入力したときのみ実行されます。 |
+| [`/pstack:how`](./skills/how/SKILL.md) | サブシステムがどのように動作するかのウォークスルーが欲しいとき。 |
+| [`/pstack:why`](./skills/why/SKILL.md) | なぜそのように作られたのか理由を知りたいとき。コードではなく記録（それを導入したコミットや PR の議論、その後の各変更履歴、記録が薄い場合はその他の情報源）に基づいて回答します。作成者の記述を引用し、エージェント自身の推測は明示し、記録からは分からない点も明確に伝えます。 |
+| [`/pstack:recall`](./skills/recall/SKILL.md) | 作業の開始時や再開時に、自分のチャット履歴と共有記録から特定のトピックに関する直近のコンテキストを再構築し、コンパクトな現状ブリーフィングとして受け取りたいとき。 |
+| [`/pstack:ketchup`](./skills/ketchup/SKILL.md) | 自分の最後のメッセージ以降にこのチャットで何が変化したかを、平易な言葉と小さな図解で把握したいとき。ユーザーの判断待ちとなっているすべての項目をリストアップし、返信が長くなったとしても、その返信を読むだけで意思決定できる状態にします。 |
+| [`/pstack:ketchup-video`](./skills/ketchup-video/SKILL.md) | `/pstack:ketchup` のキャッチアップ内容を字幕付きの短いスライド動画として受け取りたいとき。ユーザーの判断待ち項目は動画の下にテキストで記載されます。 |
+| [`/pstack:blast-radius`](./skills/blast-radius/SKILL.md) | 小さく見える変更が他にどこを壊す可能性があるかを知りたいとき。推測や断言ではなく、実際にコードを実行して証明された「安全である根拠となる1つの事実」とともに提示します。 |
+| [`/pstack:architect`](./skills/architect/SKILL.md) | 関数の境界をまたぐコードを書く前に、呼び出し側の使い方、型定義、モジュールの形状を先に固めたいとき。 |
+| [`/pstack:arena`](./skills/arena/SKILL.md) | 同じ課題に対して N 個の並列アプローチを試行させ、それぞれの最も優れた部分を取り入れたいとき。 |
+| [`/pstack:swarm`](./skills/swarm/SKILL.md) | 異なる領域や検証対象に対して N 個の並列ワーカーを走らせ、1つの統合レポートにまとめたいとき。 |
+| [`/pstack:interrogate`](./skills/interrogate/SKILL.md) | 差分（diff）に対して複数の異なるモデルに破壊テスト（問題点の指摘）を行わせ、実際の実行によって証明された指摘だけを残したいとき。 |
+| [`/pstack:automate-me`](./skills/automate-me/SKILL.md) | これまでの実際の作業履歴から、自分専用の `<自分の名前>-mode` スキルを起草したいとき。 |
+| [`/pstack:setup-pstack`](./skills/setup-pstack/SKILL.md) | ロールごとに pstack が使用するモデルを選択したいとき。利用可能なモデルを検出し、設定ルールを書き出します。 |
+| [`/pstack:reflect`](./skills/reflect/SKILL.md) | 長時間のタスクが完了した後、そこで得た手順や教訓をスキルの編集内容として定着させたいとき。 |
+| [`/pstack:correct`](./skills/correct/SKILL.md) | エージェントの同じミスを何度も修正しているとき。履歴からミスのパターンを抽出し、機能する最も高いレイヤー（アーキテクチャ → 型・Lint・CI → テスト → 最後にドキュメント）で修正し、各ルールとそれを強制する仕組みを対応付けた表を維持します。 |
+| [`/pstack:teach`](./skills/teach/SKILL.md) | 単なる要約ではなく、変更やサブシステムの仕組みを本質的に理解したいとき。`how` と `why` を実行し、図解を1つずつ積み上げながら平易な解説を組み立てます。 |
+| [`/pstack:tdd`](./skills/tdd/SKILL.md) | バグ修正において、低コストで実行できるローカルテスト環境があるとき。まず失敗するテストを書き、その後に修正を行います。 |
+| [`/pstack:benchmark-checklist`](./skills/benchmark-checklist/SKILL.md) | ベンチマークを実行したり、高速化やリグレッションを計測したりしたとき。数値を報告したり意思決定に使ったりする前に、その数値の妥当性（ボトルネック要因、チューニング条件、エラー有無、反復実行、エンドツーエンドでの意義）を精査します。 |
+| [`/pstack:no-comments`](./skills/no-comments/SKILL.md) | レビュー前に不要なコメントを削除する。Comment Sicko を起動して指摘を精査し、受け入れた修正を適用したうえで、コメントに書かれていた制約をコードや型として表現する方法を提案します。 |
+| [`/pstack:typescript-best-practices`](./skills/typescript-best-practices/SKILL.md) | TypeScript を読んだり編集したりするとき。`type-system-discipline`（型システムの規律）の原則を具体的な構文レベルに落とし込みます。 |
+| [`/pstack:figure-it-out`](./skills/figure-it-out/SKILL.md) | 同梱されているどのプレイブックにも当てはまらないとき。そのタスク専用の厳格で監査可能なプレイブックを設計します。 |
+| [`/pstack:show-me-your-work`](./skills/show-me-your-work/SKILL.md) | レビュー可能な意思決定の軌跡を残したいとき。コミット可能な TSV ファイルに判断履歴を記録します。 |
+| [`/pstack:create-verification-skill`](./skills/create-verification-skill/SKILL.md) | プロジェクトにアプリの挙動を証明するスクリプト手段がないとき。あらゆる言語やプラットフォームに対応した、機能マップ付きのプロジェクト固有検証スキルを生成します。 |
+| [`/pstack:maintain-verification-skill`](./skills/maintain-verification-skill/SKILL.md) | 検証スキルの機能マップが現在のアプリと乖離してしまったとき。ソースコードの調査と1回の実機パスを実行し、証明された修正のみを含む最大1つの PR を作成します。 |
+| [`/pstack:create-formal-verification-skill`](./skills/create-formal-verification-skill/SKILL.md) | 競合状態、リトライ、ステートマシン、パーサー、アンセーフコードなどのバグに通常のテストでは到達できないとき。適切なツールで1つの性質を形式検証し、変更のたびに再チェックするプロジェクト固有スキルを生成します。 |
+| [`/pstack:maintain-formal-verification-skill`](./skills/maintain-formal-verification-skill/SKILL.md) | 形式検証の対象コードが前回のチェック以降に変更されたとき。コードに合わせてモデル、ハーネス、または検証性質を更新して再実行し、各失敗が検証側の乖離によるものかコードのバグによるものかを判定します。 |
+| [`/pstack:statechart`](./skills/statechart/SKILL.md) | 仕様書を読むのではなく、振る舞いのオーナーが視覚的に状態を理解する必要があるとき。TLA+ モデルをチェックし、ユーザーから見える挙動を Mermaid のステートチャートとして描画し、ルール違反となる各状態をマークしてそこへ至る最短パスを示します。 |
+| [`/pstack:unslop`](./skills/unslop/SKILL.md) | 文章をクリーンアップしたいとき。AI 特有の不自然な言い回し（AI tells）を取り除きます。 |
+| [`/pstack:bro`](./skills/bro/SKILL.md) | 直前のメッセージを、専門用語を使わない平易な人間の言葉で言い直してほしいとき。 |
+| [`/pstack:technical-writing`](./skills/technical-writing/SKILL.md) | ドキュメント、RFC、README、PR 説明文、コミットメッセージのための重層的なドキュメント基準（Diátaxis + Google developer style + STE + Global English）。 |
 
 </details>
 
 ### 使用例
 
-ほとんどの場合、私はタスクの開始時に [`/poteto-mode`](./skills/poteto-mode/SKILL.md) を入力し、適切なプレイブックへのルーティングを任せています。他のスキルは各ステップの必要に応じて自動的に起動します。直接呼び出すことも多い例をいくつか挙げます。
+ほとんどの場合、私はタスクの開始時に [`/pstack:poteto-mode`](./skills/poteto-mode/SKILL.md) を入力し、適切なプレイブックへのルーティングを任せています。他のスキルは各ステップの必要に応じて自動的に起動します。直接呼び出すことも多い例をいくつか挙げます。
 
 <details>
 <summary>すべての使用例</summary>
 
 ```
-bug fix:           /poteto-mode this pr has a subtle bug where the scroll drifts every 750ms even
+bug fix:           /pstack:poteto-mode this pr has a subtle bug where the scroll drifts every 750ms even
                    when idle. repro first, then fix and verify.
-perf:              /poteto-mode a big list takes a second or two to load even though we virtualize.
+perf:              /pstack:poteto-mode a big list takes a second or two to load even though we virtualize.
                    run a cpu trace and tell me why.
-feature:           /poteto-mode build a small feature behind a feature flag. verify it really works.
-prototype:         /poteto-mode build two prototypes of the markdown renderer so we can compare.
+feature:           /pstack:poteto-mode build a small feature behind a feature flag. verify it really works.
+prototype:         /pstack:poteto-mode build two prototypes of the markdown renderer so we can compare.
                    spawn an agent for each.
-multi-phase:       /poteto-mode open source these skills as a plugin. nothing internal leaks, work
+multi-phase:       /pstack:poteto-mode open source these skills as a plugin. nothing internal leaks, work
                    in a temp dir, show me the dependency graph first.
-overnight run:     /poteto-mode i'm going to bed. land the stack even if ci flakes. i want
+overnight run:     /pstack:poteto-mode i'm going to bed. land the stack even if ci flakes. i want
                    everything merged by morning.
-babysit:           /poteto-mode check on pr 123. anything outstanding?
-visual parity:     /poteto-mode the row spacing is too tall when this flag is on. the second image
+babysit:           /pstack:poteto-mode check on pr 123. anything outstanding?
+visual parity:     /pstack:poteto-mode the row spacing is too tall when this flag is on. the second image
                    is correct. repro and fix until it matches.
-figure it out:     /poteto-mode i'm stepping away. migrate every caller from the synchronous store
+figure it out:     /pstack:poteto-mode i'm stepping away. migrate every caller from the synchronous store
                    to the new async one, keeping behavior identical. i want to trust it was done
                    right when i'm back.
-how:               /how do we cancel runs? do we have an n+1 when we look up every run to cancel?
-why:               /why is this feature flag not on yet?
-architect:         design this instrumentation to be high signal with no false positives. /architect
+how:               /pstack:how do we cancel runs? do we have an n+1 when we look up every run to cancel?
+why:               /pstack:why is this feature flag not on yet?
+architect:         design this instrumentation to be high signal with no false positives. /pstack:architect
                    this first.
-arena:             /arena take my prompt to the arena verbatim. i want to compare their proposals
+arena:             /pstack:arena take my prompt to the arena verbatim. i want to compare their proposals
                    with yours.
-swarm:             /swarm check every package under packages/ against its check.sh. one worker per
+swarm:             /pstack:swarm check every package under packages/ against its check.sh. one worker per
                    package. one report.
-interrogate:       /interrogate review this pr.
-tdd:               /tdd implement
+interrogate:       /pstack:interrogate review this pr.
+tdd:               /pstack:tdd implement
 unslop:            can we unslop and tighten the new changes?
-reflect:           /reflect that took too long. capture what we learned so the next run doesn't
+reflect:           /pstack:reflect that took too long. capture what we learned so the next run doesn't
                    repeat it.
-correct:           /correct
-show-me-your-work: /show-me-your-work keep a decision trail i can review when i'm back.
-automate-me:       /automate-me
-help:              /poteto-help which skill should i use to review this branch?
+correct:           /pstack:correct
+show-me-your-work: /pstack:show-me-your-work keep a decision trail i can review when i'm back.
+automate-me:       /pstack:automate-me
+help:              /pstack:poteto-help which skill should i use to review this branch?
 ```
 
 </details>
 
 ## `poteto-agent` と Comment Sicko サブエージェント
 
-[`/poteto-mode`](./skills/poteto-mode/SKILL.md) は、それを受け取ったチャット内で実行されます。そのチャットがプレイブック、Todo リスト、およびすべてのサブエージェントの起動を管理します。
+[`/pstack:poteto-mode`](./skills/poteto-mode/SKILL.md) は、それを受け取ったチャット内で実行されます。そのチャットがプレイブック、Todo リスト、およびすべてのサブエージェントの起動を管理します。
 
-pstack には、実行中に委譲先として起動されるラッパーとして [`subagent_type: "poteto-agent"`](./agents/poteto-agent.md) も同梱されています。このサブエージェントは作業を開始する前に、インラインの原則インデックスを含む `poteto-mode` の全文を読み込みます。代わりに `generalPurpose` を使用するとこの読み込みがスキップされ、方針のズレ（ドリフト）が生じます。なお、プレイブック自体の実行に `poteto-agent` を起動しないでください。
+pstack には、実行中に委譲先として起動されるラッパーとして [`subagent_type: "pstack:poteto-agent"`](./agents/poteto-agent.md) も同梱されています。このサブエージェントは作業を開始する前に、インラインの原則インデックスを含む `poteto-mode` の全文を読み込みます。代わりに `general-purpose` を使用するとこの読み込みがスキップされ、方針のズレ（ドリフト）が生じます。なお、プレイブック自体の実行に `poteto-agent` を起動しないでください。
 
-[`/poteto-mode`](./skills/poteto-mode/SKILL.md) と [`subagent_type: "poteto-agent"`](./agents/poteto-agent.md) は同じラッパーを経由してルーティングされます。
+[`/pstack:poteto-mode`](./skills/poteto-mode/SKILL.md) と [`subagent_type: "pstack:poteto-agent"`](./agents/poteto-agent.md) は同じラッパーを経由してルーティングされます。
 
-pstack にはさらに、読み取り専用のコメントレビュアーである [Comment Sicko](./agents/comment-sicko.md) も `subagent_type: "comment-sicko"` として同梱されています。通常は直接呼び出さず、[`/no-comments`](./skills/no-comments/SKILL.md) を通じて起動します。
+pstack にはさらに、読み取り専用のコメントレビュアーである [Comment Sicko](./agents/comment-sicko.md) も `subagent_type: "pstack:comment-sicko"` として同梱されています。通常は直接呼び出さず、[`/pstack:no-comments`](./skills/no-comments/SKILL.md) を通じて起動します。
 
 ## 原則（Principles）
 
@@ -254,31 +243,24 @@ pstack にはさらに、読み取り専用のコメントレビュアーであ�
 
 `poteto-mode` から参照されるものの、このプラグインには同梱されていないものがいくつかあります：
 
-- `/deslop` と `deslop` スキルは `cursor-team-kit` プラグインに同梱されています。
+- `deslop` スキルは `cursor-team-kit` プラグインに同梱されています。
 - `control-cli`（CLI および TUI 用）と `control-ui`（ブラウザ、Electron、Web 用）も `cursor-team-kit` に同梱されています。
-- `/create-skill` は Cursor の組み込み機能です。また、Cursor には PR を監視する組み込みの `/autopilot` も搭載されていますが、`poteto-mode` 内での PR ステータス確認リクエストは代わりに [babysit プレイブック](./skills/poteto-mode/playbooks/babysit.md) にルーティングされます。
 
-フルセットを使いたい場合は、pstack とあわせて `cursor-team-kit` をインストールしてください。
+`cursor-team-kit` は Cursor 向けのプラグインで、このマーケットプレイスからは Claude Code にインストールできません。代わりに、同じ結果になるよう平易な言葉で指示してください。
 
 ## なぜプランニング（計画立案）スキルがないのか？
 
-Cursor にはすでに優れた Plan モードがあり、pstack とも非常にうまく連携します。ただ私個人としては、事前の計画立案をあまり信じていません。最高の仕様書はコードそのものです。それでも計画を立てたい場合は [`/poteto-mode`](./skills/poteto-mode/SKILL.md) でカバーしていますが、デフォルトのワークフローにはしていません。
+Claude Code にはすでに plan mode（`/plan`）があり、pstack とも非常にうまく連携します。ただ私個人としては、事前の計画立案をあまり信じていません。最高の仕様書はコードそのものです。それでも計画を立てたい場合は [`/pstack:poteto-mode`](./skills/poteto-mode/SKILL.md) でカバーしていますが、デフォルトのワークフローにはしていません。
 
 ## 自分好みにカスタマイズする
 
 `poteto-mode` は私のスタイルです。あなたにぴったり合うとは限りません。
 
-[`/automate-me`](./skills/automate-me/SKILL.md) と入力してみてください。最近のチャット履歴をマイニングし、あなたの実際の働き方から `<あなたの名前>-mode` スキルを起草し、裏側で pstack を経由してルーティングするように設定します。pstack をベースとして維持したまま、`poteto-mode` と並んで自分専用のルーティングスキルを手に入れることができます。
+[`/pstack:automate-me`](./skills/automate-me/SKILL.md) と入力してみてください。最近のチャット履歴をマイニングし、あなたの実際の働き方から `<あなたの名前>-mode` スキルを起草し、裏側で pstack を経由してルーティングするように設定します。pstack をベースとして維持したまま、`poteto-mode` と並んで自分専用のルーティングスキルを手に入れることができます。
 
-使用モデルも設定可能です。[`/setup-pstack`](./skills/setup-pstack/SKILL.md) と入力すると、アクセス可能なモデルを検出し、各ロール（コード生成、判断、レビューパネル）をモデルにマッピングする小さな常時適用ルールを書き出します。すべてのスキルはこのルールを読み込み、ルールが存在しない場合は適切なデフォルト値にフォールバックするため、変更したい部分だけを上書きできます。
+使用モデルも設定可能です。[`/pstack:setup-pstack`](./skills/setup-pstack/SKILL.md) と入力すると、アクセス可能なモデルを検出し、各ロール（コード生成、判断、レビューパネル）をモデルにマッピングする小さなルールファイル `~/.claude/rules/pstack-models.md` を書き出します。すべてのスキルはこのルールを読み込み、ルールが存在しない場合は適切なデフォルト値にフォールバックするため、変更したい部分だけを上書きできます。
 
-デフォルト設定がアップデートされた場合、変更前に作成されたルールは再度 `/setup-pstack` を実行するまで古いデフォルト値を固定し続けます。再実行すると、認識された古いデフォルト値は新しいものに置き換わり、デフォルトとは異なるモデルを明示的に指定していた他のロールはそのまま維持されます。認識されない固定設定を解除したい場合は、先に該当ロールの行またはルールファイル自体を削除してください。
-
-## オートメーション（Automations）
-
-pstack には、休止状態の [benny オートメーションパック](./automations/benny/) も同梱されています。benny は Slack 上の不具合報告をトリアージし、確認されたバグを実際の UI の証拠とともに再現・修正します。これらのファイルはスラッシュスキルとしては登録されていません。
-
-セットアップするには、Cursor に [`FOR_AGENTS.md`](./automations/benny/FOR_AGENTS.md) を参照させてください。セットアップを実行すると、対象リポジトリの `.cursor/automations/benny/` にパックがコピーされ、共通スキルを利用できるようにそこで pstack が有効化されます（ユーザー設定はコピーされたパックの外部に保持されます）。benny は Cursor Automations 上で動作するため、Cursor 専用機能となります。
+デフォルト設定がアップデートされた場合、変更前に作成されたルールは再度 `/pstack:setup-pstack` を実行するまで古いデフォルト値を固定し続けます。再実行すると、認識された古いデフォルト値は新しいものに置き換わり、デフォルトとは異なるモデルを明示的に指定していた他のロールはそのまま維持されます。認識されない固定設定を解除したい場合は、先に該当ロールの行またはルールファイル自体を削除してください。
 
 ## ライセンス
 
