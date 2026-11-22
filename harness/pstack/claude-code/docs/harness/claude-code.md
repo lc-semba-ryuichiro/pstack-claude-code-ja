@@ -8,8 +8,8 @@ pstack のスキルでは Cursor の名称が使用されています。Claude C
 | --- | --- |
 | `Task` | `Agent` |
 | `AskQuestion` | `AskUserQuestion`。`-p` モードでは利用できないため、プレーンテキストで質問してください。 |
-| Todo リストを開く、または Todo リストツールにステップをコピーする | セッションで `TodoWrite` が提供されている場合はそれを使用します。そうでない場合は、返信内にリストを保持し、各フェーズで更新してください。 |
-| 別の pstack スキルを実行する（`/name` または「**name** スキル」） | `<pstack>/skills/<name>/SKILL.md` を `Read` で読み込み、その指示に従います。`Skill` ツールは大半の pstack スキルを拒否します。ユーザーに入力を促す際は `/pstack:<name>` と記述してください。 |
+| Todo リスト（todolist）を開く、または Todo リストツールにステップをコピーする | セッションで `TodoWrite` が提供されている場合はそれを使用します。そうでない場合は、返信内にリストを保持し、各フェーズで更新してください。 |
+| 別の pstack スキルを実行する（Run another pstack skill。`/name` または「**name** スキル」の形） | `<pstack>/skills/<name>/SKILL.md` を `Read` で読み込み、その指示に従います。`Skill` ツールは大半の pstack スキルを拒否します。ユーザーに入力を促す際は `/pstack:<name>` と記述してください。 |
 | `Grep`, `Glob` | セッションに `Grep` や `Glob` がない場合は、`Bash` で `rg` を使用します。 |
 
 ## サブエージェントのフィールド
@@ -56,7 +56,7 @@ Claude Code は新しいセッションごとに `~/.claude/rules/` 内のすべ
 | `https://github.com/cursor/plugins/blob/main/pstack/<path>` | 該当ファイルが存在する場合は `<pstack>/<path>`。プラグインにはスキル、`docs/guide/`、`README.md` が同梱されています。外部からフェッチせずローカルのコピーを読み込んでください。ユーザーにリンクを示す必要がある場合のみ URL を提示してください。 |
 | `~/.cursor/projects/<slug>/agent-transcripts/` 内のトランスクリプト | `~/.claude/projects/<slug>/<session>.jsonl`。スラッグはワークスペースパスの `/` と `.` をそれぞれ `-` に置換したものです（例：`/Users/you/proj` は `-Users-you-proj`）。そのフォルダ直下にある最新の `.jsonl` ファイルが現在のセッションです。`<session>/subagents/` フォルダにサブエージェントのトランスクリプトが格納されています。このワークスペースのフォルダのみを読み込んでください。 |
 
-## Cursor 専用機能
+## Cursor 専用機能（Cursor-only features）
 
 Claude Code には Cursor Automations、Bugbot、Cursor クラウドエージェント、組み込みの PR ツールがありません。ステップでこれらが必要になった場合は、返信に `Skipped in Claude Code: <step>. <reason>.` という1行を記載し、そのまま次のステップに進んでください。停止したり、ユーザーに確認したり、リトライしたりしないでください。後のステップで、スキップしたステップの成果物（URL やキーなど）が必要になる場合は、プレースホルダーを残し、その1行の中で名前を明記してください。
 

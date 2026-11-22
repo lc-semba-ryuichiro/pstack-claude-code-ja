@@ -1,48 +1,48 @@
 ---
 name: arena
-description: "Spawn N parallel candidates at the same task, pick a base, graft the strongest parts of the losers into it. Use for /arena, 'arena this', 'throw it in the arena', or when one attempt at a non-trivial artifact would lock in the wrong shape."
+description: "同じタスクに対して N 個の並列候補を起動し、ベース案を1つ選んだうえで、選ばれなかった候補からも最も優れた部分を移植・統合します。/arena、'arena this'、'throw it in the arena' の指示時や、複雑な成果物を1回の試行だけで作ると誤った形に固定されてしまう場合に使用します。"
 disable-model-invocation: true
 ---
 
 # Arena
 
-Open a todolist with one entry per phase (Frame, Fan out, Cross-judge, Pick, Graft, Verify) before launching anything.
+何かを起動する前に、各フェーズ（Frame、Fan out、Cross-judge、Pick、Graft、Verify）を1項目ずつ登録した Todo リストを開いてください。
 
-## Phase A: Frame
+## フェーズ A：Frame（課題設定）
 
-Every candidate gets the same prompt, so the prompt is the contract.
+すべての候補に同じプロンプトが渡されるため、プロンプトそのものが契約（仕様）になります。
 
-1. State the artifact each candidate is producing.
-2. Derive the rubric, 3-6 concrete gradeable criteria for what success looks like on *this* task. It is the picker's tool in Phase D. Candidates only see the task.
-3. Pick the runners from the `arena runners` line in `~/.cursor/rules/pstack-models.mdc`, by default `claude-fable-5-2-high`, `claude-opus-5-5-high-fast`, and `gemini-4-neon-xhigh`. An `auto` or `inherit-parent` entry is the parent model, so omit `model` and spawn `generalPurpose`. If the Task tool rejects a slug, use the nearest valid slug of the same family or drop the seat, keep at least two runners, and say so. Families go by prefix, and the longest match wins: `claude-fable-*`, `claude-*`, and `gemini-*`, after dropping a leading `cursor-`. Any other slug's family is its text before the first hyphen. Spawn more for multiple design directions, and repeat one model when the work is generation-bound, not judgment-sensitive. Pick each subagent's reasoning level per the Subagents section of the **poteto-mode** skill.
-4. Give each candidate its own output location (a git worktree where possible, otherwise `/tmp/arena-<slug>/candidate-<n>/`), per the **separate-before-serializing-shared-state** principle skill.
+1. 各候補が作成すべき成果物を明確に定義します。
+2. 採点基準（ルーブリック）を導出します。*この*タスクにおいて何が成功かを判定できる、具体的で採点可能な3〜6個の評価基準を設定してください。これはフェーズ D でベース案を選ぶ人が使うツールであり、候補側にはタスク内容しか見せません。
+3. `~/.cursor/rules/pstack-models.mdc` の `arena runners` 行から実行モデル（ランナー）を選択します。デフォルトは `claude-fable-5-2-high`、`claude-opus-5-5-high-fast`、`gemini-4-neon-xhigh` です。`auto` または `inherit-parent` のエントリは親チャットのモデルを使うという意味なので、`model` フィールドを省略して `generalPurpose` を起動してください。Task ツールがスラッグを拒否した場合は、同じモデルファミリー内で最も近い有効なスラッグを使うか、その枠を外してください（ただし最低2つのランナーは維持し、変更した旨を明記します）。ファミリーはプレフィックスで判定され、最長一致が優先されます（先頭の `cursor-` を除いたうえで、`claude-fable-*`、`claude-*`、`gemini-*` の順）。それ以外のスラッグのファミリーは、最初のハイフンより前の文字列になります。複数の設計アプローチを探りたいときは候補数を増やし、判断の鋭さよりも生成量・バリエーションが重要なタスクでは同じモデルを複数回起動してください。各サブエージェントの推論レベルは、**poteto-mode** スキルの Subagents セクションに従って設定します。
+4. **separate-before-serializing-shared-state** 原則スキルに従い、各候補に専用の出力先（可能であれば Git worktree、難しければ `/tmp/arena-<slug>/candidate-<n>/`）を割り当ててください。
 
-## Phase B: Fan out
+## フェーズ B：Fan out（並列展開）
 
-Spawn all N subagents in one message with `run_in_background: true`, each with the task, the path to the shared grounding, its own output path, and instructions to produce the artifact and a short rationale naming the alternatives it considered and what it rejected.
+1回のメッセージで `run_in_background: true` を指定して N 個のサブエージェントすべてを一斉に起動します。各エージェントには、タスク内容、共通の前提資料（shared grounding）へのパス、専用の出力先パスを渡し、成果物とあわせて「検討した代替案と何を却下したか」を記した短い設計根拠（rationale）を作成するよう指示してください。
 
-If a candidate produces no output, proceed with N-1 and note the dropout.
+出力を生成しなかった候補がある場合は、残りの N-1 個で作業を続行し、脱落（ドロップアウト）があった旨を記録してください。
 
-## Phase C: Cross-judge
+## フェーズ C：Cross-judge（クロス審査）
 
-After all Phase B candidates complete, spawn one readonly judge from the `arena cross-judge pool` line in `~/.cursor/rules/pstack-models.mdc`, by default `claude-opus-5-5-high-fast`, `gemini-4-neon-xhigh`. The judge is never from the parent's vendor, and Fable counts as Claude for that check, so use the first entry from another vendor. An `auto` or `inherit-parent` entry is the parent model. If you do not know the parent's model, use the first real slug and say that the vendor check did not run. If the Task tool rejects a slug, use the nearest valid slug of the same family, then the next such entry, or skip the judge, and say so. While you read in Phase D, the judge scores each candidate, by path label, on each rubric criterion and recommends a base.
+フェーズ B のすべての候補が完了したら、`~/.cursor/rules/pstack-models.mdc` の `arena cross-judge pool` 行（デフォルトは `claude-opus-5-5-high-fast`、`gemini-4-neon-xhigh`）から、読み取り専用の審査員（judge）を1体起動します。審査員には親チャットと同じベンダーのモデルは決して使わず（この判定では Fable も Claude 扱いとします）、別ベンダーの最初のエントリを選択してください。`auto` または `inherit-parent` のエントリは親モデルとみなします。親チャットのモデルが不明な場合は、最初の有効な実スラッグを使用し、ベンダーチェックを行わなかった旨を明記してください。Task ツールがスラッグを拒否した場合は、同じファミリー内で最も近い有効なスラッグを使うか、別ベンダーの次のエントリを試すか、それでも無理なら審査員をスキップし、その旨を明記してください。あなたがフェーズ D で各候補を読み込んでいる間に、審査員はパス名ラベルごとに各ルーブリック基準で全候補を採点し、ベースとなる推奨案を提示します。
 
-## Phase D: Pick a base
+## フェーズ D：Pick a base（ベース案の選択）
 
-Read every candidate end to end before picking. Score each against the rubric criterion by criterion, not on holistic feel, and compare with the cross-judge when Phase C ran one. Agreement on the base confirms the pick. Disagreement means one of you is biased or the rubric was ambiguous. Read both rationales before deciding.
+ベース案を選ぶ前に、すべての候補を端から端まで読み通してください。全体の雰囲気ではなく、ルーブリックの評価基準ごとに1項目ずつ採点し、フェーズ C でクロス審査を実行した場合はその結果と比較します。両者の推奨ベース案が一致していれば選択の裏付けになります。意見が食い違った場合は、どちらかにバイアスがかかっているか、ルーブリックが曖昧だったことを意味します。決定を下す前に、双方の根拠（rationale）を読み比べてください。
 
-Pick the base a future maintainer can extend most easily without breaking invariants. When two feel tied, prefer the cleaner boundary or smaller API, per the Laziness Protocol.
+将来の保守担当者が不変条件（インバリアント）を壊すことなく最も容易に拡張できる案をベースに選んでください。2つの案が互角に思える場合は、Laziness Protocol（怠惰のプロトコル）に従い、境界がよりクリーンな方、または API サーフェスがより小さい方を優先します。
 
-## Phase E: Graft
+## フェーズ E：Graft（移植・統合）
 
-Walk each losing candidate once more for what is worth porting into the base, usually one or two things per candidate, not most of it. Fold each graft in by hand, per the **redesign-from-first-principles** principle skill, so the result stays coherent under one mental model. Don't paste mechanically.
+選ばれなかった各候補にもう一度目を通し、ベース案に移植（graft）する価値のある要素を探します。通常は1候補あたり全体の大半ではなく、1〜2個の優れたアイデアを取り入れます。**redesign-from-first-principles** 原則スキルに従い、全体が1つの一貫したメンタルモデルのもとで整合性を保つよう、各要素を手作業で丁寧に統合してください。機械的なコピペをしてはいけません。
 
-If the candidates converge on one shape, that is strong agreement. Note it and ship the consensus shape. No graft is needed. If they wildly diverge, Phase A was under-specified. Reframe and re-run rather than averaging the divergence.
+すべての候補が1つの同じ構造に収束した場合は、非常に強い合意が得られたことを意味します。その旨を記録し、移植作業は行わずにその合意された構造をそのまま採用してください。逆に、各候補の方向性が大きくバラバラに発散してしまった場合は、フェーズ A の要件定義が曖昧すぎたということです。バラバラな案を無理やり平均化して妥協するのではなく、課題設定（Frame）をやり直して再実行してください。
 
-## Phase F: Verify
+## フェーズ F：Verify（検証）
 
-Verify the synthesized artifact like any other output, per the **prove-it-works** principle skill. If verification finds a problem the arena missed, either Phase A was wrong (re-frame and re-run) or a candidate caught it and you missed the graft (go back to Phase E). Don't paper over it.
+統合した成果物を、**prove-it-works** 原則スキルに従って他のあらゆる出力と同様に検証します。検証によってアリーナが見落としていた問題が見つかった場合、原因はフェーズ A の課題設定が誤っていたか（課題設定をやり直して再実行）、あるいは他の候補がその問題に対処していたのに移植し損ねたか（フェーズ E に戻る）のどちらかです。その場しのぎの修正で取り繕ってはいけません。
 
-## Outputs
+## 出力
 
-One synthesized artifact, with a short synthesis note alongside naming the base and why, the cross-judge's verdict or that Phase C skipped the judge, each graft with its source candidate, what was rejected and why, any convergence or dropouts, and the verification result.
+統合された1つの成果物と、それに添える短い統合ノート。ノートには、ベースに選んだ案とその理由、クロス審査員の判定結果（またはフェーズ C で審査員をスキップした旨）、移植した各要素とその元の候補名、却下した要素とその理由、候補間の収束や脱落（ドロップアウト）の有無、および検証結果を記載します。

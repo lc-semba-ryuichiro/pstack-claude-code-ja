@@ -1,42 +1,42 @@
 ---
 name: tdd
-description: "Use only when the user explicitly asks for TDD, a failing test, or a regression test, OR when the bug has an obvious cheap local test target. Skip when the test path is unclear, expensive, integration-heavy, or not requested."
+description: "ユーザーが明示的に TDD、失敗するテスト、またはリグレッションテストを求めた場合、あるいはバグに明白で安価なローカルテスト対象がある場合にのみ使用します。テストパスが不明確、高コスト、統合テスト寄り、または要求されていない場合はスキップします。"
 disable-model-invocation: true
 ---
 
 # TDD Bug Fix
 
-When fixing a bug with a clear, cheap test path, make the broken behavior executable before changing production code. The goal is a focused regression test that fails before the fix and passes after it.
+明確で安価なテストパスがあるバグを修正する際は、本番コードを変更する前に、壊れた振る舞いを実行可能なテストにします。目標は、修正前に失敗し、修正後にパスする、焦点の絞られたリグレッションテストです。
 
-Do not force a test when it would be impractical. If the available test would require broad harness setup, brittle mocks, slow end-to-end infrastructure, production-only state, vague reproduction steps, or large unrelated fixture churn, skip adding a new test and use the closest useful verification instead.
+非現実的な場合にテストを無理強いしないこと。利用可能なテストに大掛かりなハーネス（harness）のセットアップ、脆いモック、低速な E2E インフラ、本番環境のみの状態、曖昧な再現手順、または無関係なフィクスチャの大量変更が必要な場合は、新しいテストの追加をスキップし、代わりに最も近い有用な検証手段を使用します。
 
-## Workflow
+## ワークフロー
 
-1. **Understand the bug.** Identify the intended behavior, current behavior, affected path, and smallest observable reproduction.
-2. **Choose the narrowest executable check.** Prefer the closest unit, component, integration, or regression test already used for that codepath. If no practical test path is obvious, do not create one from scratch just to satisfy the workflow.
-3. **Write the failing test first.** Add the smallest focused test that would have caught the bug. The test should encode intended behavior, not mirror the current implementation.
-4. **Run the new test before fixing.** Confirm it fails for the intended reason. If it passes or fails for an unrelated reason, correct the test or reproduction before editing the implementation.
-5. **Fix the bug.** Make the smallest production change that satisfies the intended behavior while preserving nearby contracts.
-6. **Rerun the regression test.** Confirm the test now passes.
+1. **バグを理解する。** 意図された振る舞い、現在の振る舞い、影響を受けるパス、および最小の観測可能な再現手順を特定します。
+2. **最も狭い実行可能なチェックを選択する。** そのコードパスですでに使われている最も近いユニット、コンポーネント、インテグレーション、またはリグレッションテストを優先します。実用的なテストパスが明らかでない場合は、ワークフローを満たすためだけにゼロから作成しないでください。
+3. **最初に失敗するテストを書く。** そのバグを捕捉できたはずの最小で焦点の絞られたテストを追加します。テストは現在の実装をなぞるのではなく、意図された振る舞いをエンコードすべきです。
+4. **修正前に新しいテストを実行する。** 意図した理由で失敗することを確認します。パスしてしまう場合や無関係な理由で失敗する場合は、実装を編集する前にテストまたは再現手順を修正します。
+5. **バグを修正する。** 周辺の契約（contracts）を維持しながら、意図された振る舞いを満たす最小限の本番コード変更を行います。
+6. **リグレッションテストを再実行する。** テストがパスすることを確認します。
 
-## If a Failing Test Is Impractical
+## 失敗するテストを書くのが現実的でない場合
 
-Use the closest executable regression check instead: a targeted script, manual reproduction command, browser automation, snapshot comparison, log assertion, or focused integration check.
+代わりに、最も近い実行可能なリグレッションチェック（対象を絞ったスクリプト、手動再現コマンド、ブラウザ自動化、スナップショット比較、ログのアサーション、または焦点を絞った統合チェック）を使用します。
 
-Prefer no new test over a bad test. A bad test is one that mostly tests mocks, encodes current implementation details, depends on timing or unrelated global state, needs expensive infrastructure for a small fix, or would be deleted immediately after proving the fix.
+悪いテストを書くくらいなら、新しいテストを書かない方がマシです。悪いテストとは、主にモックをテストするもの、現在の実装詳細をエンコードするもの、タイミングや無関係なグローバル状態に依存するもの、小さな修正に対して高価なインフラを必要とするもの、あるいは修正を証明した直後に削除されるようなテストのことです。
 
-## Guardrails
+## ガードレール
 
-- Do not change tests merely to match a wrong implementation.
-- Do not weaken existing assertions unless the expected behavior has genuinely changed and the reason is clear.
-- Keep the regression test focused on the bug. Avoid broad fixture churn or unrelated coverage expansion.
-- If the bug is flaky, make the test deterministic where possible and document the signal being locked down.
-- If the bug exposes a broader class of failures, first land the focused regression path, then consider additional sibling coverage.
+- 誤った実装に合わせるためだけにテストを変更しないこと。
+- 既存のアサーションを弱めないこと。弱めてよいのは、期待される振る舞いが本当に変わっていて、かつその理由が明確な場合だけです。
+- リグレッションテストはバグに焦点を絞ること。広範なフィクスチャの変更や無関係なカバレッジ拡大は避けます。
+- バグが不安定（flaky）な場合は、可能な限りテストを決定論的にし、固定したシグナルを文書化します。
+- バグがより広範なクラスの障害を露呈させた場合は、まず焦点を絞ったリグレッションパスを着地させ、その後に類似箇所の追加カバレッジを検討します。
 
-## Final Response
+## 最終報告
 
-Report the evidence, not just the outcome:
+結果だけでなく、証拠を報告すること。
 
-- Name the failing-before test or executable check and the failure it produced.
-- Name the passing-after test run and any nearby validation performed.
-- If failing-before evidence could not be demonstrated, state why and describe the closest regression check used instead.
+- 修正前に失敗したテストまたは実行可能チェックの名前と、それが出力した失敗内容。
+- 修正後にパスしたテスト実行の名前と、周辺で実施した検証。
+- 修正前の失敗証拠を実証できなかった場合は、その理由と代わりに使用した最も近いリグレッションチェックの説明。

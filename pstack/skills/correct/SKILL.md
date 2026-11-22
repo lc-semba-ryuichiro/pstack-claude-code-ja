@@ -1,32 +1,32 @@
 ---
 name: correct
-description: "Find the mistakes agents keep repeating in this repo and make each one impossible. Try architecture first, then types, then a lint whose error names the fix, then a test, and write docs last. Prove each check fails on a real past mistake. Repeat this each time the operator corrects you. Use for /correct."
+description: "このリポジトリでエージェントが繰り返し犯しているミスを特定し、構造的に発生し得ないように修正します。まずアーキテクチャ、次に型システム、次に修正方法をエラーメッセージで明示する Lint、次にテストの順で対策を講じ、ドキュメントの記述は最後の手段にします。追加した各チェックが過去の実際のミスで確実に失敗することを証明します。オペレーターから指摘を受けるたびにこのプロセスを繰り返してください。/correct で使用します。"
 disable-model-invocation: true
 ---
 
 # Correct
 
-The operator keeps correcting agents in this repo for the same mistakes. Change the repo so the next agent can't make them.
+オペレーター（開発者）は、このリポジトリでエージェントに対して何度も同じミスを指摘し続けています。次のエージェントが同じミスを犯せないように、リポジトリそのものを改善してください。
 
-Assume every contributor is an agent that sees only the files it opened, copies the nearest example, and takes the shortest path that compiles. Design the repo so a change that looks right from one file is right for the whole repo.
+すべてのコントリビューターは「自分が開いたファイルだけを見て、一番近くにある実装例をコピペし、コンパイルが通る最短ルートを選ぶエージェント」であると仮定してください。1つのファイルだけを見て「正しそうだ」と判断して書いた変更が、リポジトリ全体にとっても正しい変更になるように設計するのです。
 
-## Find the mistake classes
+## ミスのパターン（クラス）を特定する
 
-First, read recent commits, reverts, review comments, agent instruction files, and comments that explain workarounds. Group the mistakes into classes. A class counts once it has happened twice.
+まず、直近のコミット、リバート履歴、レビューコメント、エージェント向けの指示ファイル、および場当たり的なワークアラウンドを説明しているコメントを読み込みます。発見したミスをパターン（クラス）ごとに分類してください。同じ種類のミスが2回発生していれば、1つのクラスとしてカウントします。
 
-## Fix each class at the highest level that works
+## 機能する最も高いレイヤーで各クラスを修正する
 
-1. **Eliminate it with architecture.** Give each piece of state one owner and each task one supported way. Hide internals so the wrong import fails. Replace hand-synced lists with one source of truth. Delete old ways and dead code an agent would copy.
-2. **Enforce it with types so the bad state can't be written.** If bad code still compiles, add a lint or CI check whose error names the file, type, or function to use instead. If the pattern is already common, fail only when a change adds more.
-3. **Test the behavior.** Fix or delete any test that still passes when the behavior it checks breaks, or that fails when only the internals change.
-4. **Write docs or agent rules last, only for judgment calls.** Nothing fails when an agent skips them.
+1. **アーキテクチャによって根本から排除する。** 各状態に単一の所有者を与え、各タスクの実装方法を公式にサポートされた1通りに統一します。内部実装を隠蔽し、誤ったインポート自体が失敗するようにします。手動で同期しているリストは単一の信頼できる情報源（Single Source of Truth）に置き換えます。エージェントがうっかりコピーしてしまいそうな古い書き方やデッドコードは削除してください。
+2. **不正な状態そのものを書けないよう型システムで強制する。** それでも誤ったコードのコンパイルが通ってしまう場合は、「代わりに使うべきファイル名・型・関数名」をエラーメッセージで明示する Lint ルールや CI チェックを追加します。すでに既存コード全体にそのパターンが蔓延している場合は、新たな変更によってその件数が増えたときにだけ失敗させるようにします。
+3. **振る舞いをテストする。** チェック対象の振る舞いが壊れているのにパスしてしまうテストや、内部実装を変えただけで落ちてしまう脆いテストは、修正するか削除してください。
+4. **ドキュメントやエージェント向けルールは最後の手段とし、人間の判断が絡む基準だけに絞って書く。** エージェントがルールを読み飛ばしても何もエラーにならず失敗しないため、強制力がないからです。
 
-## Fix and prove
+## 修正して証明する
 
-Then fix the most frequent classes now, one commit each. Prove each new check fails on a real past mistake. Run the same command locally and in CI. Exceptions go on the offending line with a reason, an expiry date, and a human's approval.
+最も頻度の高いミスのクラスから順に、1クラス1コミットの単位で今すぐ修正します。新しく追加した各チェックが、過去の実際のミスに対して確実に失敗することを証明してください。ローカル環境でも CI でもまったく同じコマンドが実行されるようにします。例外を許可する必要がある場合は、該当行に直接記述し、理由・有効期限・人間の承認を必ず添えてください。
 
-## Keep the rule table
+## ルール対応表を維持する
 
-Last, keep a table in the agent instruction file that pairs each rule with what enforces it. When the operator corrects you, fix the mistake and add the rule. If the rule was already there and nothing enforces it, that's a repeat, so fix it at the highest level in the same change. Drop a rule once its mistake can't happen.
+最後に、エージェント指示ファイル内に「各ルールと、それを強制する仕組み（型・Lint・テストなど）」を対応付けた表を維持してください。オペレーターから指摘を受けたら、そのミスを修正すると同時に表へルールを追加します。すでに表にルールが存在していたにもかかわらず、それを強制する仕組みが何もない状態だったなら、それは「再発」です。同じ変更の中で、機能する最も高いレイヤーの強制機構を実装してください。構造上そのミスが二度と起こり得なくなったら、表からそのルールを削除します。
 
-**Reply:** each class with its evidence, the level you picked, and why a higher level didn't work.
+**返信形式：** 特定した各ミスのクラスについて、その根拠（エビデンス）、選択した対策レイヤー、そしてなぜそれより高いレイヤーを使えなかったのかを報告してください。

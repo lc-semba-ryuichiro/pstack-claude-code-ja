@@ -1,162 +1,162 @@
-# Verify the result and open a PR
+# 結果を検証し、PR を作成する
 
-"It compiles" is not evidence. The [Prove It Works principle](../../skills/principle-prove-it-works/SKILL.md) makes the agent check the real artifact before it reports success, and your job is to make "the real artifact" checkable. This page covers stating a finish condition, vetting a measured number, generating a verification skill for your app, formally verifying a property tests rarely reach, opening the PR, and driving it to merged.
+「コンパイルが通った」は証拠になりません。[Prove It Works 原則](../../skills/principle-prove-it-works/SKILL.md) は、エージェントが成功を報告する前に「実際の成果物」をチェックすることを義務付けており、あなたの仕事はその「実際の成果物」をチェック可能な状態にすることです。このページでは、完了条件の明示、計測値の精査、アプリ専用の検証スキルの生成、通常のテストでは到達しにくい性質の形式検証、PR の作成、そしてマージ完了までの推進方法を解説します。
 
-Verification is the slowest step in most agent work, because it's the step that usually waits on a human. Make the agent able to do it, and you stop being the bottleneck. Skip it, and running more agents only gets you more unchecked work to review.
+ほとんどのエージェント作業において、検証は最も時間のかかるステップです。なぜなら、通常ここは人間の確認待ちになる工程だからです。エージェント自身が検証できるようにすれば、あなたがボトルネックになることはなくなります。逆に検証をスキップすれば、エージェントを並列で増やすほど、未確認のレビュー待ち作業が山積みになるだけです。
 
-![A prototype plane flies a real test course while she times it with a stopwatch and robots film and checklist the run; the terminal reads verify: pass, evidence: captured.](./images/verification.jpg)
+![試作機が実際のテストコースを飛行する中、女性がストップウォッチで計測し、ロボットたちが飛行を撮影しながらチェックリストを確認している。端末の画面には verify: pass, evidence: captured と表示されている。](./images/verification.jpg)
 
-## State the finish condition up front
+## 最初に完了条件を明示する
 
-Put what done means in the first prompt, in whatever words fit:
-
-```text
-/poteto-mode add json output to this command. text output stays byte-identical, the json parses, both run against the sample project. show me the evidence.
-```
-
-Now the agent has three checks it can run, not a mood to satisfy. When the reply comes back, it should carry the exact commands and outputs. If a check couldn't run, a good reply says "inconclusive". A confident reply without evidence is a warning sign.
-
-Match the check to the change:
-
-- A CLI change runs the real command.
-- A UI change walks the changed flow in the running app. When it must match a reference pixel for pixel, the [Visual parity playbook](../../skills/poteto-mode/playbooks/visual-parity.md) diffs screenshots against a frozen baseline instead of judging by eye.
-- A parser or migration replays a saved input.
-- A perf change compares before and after profiles.
-- A storage change reads back the written value.
-
-Ask for the proof as an artifact you can inspect yourself: the failing test and then the passing one, a before-and-after video, the trace, the screenshot. If the fix already merged, ask for the same check again on main. An artifact beats a plausible explanation, because you can challenge it without replaying the whole run.
-
-For a small diff you don't fully trust, [`/blast-radius`](../../skills/blast-radius/SKILL.md) finds what it could break elsewhere. It finds the one fact that makes the change safe and proves that fact by running code, not by arguing for it.
-
-## Vet a measured number with `/benchmark-checklist`
-
-A before-and-after number is the easiest evidence to get wrong by accident. A warm cache, a debug build on one side, or work that never ran inside the timed region can each produce a convincing speedup. Before you report or act on a number, type:
+最初のプロンプトの中に、しっくりくる自然な言葉で「何をもって完了とするか」を盛り込みます：
 
 ```text
-/benchmark-checklist vet the export speedup before it goes in the pr
+/poteto-mode このコマンドに JSON 出力を追加して。テキスト出力はバイト単位で完全に同じ状態を維持し、JSON は正しくパースでき、両方ともサンプルプロジェクトに対して動作すること。証拠を提示して。
 ```
 
-[`/benchmark-checklist`](../../skills/benchmark-checklist/SKILL.md) asks seven questions and wants evidence from a run for each:
+これにより、エージェントには曖昧な雰囲気ではなく、実際に実行できる3つのチェック項目が与えられます。返信が返ってきたときには、実行した正確なコマンドとその出力が含まれているはずです。もし実行できないチェックがあった場合、優れた返信は「判断不能（inconclusive）」と正直に報告します。証拠のない自信満々な返信は危険信号です。
 
-1. What limits the number, and why isn't it double?
-2. Did every side run tuned the way production runs?
-3. Does the result break a physical limit, like disk bandwidth or core count?
-4. Did anything error or return wrong output?
-5. Does it reproduce over alternating runs, with a median and a range?
-6. Does it matter end to end, on the path a user waits on?
-7. Did the work actually happen inside the timed region?
+変更内容に合わせて検証方法を一致させましょう：
 
-The verdict comes back as faster, slower, no measurable difference, or inconclusive, with the run count, range, and limiter. It says inconclusive when it can't name the limiter or a side ran untuned. `/poteto-mode` already runs the checklist inside the Perf issue and Hillclimb playbooks, so you type it yourself when you measured something outside them, or when someone else's number looks too good. It's the working form of the [Explain the Number principle](../../skills/principle-explain-the-number/SKILL.md).
+- CLI の変更であれば、実際のコマンドを実行します。
+- UI の変更であれば、起動中のアプリ上で変更されたフローを実際に操作します。お手本とピクセル単位で一致させる必要がある場合は、目視で判断する代わりに [Visual parity プレイブック](../../skills/poteto-mode/playbooks/visual-parity.md) を使って固定ベースラインのスクリーンショットと差分比較を行います。
+- パーサーやマイグレーションであれば、保存済みの入力データをリプレイします。
+- パフォーマンス改善であれば、変更前後のプロファイルを比較します。
+- ストレージ関連の変更であれば、書き込んだ値を実際に読み戻して確認します。
 
-## Create a project verification skill
+自分自身で検査できるアーティファクト（成果物）として証拠を求めてください。たとえば、最初は失敗し修正後にパスするテスト結果、変更前後の動画、トレースログ、スクリーンショットなどです。修正がすでにマージされている場合は、`main` ブランチ上でもう一度同じチェックを実行させてください。アーティファクトはもっともらしい言葉での説明よりもはるかに雄弁です。実行全体をやり直さなくても、その妥当性を検証できるからです。
 
-The UI bullet above hides a real requirement. The agent needs a scripted way to drive your app. If your project has one, great. If not, run:
+完全には安心しきれない小さな差分については、[`/blast-radius`](../../skills/blast-radius/SKILL.md) を使うと他のどの箇所を壊す可能性があるかを洗い出せます。その変更が安全である根拠となる「1つの決定的な事実」を突き止め、口頭で正当化するのではなく、実際にコードを実行してその事実を証明します。
+
+## `/benchmark-checklist` で計測値を精査する
+
+変更前後の数値比較は、うっかり間違った証拠を出しやすい代表例です。キャッシュが温まっていた、片方だけデバッグビルドだった、あるいは計測区間の外で処理が動いていた、といった理由だけで説得力のある高速化データが簡単に出てしまいます。数値を報告したり、それに基づいて行動したりする前に、次のように入力してください：
+
+```text
+/benchmark-checklist PR に載せる前に、エクスポート高速化の計測値が妥当か精査して
+```
+
+[`/benchmark-checklist`](../../skills/benchmark-checklist/SKILL.md) は7つの質問を投げかけ、それぞれについて実際の実行結果に基づく証拠を求めます：
+
+1. 何が数値を制限している（ボトルネックになっている）のか、そしてなぜ2倍の速度が出ないのか？
+2. 比較するすべての側が、本番環境と同じようにチューニングされた状態で実行されたか？
+3. 結果はディスク帯域幅やコア数といった物理的限界を超えてしまっていないか（＝計測ミスではないか）？
+4. エラーが発生したり、間違った出力を返したりしていないか？
+5. 交互に繰り返し実行しても再現性があり、中央値とばらつきの範囲（レンジ）が示されているか？
+6. ユーザーが実際に待たされるパスにおいて、エンドツーエンドで意味のある改善になっているか？
+7. 計測対象の区間内で、意図した処理が本当に実行されていたか？
+
+判定結果は、`faster`（高速化）、`slower`（低速化）、`no measurable difference`（計測可能な差なし）、または `inconclusive`（判断不能）のいずれかとして、試行回数、数値の範囲、ボトルネック要因とともに返されます。ボトルネックを特定できない場合や、片方が未チューニング状態で実行されていた場合は「判断不能」となります。`/poteto-mode` は Perf issue や Hillclimb プレイブックの内部ですでにこのチェックリストを実行しているため、あなたが自分で入力するのは、それらのプレイブック外で何かを計測したときや、他の誰かが出した数値がうますぎるように見えるときです。これは [Explain the Number 原則](../../skills/principle-explain-the-number/SKILL.md) を実践に落とし込んだスキルです。
+
+## プロジェクト固有の検証スキルを作成する
+
+先ほどの UI 検証の項目には、実は重要な前提条件が隠れています。エージェントがあなたのアプリを操作するためのスクリプト化された手段が必要だという点です。プロジェクトにすでにそれがあるなら素晴らしいですが、ない場合は次を実行してください：
 
 ```text
 /create-verification-skill
 ```
 
-[`/create-verification-skill`](../../skills/create-verification-skill/SKILL.md) interviews the repository, not you. It works out what a user touches, how the app launches locally, what can drive it (an existing harness first, otherwise browser and CDP, a PTY, or plain HTTP), what evidence proves behavior, and whether two instances can run side by side. It asks you only what the code can't answer.
+[`/create-verification-skill`](../../skills/create-verification-skill/SKILL.md) はあなたではなく、リポジトリに対してインタビュー（調査）を行います。ユーザーがどこを操作するのか、ローカルでアプリをどう起動するのか、何を使えば操作できるのか（既存のテストハーネスを最優先し、なければブラウザと CDP、PTY、あるいはプレーンな HTTP）、どの証拠があれば挙動を証明できるのか、そして2つのインスタンスを並べて同時実行できるかを調べ上げます。コードからは答えが得られない点だけをあなたに質問します。
 
-It writes `.cursor/skills/verify-<app>/`, agent-facing instructions with exact Launch, Doctor, Drive, Evidence, and Cleanup sections, a Helpers section for any script it ships, plus a feature map under `features/` that indexes what the app does and what result proves each feature works. The skill ships a [worked feature-map example](../../skills/create-verification-skill/references/feature-map-example/) with a README index and one file per feature using the four required H2s. Before handing it over, the generator proves the skill once end to end: launch, doctor check, drive one feature, capture evidence, clean up, then confirm the evidence survived the cleanup. If that proof fails, don't use the output.
+そして、具体的な Launch（起動）、Doctor（ヘルスチェック）、Drive（操作）、Evidence（証拠収集）、Cleanup（後片付け）の各セクションと、同梱スクリプト用の Helpers セクション、さらに `features/` 配下に「アプリが何をするか」と「各機能の動作を証明する結果」を索引化した機能マップを備えたエージェント向け手順書 `.cursor/skills/verify-<app>/` を書き出します。このスキルには、README インデックスと必須の4つの H2 見出しを使った機能別ファイルから成る[機能マップのサンプル](../../skills/create-verification-skill/references/feature-map-example/)も同梱されています。引き渡す前に、ジェネレーターはスキル全体をエンドツーエンドで一度実証します（起動 → ヘルスチェック → 1つの機能の操作 → 証拠のキャプチャ → 後片付け → 後片付け後も証拠が残っていることの確認）。もしこの実証に失敗した場合、生成された出力は使わないでください。
 
-From then on, "verify it in the app" is a step any agent can execute, in this repo, with no setup conversation. Name it in the prompt when you want the proof in a specific form:
+これ以降は、セットアップのやり取りを一切しなくても、このリポジトリ内のどのエージェントでも「アプリ上で検証する」というステップを実行できるようになります。特定の形式で証拠が欲しいときは、プロンプトでスキル名を指定してください：
 
 ```text
-/poteto-mode build the bulk-archive action. use /verify-<app> to verify your changes and show me a video and screenshots as proof.
+/poteto-mode 一括アーカイブ機能を実装して。/verify-<app> を使って変更を検証し、証拠として動画とスクリーンショットを提示して。
 ```
 
 ```text
-/poteto-mode repro this with /verify-<app>. if it repros on main, fix it and show me a video as proof.
+/poteto-mode /verify-<app> でこの不具合を再現させて。main ブランチでも再現するなら修正し、証拠として動画を提示して。
 ```
 
-Once the verify skill works, a [`/swarm`](../../skills/swarm/SKILL.md) can split a full pass by feature-map entry and aggregate the results. A swarm of verifiers also confirms a perf win over a big enough sample, or fuzzes the app for regressions before a PR ships.
+検証スキルが機能するようになれば、[`/swarm`](../../skills/swarm/SKILL.md) を使って機能マップのエントリごとに全体テストを分割実行し、結果を集約することもできます。検証ワーカーのスウォームを使えば、十分なサンプル数でパフォーマンス改善を裏付けたり、PR を出す前にアプリをファジング（ランダム入力テスト）してリグレッションを洗い出したりすることも可能です。
 
-Treat the verification skill as infrastructure, not a one-off. Commit it, so every person and every agent on the team drives the app the same way. Then [build the lever](../../skills/principle-build-the-lever/SKILL.md). When agents keep writing throwaway scripts to click through the app, ask for a small control CLI that the skill calls instead. Agents spend fewer tokens, and every run becomes repeatable. A CLI that agents use well has these traits:
+検証スキルは使い捨てではなく、インフラとして扱ってください。リポジトリにコミットすることで、チームの全員とすべてのエージェントが同じ方法でアプリを操作できるようになります。そのうえで、[てこを作る（build the lever）](../../skills/principle-build-the-lever/SKILL.md) 原則を実践しましょう。エージェントがアプリをクリック操作するための使い捨てスクリプトを毎回書いているようなら、代わりにスキルから呼び出せる小さな操作用 CLI を作るよう依頼してください。エージェントのトークン消費量が減り、すべての実行に再現性が生まれます。エージェントが使いこなせる CLI には次のような特徴があります：
 
-- A few composable commands, each doing real work, rather than many thin ones.
-- A `--dry-run` option on anything destructive.
-- Subcommands that reveal features gradually instead of all at once.
-- Error messages that say what to do instead.
-- Rich `--help` text.
-- Machine-readable output, such as JSON.
+- 薄いコマンドを大量に作るのではなく、それぞれが実質的な仕事をする組み合わせ可能な少数のコマンド。
+- 破壊的な操作にはすべて `--dry-run` オプションを用意する。
+- すべての機能を一度に見せるのではなく、サブコマンドで段階的に機能を開示する。
+- 代わりに何をすべきかを具体的に示すエラーメッセージ。
+- 充実した `--help` テキスト。
+- JSON などの機械可読な出力。
 
-While you're there, make the dev setup repeatable too: seeded data, test users, and one command that brings the environment up the same way every time.
+ついでに、開発環境のセットアップも再現可能にしておきましょう。シードデータ（初期投入データ）、テストユーザー、そして毎回まったく同じ状態で環境を立ち上げられる単一のコマンドを用意しておきます。
 
-## Keep the verification skill honest
+## 検証スキルを常に正確な状態に保つ
 
-Apps change, and feature maps go out of date. Run this at least once a day, ideally from a scheduled automation so nobody has to remember:
+アプリは日々変化するため、機能マップも古くなります。誰も覚えておく必要がないよう、できればスケジュール実行のオートメーションを使って、少なくとも1日1回は次を実行してください：
 
 ```text
 /maintain-verification-skill
 ```
 
-[`/maintain-verification-skill`](../../skills/maintain-verification-skill/SKILL.md) audits the generated skill: one read-only source reader per feature in parallel, then one live pass that drives every mapped feature. It ends in exactly one of three outcomes. `clean` means full coverage and nothing to ship. `changed` means one PR of proven corrections, confined to the verification skill's own directory. `blocked` names the blocker. It never edits product code. If the live pass catches a product regression, it reports the regression instead of hiding it with a doc edit.
+[`/maintain-verification-skill`](../../skills/maintain-verification-skill/SKILL.md) は生成された検証スキルを監査します。まず機能ごとに読み取り専用のソースリーダーを並列で走らせ、次にマッピングされたすべての機能を実際に操作するライブパスを1回実行します。結果は必ず次の3つのいずれかになります。`clean` はすべて網羅されており変更不要であること、`changed` は検証スキル自身のディレクトリ内のみに限定された証明済みの修正を含む1つの PR を作成したこと、`blocked` は進行を妨げている要因があることを示します。プロダクトコードは一切編集しません。もしライブパスでプロダクト側のリグレッションを検知した場合は、ドキュメントの書き換えで隠蔽するのではなく、リグレッションとして報告します。
 
-## Prove a property with a formal verification skill
+## 形式検証スキルでコードの性質を証明する
 
-A verification skill proves the paths you drive. Some bugs live on paths nobody drives: two retries that overlap, a lock that expires mid-write, a state change that arrives out of order. Tests rarely reach those cases. For code where such a bug is costly, run:
+通常の検証スキルが証明できるのは、実際に操作したパスだけです。しかし、誰も操作しないパスに潜むバグもあります。たとえば、2つのリトライ処理が重なるケース、書き込みの途中でロックが期限切れになるケース、状態変化が順不同で到着するケースなどです。通常のテストがこうしたケースに到達することはめったにありません。そのようなバグのコストが高いコードには、次を実行してください：
 
 ```text
 /create-formal-verification-skill
 ```
 
-[`/create-formal-verification-skill`](../../skills/create-formal-verification-skill/SKILL.md) picks the target from the code: a promise the code makes, where a break harms users and tests rarely reach the case that breaks it. It picks the strongest target, not the easiest to verify. Name an area or a bug to start there instead:
+[`/create-formal-verification-skill`](../../skills/create-formal-verification-skill/SKILL.md) はコードの中からターゲットを選び出します。具体的には「そのコードが約束している仕様であり、破られるとユーザーに実害が出るにもかかわらず、通常のテストでは破綻するケースにめったに到達できない箇所」です。検証しやすい簡単な箇所ではなく、最も重要なターゲットを選びます。特定の領域やバグから始めたい場合は、名前を指定してください：
 
 ```text
-/create-formal-verification-skill the job lease and retry logic. a job must never run twice at once.
+/create-formal-verification-skill ジョブのリース管理とリトライロジックを対象にして。1つのジョブが同時に2回実行されることは決してない、という性質を検証したい。
 ```
 
-The question picks the tool. Whether events can happen in a bad order suits a model checker over a small model of the design, and TLA+ is the default for that in any language. Whether the code behaves for every input suits a verifier that runs on the code. If no verifier runs on your language, the agent says so and tests the real code with generated inputs, not a hand-written model of the function. A property that must hold at every size can need a proof. The agent tells you which tool it chose and why.
+検証したい「問い」の内容によって、使用するツールが決まります。イベントが不正な順序で起こり得るかどうかを調べるには、設計の小さなモデルに対するモデルチェッカーが適しており、どの言語であっても TLA+ がデフォルトになります。あらゆる入力に対してコードが正しく振る舞うかどうかを調べるには、コード上で直接動作する検証器が適しています。お使いの言語で動作する検証器がない場合、エージェントはその旨を伝えたうえで、手書きの関数モデルではなく自動生成された入力データを使って実際のコードをテストします。あらゆるデータサイズで成り立つ必要がある性質には、数学的証明（proof）が必要になることもあります。エージェントはどのツールを選び、なぜそれを選んだのかを説明します。
 
-It verifies one property and shows that property failing on a broken variant of the code, because a check you've never seen fail proves nothing. When the current code already breaks the property, you get the counterexample as a short sequence of steps in your code's terms. The property stays as stated, so the finding stays a finding. Product code doesn't change unless you ask.
+このスキルは1つの性質を検証し、さらに意図的に壊したコードのバリエーションに対してその性質が失敗することも実演します。一度も失敗する様子を見たことがないチェックは、何も証明していないのと同じだからです。現在のコードがすでにその性質に違反している場合は、コード内の用語を使った短いステップの連続として反例（カウンターエグザンプル）が提示されます。指摘事項がうやむやにならないよう、検証する性質自体は最初に宣言した通りのまま維持されます。あなたが指示しない限り、プロダクトコードは変更されません。
 
-It writes a project-local skill that tells the next agent whether a change touches the verified code, how to run the check with one command, and how to tell a real bug from a modeling error. Before handing it over, the generator follows that skill once on a scratch change that breaks the property, and the check must catch it. The handoff says what was verified, with which tool and bounds, what the check found, and what it doesn't cover. A pass covers the model or the bound, not the whole system.
+次に、変更がその検証済みコードに触れているかどうか、1つのコマンドでチェックを実行する方法、そして本物のバグとモデリング上の誤りを見分ける方法を次のエージェントに伝えるプロジェクト固有スキルを書き出します。引き渡す前に、ジェネレーターはその性質を破る一時的な変更に対してスキルを一度実行し、チェックがそれを確実に捕捉できることを実証します。引き渡し時には、何が検証されたか、どのツールと境界条件を使ったか、チェックで何が見つかったか、そして何がカバーされていないかが報告されます。パス（合格）が保証するのはあくまでそのモデルや境界条件の範囲内であり、システム全体ではありません。
 
-The skill also records which code each check covers and the commit where the check last matched it. Merges and refactors that skip the skill can leave the check passing on a description of code that's gone. After them, run [`/maintain-formal-verification-skill`](../../skills/maintain-formal-verification-skill/SKILL.md). It updates the verification from the code, reruns it, shows that each updated check can still fail, and tells you whether each failure is drift in the verification or a bug in the code.
+また、このスキルは各チェックがどのコードをカバーしているかと、最後にコードと一致したコミットを記録します。スキルをスキップして行われたマージやリファクタリングによって、すでに消滅したコードの記述に対してチェックがパスし続ける状態になることがあります。そのような変更の後は、[`/maintain-formal-verification-skill`](../../skills/maintain-formal-verification-skill/SKILL.md) を実行してください。コードの変更に合わせて検証内容を更新して再実行し、更新された各チェックが依然として失敗を検知できることを示したうえで、各失敗が検証側の乖離によるものか、それともコードのバグによるものかを判定します。
 
-## Show the behavior as a statechart
+## 振る舞いをステートチャートとして可視化する
 
-A counterexample in model terms convinces you. The PM or designer who owns the behavior needs to see it in their terms. Run:
+モデル上の用語で示された反例は、エンジニアであるあなたを納得させるには十分です。しかし、その振る舞いのオーナーである PM やデザイナーには、彼らの言葉で理解できる視覚的な表現が必要です。次を実行してください：
 
 ```text
-/statechart what the user sees when they edit a note offline
+/statechart ユーザーがオフラインでメモを編集したときに画面上で何が見えるかを可視化して
 ```
 
-[`/statechart`](../../skills/statechart/SKILL.md) draws a Mermaid statechart of what the user sees, generated from a TLA+ model, so the picture and the checked model can't drift apart. The reader's rules ("you never see Synced while you're offline") become invariants. The chart marks each state that breaks a rule, and the report gives the shortest path to it in the reader's words. Before the hand-off, the agent reproduces each bug path in the real code, so a modeling error doesn't reach the reader as a bug.
+[`/statechart`](../../skills/statechart/SKILL.md) は、TLA+ モデルから生成された「ユーザーから見える挙動」の Mermaid ステートチャートを描画します。モデルから直接生成されるため、図と検証済みモデルの内容が食い違うことはありません。読み手のルール（「オフライン中に『同期済み（Synced）』と表示されることは決してない」など）が不変条件（invariant）になります。チャート上ではルールに違反する各状態がマークされ、レポートにはそこへ至る最短パスが読み手の言葉で記載されます。引き渡しの前に、エージェントは実際のコード上で各バグのパスを再現するため、単なるモデリング上の誤りがバグとして報告されることはありません。
 
-## Open the PR
+## PR を作成する
 
 ```text
-/poteto-mode open the pr. small ordered commits, evidence in the description.
+/poteto-mode PR を作成して。順序立てられた小さなコミットに分割し、説明文に検証の証拠を記載して。
 ```
 
-The [Opening a PR playbook](../../skills/poteto-mode/playbooks/opening-a-pr.md) works from a worktree, rebases the work into small landable commits, cleans the diff, writes a one-minute briefing as the body, and opens the PR ready. Stacked follow-ups beat a growing branch.
+[Opening a PR プレイブック](../../skills/poteto-mode/playbooks/opening-a-pr.md) は、worktree 上で作業を行い、変更をマージ可能な小さなコミット単位にリベースし、差分をクリーンアップし、本文として1分で読めるブリーフィングを記述したうえで、レビュー準備完了（ready）の状態で PR を作成します。肥大化し続ける1つのブランチよりも、小さく積み上げたフォローアップ PR（stacked PRs）のほうが優れています。
 
-## Drive the PR to merge-ready with Babysit
+## Babysit で PR をマージ可能な状態まで導く
 
-An open PR starts collecting blockers immediately. Checks fail, reviewers comment, trunk moves. Hand that churn to the [Babysit playbook](../../skills/poteto-mode/playbooks/babysit.md):
+作成した PR には、すぐにマージを阻む要因（ブロッカー）が集まり始めます。CI チェックが落ちたり、レビュアーからコメントがついたり、メインブランチ（trunk）が先に進んだりします。そうした煩雑な対応は [Babysit プレイブック](../../skills/poteto-mode/playbooks/babysit.md) に任せてしまいましょう：
 
 ```text
-/poteto-mode babysit this pr. get it green.
+/poteto-mode この PR の babysit をお願い。すべてのチェックがグリーンになるまで進めて。
 ```
 
-Babysit watches the PR, with a bundled watcher on GitHub or the Origin CLI when it's available, and takes blockers in order: conflicts, then review threads, then CI. It never rebases or force-pushes. A conflict or a stale base comes back to you with the branch that needs the rebase. The comment triage is skeptical, because humans and bots file real catches and noise in the same list. A real finding gets a fix, and noise gets dismissed with the disproof posted on the thread. When all you want is status, ask smaller and Babysit answers without starting the loop:
+Babysit は、GitHub 用の同梱ウォッチャー（または利用可能な場合は Origin CLI）を使って PR を監視し、コンフリクト → レビュースレッド → CI という順でブロッカーを扱っていきます。リベースやフォースプッシュは決して行いません。コンフリクトやベースブランチの古さが発生した場合は、リベースが必要なブランチ名を添えてあなたに差し戻します。レビューコメントのトリアージは懐疑的な姿勢で行われます。人間もボットも、本当のバグ指摘と単なるノイズを同じリストに並べてくるからです。本物の指摘には修正を行い、ノイズに対しては反証をスレッドに投稿したうえで却下（dismiss）します。単に状況だけを知りたい場合は、もっと小さな範囲で質問すれば、監視ループを開始せずに状況だけを回答します：
 
 ```text
-/poteto-mode check on pr 123. anything outstanding?
+/poteto-mode PR 123 の状況を確認して。残っている課題はある？
 ```
 
-Babysit stops at merge-ready. It never merges, even with everything green, because merging is a different decision.
+Babysit は「マージ可能な状態（merge-ready）」になった時点で停止します。たとえすべてのチェックがグリーンになっていても、自動でマージすることは決してありません。マージするかどうかはまた別の意思決定だからです。
 
-## Land the stack with Shipping
+## Shipping でスタックをマージする
 
-Green is not the same as safe. When you're ready to land, say so:
+CI がグリーンであることと、安全であることはイコールではありません。マージする準備ができたら、その旨を指示してください：
 
 ```text
-/poteto-mode land the stack.
+/poteto-mode このスタックをマージして。
 ```
 
-The [Shipping playbook](../../skills/poteto-mode/playbooks/shipping.md) verifies each PR independently before it arms anything. One fresh agent per PR proves the behavior live, and the agent that judges a change is never the one that wrote it. Then Shipping lands only the contiguous verified run from the bottom, one PR at a time through GitHub by default or Origin when its CLI is available, and reports the first PR that breaks the chain. A verified PR sitting above an unverified one waits, because merging it would pull the gap in underneath.
+[Shipping プレイブック](../../skills/poteto-mode/playbooks/shipping.md) は、実際にマージ処理を起動する前に、各 PR を独立して検証します。PR ごとに新しいエージェントを1つ割り当てて実際の挙動をライブで証明させますが、このとき「変更を判定するエージェント」と「そのコードを書いたエージェント」は決して同じにしません。その後、Shipping は下から連続して検証が通った一連の PR だけを、デフォルトでは GitHub 経由（Origin CLI が利用可能な場合は Origin 経由）で1つずつマージし、連鎖が途切れた最初の PR を報告します。未検証の PR の上に積み上がっている検証済み PR は待機状態になります。それをマージしてしまうと、下にある未検証の隙間まで一緒に取り込んでしまうからです。
 
-Next: [Run work while you sleep](./07-overnight.md).
+次へ：[寝ている間に作業を進める](./07-overnight.md)

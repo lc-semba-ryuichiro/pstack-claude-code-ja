@@ -1,11 +1,11 @@
 ---
 name: architect
-description: "Sketch types, signatures, and module structure before code, then stay in the loop while implementation fills in. Use for /architect, 'architect this', 'design this', or non-trivial work where jumping to code would lock in the wrong shape."
+description: "コードを書く前に型、シグネチャ、モジュール構造をスケッチし、実装が進む間もループに留まって設計を支えます。/architect、'architect this'、'design this' の指示時や、いきなりコードを書き始めると誤った構造に固定されてしまうような複雑な作業で使用します。"
 disable-model-invocation: true
 ---
 
 # Architect
 
-Before writing code, trace every system the change touches, then sketch two different shapes for it (types, signatures, module boundaries) and pick the one where each piece of state has one owner, each task has one way to do it, and callers need to know least. Redesign instead of patching if workarounds repeat.
+コードを書く前に、変更が影響するすべてのシステムをトレースしてください。そのうえで、2つの異なる構造案（型、シグネチャ、モジュール境界）をスケッチし、「各状態に単一の所有者がいること」「各タスクの実行方法が1通りに定まっていること」「呼び出し側が知るべき知識が最小限であること」を満たす案を選択します。同じような場当たり的対応（ワークアラウンド）が繰り返される場合は、その場しのぎのパッチを当てるのではなく設計そのものをやり直してください。
 
-For a large or contested design, run the **arena** skill instead of sketching alone.
+大規模な設計や意見が分かれる設計の場合は、単独でスケッチする代わりに **arena** スキルを実行してください。

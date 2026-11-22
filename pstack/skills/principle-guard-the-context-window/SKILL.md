@@ -1,12 +1,12 @@
 ---
 name: principle-guard-the-context-window
-description: "Apply when context is filling up: large outputs, long files, repeated reads, fan-out planning. Route bulk to subagents; keep summaries in the main thread, not raw payloads."
+description: "コンテキストが圧迫されているときに適用します（巨大な出力、長いファイル、繰り返しの読み取り、ファンアウトの計画など）。バルク処理はサブエージェントにルーティングし、メインスレッドには生のペイロードではなく要約を保持します。"
 disable-model-invocation: true
 ---
 
 # Guard the Context Window
 
-**Why:** Context overflow degrades reasoning quality, creates compression artifacts, and halts progress.
+**なぜ（Why）:** コンテキストのオーバーフローは推論の品質を低下させ、圧縮によるアーティファクトを生み出し、進行を停止させるからです。
 
-**Pattern:**
-- **Size phases and cap scope.** Limit files per phase, set turn budgets, account for mechanism costs.
+**パターン:**
+- **フェーズのサイズを測り、スコープの上限を設ける:** フェーズごとのファイル数を制限し、ターンごとの予算を設定し、メカニズムのコストを考慮します。

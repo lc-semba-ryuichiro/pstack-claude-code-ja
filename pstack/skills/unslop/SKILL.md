@@ -1,40 +1,40 @@
 ---
 name: unslop
-description: Cut AI tells from any writing.
+description: あらゆる文章から AI 臭さ（AI tells）を削ぎ落とします。
 disable-model-invocation: true
 ---
 
 # Unslop
 
-Edit text to remove AI patterns. Scan for the patterns below, then rewrite. Preserve meaning and match the intended tone.
+テキストを編集して AI パターンを取り除きます。以下のパターンをスキャンし、書き直してください。意味を保持し、意図されたトーンに合わせます。
 
-Rule numbers are stable ids that other skills cite. A removed rule leaves a gap.
+ルール番号は他のスキルが引用する固定の ID です。削除されたルールは欠番になります。
 
-3. No trailing "-ing" phrases that add no fact ("highlighting...", "ensuring...").
-5. No vague attributions ("experts believe"). Name the source or delete.
-7. No AI vocabulary: additionally, crucial, delve, enhance, foster, landscape, pivotal, showcase, testament, underscore, vibrant.
-8. Say "is" or "has", not "serves as", "stands as", "boasts", "features".
-9. No "not just X, but Y". State the point.
-10. Don't force ideas into threes.
-11. One name per thing. Repeat it.
-12. No "from X to Y" unless X and Y sit on a real scale.
-13. No em dashes, en dashes, or hyphens used as dashes, and no parentheses in their place. Use a period or a comma.
-14. A colon goes before a list or an example, never mid-sentence as a connector.
-15. Don't bold every proper noun or acronym.
-16. No bold label and colon that restates its line ("**Performance:** Performance improved..."). A bold lead-in that ends in a period and adds new detail is fine.
-17. Sentence case headings.
-18. No decorative emojis.
-19. Straight quotes.
-20. No chatbot phrases ("I hope this helps!", "Let me know if...").
-22. No praise or agreement openers. Respond directly.
-23. Cut filler. "In order to" becomes "to". Delete "it is important to note that".
-24. One hedge at most: "may".
-25. No generic conclusions. State specific plans or facts.
-26. No abstract metaphor nouns: substrate, wedge, vector, nexus, primitive, harness, surface, scaffolding, paradigm, ratchet, north star, flywheel. Use the concrete word.
-27. Say what it does, not how it feels. Name the mechanism or the number. Cut a sentence that could appear unchanged in another project's docs.
-28. One idea per sentence. Split a sentence the reader has to reread.
-29. Active voice. Name the actor unless it is unknown or doesn't matter.
-30. Cut adverbs or use a stronger verb. Give the number.
-31. Use the plain word: "use", not "utilize" or "leverage".
-32. No metaphor, aphorism, personified code, or figurative verb where a literal phrase exists.
-33. Write whole sentences with their articles and verbs. Spell out arrows and abbreviations.
+3. 事実を付け加えない末尾の "-ing" フレーズを使わない（"highlighting..."、"ensuring..." など）。
+5. 曖昧な出典を使わない（"experts believe" など）。情報源を明記するか削除する。
+7. AI 語彙を使わない：additionally、crucial、delve、enhance、foster、landscape、pivotal、showcase、testament、underscore、vibrant。
+8. "serves as"、"stands as"、"boasts"、"features" ではなく、"is" または "has" を使う。
+9. "not just X, but Y"（X だけでなく Y も）を使わない。要点を直接述べる。
+10. アイデアを無理に3つ組にまとめない。
+11. 1つのものには1つの名前を使い、それを繰り返す。
+12. X と Y が実際の尺度（スケール）上に並んでいない限り、"from X to Y" を使わない。
+13. em ダッシュ、en ダッシュ、ダッシュ代わりのハイフンを使わず、その代わりの括弧も使わない。ピリオドまたはカンマを使う。
+14. コロンはリストや例の前にのみ置き、文の途中で接続詞代わりに使わない。
+15. すべての固有名詞や頭字語を太字にしない。
+16. その行の内容を言い換えるだけの太字ラベルとコロンを使わない（"**Performance:** Performance improved..." など）。ピリオドで終わり新しい詳細を追加する太字の導入句であれば問題ない。
+17. 見出しは文頭大文字（sentence case）にする。
+18. 装飾目的の絵文字を使わない。
+19. ストレートクォート（`"` や `'`）を使う。
+20. チャットボット特有のフレーズを使わない（"I hope this helps!"、"Let me know if..." など）。
+22. 賞賛や同意の前置きを使わない。直接応答する。
+23. 埋め草（filler）を削る。"In order to" は "to" にする。"it is important to note that" は削除する。
+24. 留保表現（hedge）は多くても "may" 1つまでにする。
+25. 汎用的な結論を書かない。具体的な計画や事実を述べる。
+26. 抽象的な比喩名詞（substrate、wedge、vector、nexus、primitive、harness、surface、scaffolding、paradigm、ratchet、north star、flywheel）を使わず、具体的な言葉を使う。
+27. どう感じるかではなく、何をするかを述べる。メカニズムや数値を明記し、他のプロジェクトのドキュメントにそのまま載せられそうな文は削る。
+28. 1文につき1アイデアとする。読み返さなければならない文は分割する。
+29. 能動態を使う。行為者が不明または重要でない場合を除き、行為者を明記する。
+30. 副詞を削るか、より強い動詞を使う。数値を示す。
+31. 平易な言葉を使う："utilize" や "leverage" ではなく "use" を使う。
+32. 文字通りの表現が存在する場所では、比喩、格言、コードの擬人化、比喩的な動詞を使わない。
+33. 冠詞と動詞を備えた完全な文を書く。矢印や略語はスペルアウトする。

@@ -1,39 +1,39 @@
 ---
 name: benchmark-checklist
-description: "Vet a perf measurement (limiter, tuning, limits, errors, repeatability, relevance, and whether the work happened) before you report or act on it. Use when you run a benchmark or report a speedup or regression you measured."
+description: "パフォーマンスの計測結果（ボトルネック要因、チューニング状態、物理的限界、エラー有無、再現性、全体への影響度、処理が実際に実行されたか）を報告したり判断材料にしたりする前に精査します。ベンチマークを実行したときや、計測した高速化・リグレッションを報告するときに使用します。"
 disable-model-invocation: true
 ---
 
-# Benchmark checklist
+# ベンチマークチェックリスト
 
-Use this when you produce a performance number: a PR's before and after, a regression claim, a hillclimb harness, or a library or config choice. Answer each question with evidence from a run, not a guess about the code.
+PR の変更前後比較、リグレッションの主張、ヒルクライム改善用の計測ハーネス、あるいはライブラリや設定の選定など、パフォーマンスの数値を出すときにこのチェックリストを使用します。コードを読んだだけの推測ではなく、実際の実行結果から得られた証拠をもって各質問に答えてください。
 
-For a quick ballpark the user asked for, one run is enough. Still check questions 4 and 7, and say that it is one run. Skip the rest unless that run looks wrong. A choice between options is never a ballpark.
+ユーザーからざっくりとした概算（ボールパーク）を求められただけであれば、1回の実行で十分です。その場合でも質問 4 と 7 は必ず確認し、「1回のみの実行結果である」旨を明記してください。その1回の結果におかしな点がなければ、残りの項目はスキップして構いません。ただし、複数の選択肢からどれを採用するか決める場面では、決して概算で済ませないでください。
 
-## Before you run anything
+## 計測を実行する前の準備
 
-- Write down the claim you expect to make, in the words you would ship ("export is 30% faster at p50 on the 60k-row dataset"). The questions test that sentence.
-- Read the measurement script. Note what it times, counts, and ignores.
-- Check the load average with `uptime` and the core count with `nproc`. If the machine is busy, find out what is running. If you cannot stop it, interleave the sides so both see the same noise, and say so in the report.
+- 外部に報告する予定の主張を、そのまま使える言葉で書き出しておきます（例：「6万行のデータセットにおいて、エクスポートの p50 レイテンシが 30% 高速化した」）。以降の質問は、その一文が正しいかどうかを検証するためのものです。
+- 計測スクリプトの中身を読み込みます。何を計測し、何をカウントし、何を無視しているのかを把握してください。
+- `uptime` でロードアベレージを、`nproc` でコア数を確認します。マシンに高負荷がかかっている場合は、何が動いているのか突き止めてください。それを停止できない場合は、比較対象の両方が同じノイズの影響を受けるよう交互に（インターリーブして）実行し、その旨をレポートに明記してください。
 
-## The questions
+## 7つの確認質問
 
-1. **Why not double?** Name the limiter. Profile in a run you do not report, because profilers and tracers slow the work down. Use CPU per process (`top`, `pidstat`), a runtime profiler (`node --cpu-prof`, `py-spy`, `perf`), I/O wait, and syscall counts (`strace -c` on Linux), then map the hot spot to source. Watch the load generator too: if it saturates first, you measured the load generator. If a change did not move the number, the limiter explains why, so find it before you call the change useless.
-2. **Was it tuned?** Run every side the way production runs it: release builds, production flags and env, batching and transaction settings, connection pools, caches as warm or cold as production sees them, and the same versions and data. If one side runs on defaults, you compared configurations, not implementations. A limiter that is a setting (a commit per row, a debug build, a missing index) means that side is untuned. Tune it and measure again before you pick a winner. If you cannot tune it, do not pick a winner from that run. When the user is choosing what to adopt, narrowing the claim to the code as it ships today does not fix this, because they adopt the option, not today's settings.
-3. **Did it break limits?** Do the arithmetic. Compare bytes per second with disk and network bandwidth, operations per second times cost per operation with your cores, and the time saved with the time the changed piece took. Removing a piece that takes 10% of the run can make the run at most about 11% faster. A result past a limit measured something other than the work, such as a cache, a no-op, or a bug.
-4. **Did it error?** Count failures and non-success responses, and check that outputs are correct, not just present. Rejections are often fast, and timeouts and retries are slow. If the script does not count errors, add the count.
-5. **Does it reproduce?** Run each side at least 5 times, alternating (A, B, A, B, and so on) so warmup, lazy initialization, caches, and drift favor neither. Report the median and range. A gap smaller than the run-to-run variation is no measurable difference. When the call is close, use a rank-sum test or the harness's own statistics.
-6. **Does it matter?** Next to any micro result, measure the end-to-end path a user waits on, with realistic data sizes and concurrency, and report the micro result as a share of the whole. A helper that takes 1% of a request can make the request at most 1% faster, however fast the helper gets.
-7. **Did it even happen?** Confirm the work ran inside the timed region: the request reached the server, the rows were written, the bytes were read, and the code used the result. Lazy code (generators nobody iterates, promises nobody awaits, results the JIT can discard) and timeouts produce numbers for work that never happened.
+1. **なぜ2倍速くならないのか？（ボトルネックの特定）** 数値を制限しているボトルネック要因（リミッター）を特定します。プロファイラーやトレーサーを動かすと処理自体が遅くなるため、プロファイリングは報告用の本番計測とは別の実行で行ってください。プロセスごとの CPU 使用率（`top`、`pidstat`）、ランタイムプロファイラー（`node --cpu-prof`、`py-spy`、`perf`）、I/O 待ち時間、システムコール回数（Linux なら `strace -c`）などを使い、負荷の高いホットスポットをソースコードの該当箇所にマッピングします。負荷生成ツール（ロードジェネレーター）側の飽和にも注意してください。負荷生成側が先に限界に達していたら、測っていたのは対象アプリではなく負荷生成ツールの性能ということになります。変更を加えても数値が動かなかった場合、ボトルネック要因がその理由を説明してくれます。「この変更は意味がなかった」と切り捨てる前に、まず何が足を引っ張っているのかを突き止めてください。
+2. **本番相当にチューニングされていたか？** 比較するすべての側を、本番環境と同じ条件で実行します。リリースビルド、本番用のフラグと環境変数、バッチ処理やトランザクションの設定、コネクションプール、本番で想定されるのと同じウォーム／コールド状態のキャッシュ、そして同一のバージョンとデータを使用してください。片方だけがデフォルト設定のまま動いていた場合、比較したのは実装の優劣ではなく「設定の違い」に過ぎません。ボトルネックの原因が単なる設定不備（1行ごとのコミット、デバッグビルド、インデックスの貼り忘れなど）であるなら、その側は未チューニング状態です。勝者を決める前に、設定をチューニングして計測し直してください。チューニングできない事情があるなら、その計測結果から勝者を決めてはいけません。ユーザーが「どの選択肢を採用すべきか」を判断しようとしている場面で、「現在のデフォルト設定のまま動かした場合に限っては〜」と主張の範囲を狭めても解決になりません。ユーザーが採用するのはその「選択肢（技術・実装）」そのものであり、今日の仮設定ではないからです。
+3. **物理的・理論的な限界を超えていないか？** 実際に算数をしてみてください。秒間バイト数をディスクやネットワークの帯域幅と比較し、「秒間オペレーション数 × 1回あたりの処理コスト」をマシンのコア数と比較し、短縮された時間を「変更した箇所が元々かかっていた時間」と比較します。全体の実行時間の 10% しか占めていない処理を削除しても、全体が速くなるのは最大でも約 11% が限界です。物理的・理論的限界を超えた数値が出た場合、計測していたのは本来の処理ではなく、キャッシュヒットや何もしない空振り（no-op）、あるいはバグです。
+4. **エラーは起きていないか？** 失敗や正常系以外のレスポンス数をカウントし、出力が「単に存在するか」だけでなく「内容が正しいか」も確認します。リクエストの拒否（リジェクト）は往々にして高速に完了しますし、逆にタイムアウトやリトライは極端に遅くなります。計測スクリプトにエラーカウントの仕組みがない場合は、カウント処理を追加してください。
+5. **再現性はあるか？** ウォームアップ、遅延初期化、キャッシュ、時間経過による環境変化（ドリフト）がどちらか一方だけに有利に働かないよう、交互に（A、B、A、B……の順で）それぞれ最低 5 回ずつ実行します。報告には中央値（メディアン）とばらつきの範囲（レンジ）を記載してください。実行ごとのばらつきよりも小さな差しか出ていない場合は、「計測可能な差なし」とみなします。判定が微妙な接戦のときは、順位和検定（rank-sum test）または計測ハーネス固有の統計指標を用いて判断してください。
+6. **全体から見て意味のある改善か？** マイクロベンチマークの結果と並べて、現実的なデータサイズと同時実行数のもとで「ユーザーが実際に待たされるエンドツーエンドのパス」も計測し、全体のうちそのマイクロ計測対象がどれだけの割合を占めているかを報告してください。リクエスト全体の 1% しか占めていないヘルパー関数をどれだけ高速化しても、リクエスト全体は最大でも 1% しか速くなりません。
+7. **意図した処理は本当に実行されたか？** 計測対象の区間内で、意図した処理が実際に完了していることを裏付けます。リクエストはサーバーに到達したか、レコードは本当に書き込まれたか、バイト列は読み込まれたか、そしてコードはその計算結果を実際に使用したかを確認してください。遅延評価されるコード（誰もイテレートしないジェネレーター、誰も `await` しない Promise、JIT コンパイラが最適化で破棄できる未使用の計算結果）やタイムアウトは、「実際には何も実行されなかった処理」に対して見かけ上の数値を叩き出してしまいます。
 
-## Report
+## 報告の書き方
 
-- Lead with the verdict: faster, slower, no measurable difference, or inconclusive.
-- Give the number with its unit, the run count, the range, and the limiter. For example, "p50 41 ms → 33 ms, median of 7 runs per side, range 32 to 35 ms after, bound by JSON parsing on one core."
-- Call the verdict inconclusive when you claim a difference but cannot name the limiter, when a side ran untuned, or when you could not check questions 4 and 7. Name the gap.
-- Keep a PR body to one primary number. Put the runs, range, and limiter evidence in a linked artifact or notes file.
+- 結論（判定結果）を最初に書きます：`faster`（高速化）、`slower`（低速化）、`no measurable difference`（計測可能な差なし）、または `inconclusive`（判断不能）。
+- 単位付きの数値、試行回数、ばらつきの範囲（レンジ）、およびボトルネック要因を明記します。例：「p50 41 ms → 33 ms（各条件 7 回実行の中央値、変更後のレンジ 32〜35 ms、単一コアでの JSON パース処理がボトルネック）」。
+- 性能差を主張しているのにボトルネック要因を特定できない場合、片方が未チューニング状態で実行された場合、あるいは質問 4 と 7 を確認できなかった場合は、判定を `inconclusive`（判断不能）としてください。その際、何が確認できていないのか（ギャップ）を明記します。
+- PR の本文に記載する数値は、最も重要な指標 1 つだけに絞ります。各回の実行結果、レンジ、ボトルネックの証拠資料などは、リンク先のアーティファクトやメモファイルにまとめてください。
 
-## Other perf material
+## その他のパフォーマンス関連資料
 
-- Vet the **Perf issue** playbook's baseline before the playbook plans from it, and every number after that.
-- Vet the **Hillclimb** playbook's harness before it is frozen. The frozen harness then prints error and work counts, so each keep-or-revert checks questions 4 and 7 for free.
+- **Perf issue** プレイブックでは、計画を立てる前にまずベースラインの計測値を精査し、それ以降に出るすべての数値も同様に精査します。
+- **Hillclimb** プレイブックでは、計測ハーネスを固定（フリーズ）する前にその妥当性を精査します。一度固定されたハーネスはエラー数と実行処理量を自動的に出力するようになるため、毎回の採用・破棄（keep-or-revert）の判定において質問 4 と 7 を追加コストなしで自動的にチェックできます。

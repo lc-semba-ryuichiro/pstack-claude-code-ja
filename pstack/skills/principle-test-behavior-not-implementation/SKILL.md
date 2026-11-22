@@ -1,16 +1,16 @@
 ---
 name: principle-test-behavior-not-implementation
-description: "Apply when you write, change, or keep a test. Assert what the code's users can observe, so that the test fails when that behavior breaks and keeps passing when only the internals change."
+description: "テストを書く、変更する、または保持するときに適用します。コードのユーザーが観測できるものをアサートすることで、その動作が壊れたときにテストが失敗し、内部実装のみが変更されたときにはパスし続けるようにします。"
 disable-model-invocation: true
 ---
 
 # Test Behavior, Not Implementation
 
-A test is a claim about what users of the code can observe through its interface: return values, errors, state they can read back, and effects on outside systems. Private helpers, internal call order, and intermediate data are implementation.
+テストとは、コードのユーザーがインターフェースを通じて観測できること（戻り値、エラー、読み返せる状態、外部システムへの影響）についての主張です。プライベートなヘルパー、内部の呼び出し順序、中間データは実装（implementation）です。
 
-Judge each test against two imagined edits:
+それぞれのテストを、想像上の2つの編集に対して判定します。
 
-- **Break the behavior** (a wrong value, a skipped or doubled effect). If the test still passes, it proves nothing. The usual causes are a loose assertion, an expected value computed by the code under test, and an assertion on data the test built itself.
-- **Change the internals** and keep every observable result. If the test fails, it is pinned to the implementation.
+- **動作を壊す（Break the behavior）**（間違った値、スキップされた、あるいは二重になった影響）: これでテストがパスし続けるなら、そのテストは何も証明していません。一般的な原因は、緩いアサート、テスト対象のコードによって計算された期待値、そしてテスト自身が構築したデータに対するアサートです。
+- **内部実装を変更する（Change the internals）**（ただし、観測可能な結果はすべて維持する）: これでテストが失敗するなら、そのテストは実装に固定（pinned）されています。
 
-Keep a test that catches the first edit and survives the second. Rewrite or delete the rest. Drive the code through its public interface with a concrete input, and derive the expected value from the requirement. What an external service receives is behavior. A call to an internal helper is not. Pair "this never happens" with a case where it does happen. Assert the error type that callers branch on, not the message.
+最初の編集を捕捉し、2番目の編集を生き延びるテストを保持すること。残りは書き直すか削除します。具体的な入力を用いて公開インターフェース経由でコードを駆動し、要件から期待値を導き出します。外部サービスが受け取るものは動作（behavior）です。内部ヘルパーへの呼び出しはそうではありません。「これは決して起こらない」というテストには、それが実際に起こるケースをペアにします。呼び出し元が分岐に使用するエラータイプをアサートし、メッセージはアサートしないこと。

@@ -1,100 +1,100 @@
-# Make it yours
+# 自分好みにカスタマイズする
 
-poteto-mode is one person's style. The playbooks, routing, and model roles underneath it work just as well with yours. This page covers generating a personal mode, capturing lessons from a session, fixing the repo so agents stop repeating mistakes, authoring a focused skill, and testing a skill change before you trust it.
+`poteto-mode` はあくまで一人の開発者のスタイルに過ぎません。その裏側にあるプレイブック、ルーティング、モデル役割分担といった仕組みは、あなたのスタイルにもまったく同じように機能します。このページでは、自分専用のモードの生成、セッションから得た教訓の定着、エージェントが同じミスを繰り返さないためのリポジトリ側の改善、特定の目的に特化したスキルの作成、そしてスキル変更を信頼して採用する前のブラインドテストについて解説します。
 
-Start smaller than you think. You don't need many skills on day one, or even this whole plugin. Prompt plainly, watch where agents fail, and add a skill or a check when the same failure shows up twice.
+思っているよりも小さく始めてください。初日からたくさんのスキルを揃える必要はありませんし、このプラグイン全体を使いこなす必要すらありません。まずは普段通りにプロンプトを打ち、エージェントがどこでつまずくかを観察し、同じ失敗が2回起きたときに初めてスキルやチェック機構を追加すれば十分です。
 
-## Generate your own mode with `/automate-me`
+## `/automate-me` で自分専用のモードを生成する
 
 ```text
 /automate-me
 ```
 
-You don't describe your style, because [`/automate-me`](../../skills/automate-me/SKILL.md) reads it out of your history. It mines your recent transcripts in the active workspace for repeated preferences, in how you like replies, delegation, verification, code, prose, and process, then asks you which patterns are really you. It drafts `.cursor/skills/<your-name>-mode/SKILL.md` through Cursor's built-in `create-skill` flow, runs the draft through [`/unslop`](../../skills/unslop/SKILL.md), and opens a PR from a worktree so you review it like any other change.
+自分のスタイルを言葉で説明する必要はありません。[`/automate-me`](../../skills/automate-me/SKILL.md) があなたの履歴から直接それを読み取ってくれるからです。現在のワークスペースにおける直近のトランスクリプト（対話履歴）をマイニングし、返信のトーン、タスクの委譲方法、検証の進め方、コードや文章の好み、開発プロセスなどにおいて繰り返し現れる傾向を抽出したうえで、どのパターンが本当に「あなたらしい」かを質問してきます。その後、Cursor 組み込みの `create-skill` フローを通じて `.cursor/skills/<あなたの名前>-mode/SKILL.md` のドラフトを作成し、[`/unslop`](../../skills/unslop/SKILL.md) で文章を整えたうえで、通常のコード変更と同じようにレビューできるよう worktree から PR を作成します。
 
-Run it again whenever your habits drift:
-
-```text
-/automate-me update my mode skill with everything since its last edit
-```
-
-Update mode mines only the history since the skill last changed. It keeps rules you haven't contradicted, revises the ones with new evidence, and adds sections only for new patterns.
-
-## Capture a session's lessons with `/reflect`
-
-Right after a task that taught you something, run:
+自分の作業スタイルや習慣が変わってきたときは、いつでも再実行してください：
 
 ```text
-/reflect that took way too long. capture what we learned so the next run doesn't repeat it.
+/automate-me 前回の編集以降に蓄積されたすべての履歴をもとに、自分のモードスキルを更新して
 ```
 
-[`/reflect`](../../skills/reflect/SKILL.md) reads the transcript, keeps only lessons that would change a future agent's work, and sorts the proposals into `Accepted`, `Rejected`, and `Backlog`. It waits for your approval before any skill changes. Approve a proposal only if it would change a future decision. One weird session is an anecdote, not a rule.
+更新モードでは、スキルが最後に変更された時点以降の履歴だけをマイニングします。矛盾していないルールはそのまま維持し、新しい根拠が見つかったルールは改訂し、新しいパターンに対してのみセクションを追加します。
 
-## Fix the environment with `/correct`
+## `/reflect` でセッションの教訓を記録する
 
-When you correct agents for the same mistake again and again, the fix belongs in the repo, not in your next prompt. Rank the options by how well they hold:
-
-1. Make the mistake impossible with architecture or a better data structure.
-2. Block it with types, or with a lint or CI check whose error names the fix.
-3. Catch it with a test.
-4. Write it down as a doc or agent rule. Nothing fails when an agent skips a rule, so this comes last.
-
-Human review isn't on the list. A reviewer who must catch the same mistake on every PR is the problem this fixes. [`/correct`](../../skills/correct/SKILL.md) does the work:
+何か新しい学びがあったタスクの直後に、次を実行してください：
 
 ```text
-/correct agents keep calling the database client directly instead of going through the repository layer
+/reflect 今回は時間がかかりすぎた。次回同じことを繰り返さないように、今回学んだ教訓をスキルに落とし込んで。
 ```
 
-It reads recent commits, reverts, review comments, and comments that explain workarounds, then groups the mistakes into classes. A class counts once it has happened twice. It fixes the most frequent classes one commit each, at the highest level that works, and proves each new check fails on a real past mistake. It also keeps a table in the agent instruction file that pairs each rule with what enforces it, so a rule that nothing enforces shows up as a repeat. The reply lists each class with its evidence, the level chosen, and why a higher level didn't work.
+[`/reflect`](../../skills/reflect/SKILL.md) はトランスクリプトを読み込み、将来のエージェントの作業を変える価値のある教訓だけを抽出し、提案を `Accepted`（採用）、`Rejected`（却下）、`Backlog`（保留）に分類します。スキルの変更を適用する前には、必ずあなたの承認を待ちます。将来の意思決定を実際に変えるものだけを承認してください。たった1回の特殊なセッションは単なる逸話（レアケース）であって、ルールにすべきものではありません。
 
-Run it with no argument and it finds the classes from history on its own. `/reflect` and `/correct` split the work. `/reflect` improves skills from one session. `/correct` changes the repo so a mistake class can't come back. Pair it with `/architect` when the fix is a new boundary. [Run many projects in parallel](./07-overnight.md#run-many-projects-in-parallel) has a prompt that does both across a whole repo.
+## `/correct` で開発環境（リポジトリ側）を修正する
 
-## Author a focused skill
+エージェントの同じミスを何度も繰り返し修正しているなら、直す場所は次のプロンプトではなくリポジトリそのものです。対策は以下の有効性が高い順にランク付けされます：
 
-When you already know the workflow you want to capture:
+1. アーキテクチャやより優れたデータ構造によって、そのミス自体を構造的に不可能にする。
+2. 型システム、または「修正方法をエラーメッセージで明示する Lint や CI チェック」によってブロックする。
+3. テストによって検知する。
+4. ドキュメントやエージェント向けルールとして書き残す。エージェントがルールを読み飛ばしても何もエラーにならず失敗しないため、これは最後の手段になります。
+
+このリストに「人間によるレビュー」は入っていません。すべての PR で同じミスを人間が毎回見つけなければならない状態こそが、この仕組みで解決すべき問題だからです。[`/correct`](../../skills/correct/SKILL.md) がその作業を代行します：
 
 ```text
-/poteto-mode write a skill for verifying database migrations in this repo
+/correct エージェントがリポジトリ層を経由せず、データベースクライアントを直接呼び出し続けてしまう
 ```
 
-Writing a skill matches the [Authoring or modifying a skill playbook](../../skills/poteto-mode/playbooks/authoring-a-skill.md), which routes through Cursor's built-in `create-skill`, validates the frontmatter and links, and ships the result through the Opening a PR playbook. Agent-facing prose has a higher bar than human prose, because an unhelpful sentence becomes an instruction some future agent follows. Let the playbook hold that bar rather than writing a `SKILL.md` freehand.
+このスキルは直近のコミット、リバート履歴、レビューコメント、および場当たり的なワークアラウンドを説明するコメントを読み込み、ミスをパターン（クラス）ごとにグループ化します。同じミスが2回発生すると1つのクラスとしてカウントされます。最も頻度の高いクラスから順に、機能する最も高いレイヤーで1コミットずつ修正を行い、新しく追加したチェックが過去の実際のミスで確実に失敗することを証明します。また、エージェント指示ファイル内に「各ルールとそれを強制する仕組み」を対応付けた表を維持するため、何の強制力も持たない形だけのルールは再発時にすぐ浮き彫りになります。返信には、各クラスの根拠、選択した対策レイヤー、そしてなぜそれより高いレイヤーを使えなかったのかが記載されます。
 
-Two special cases have their own generators. A skill that must drive your app and prove behavior is a verification skill, so use [`/create-verification-skill`](../../skills/create-verification-skill/SKILL.md) and [`/maintain-verification-skill`](../../skills/maintain-verification-skill/SKILL.md) instead. A skill that checks a property of your code with a model checker, a proof, or another verifier is a formal verification skill, so use [`/create-formal-verification-skill`](../../skills/create-formal-verification-skill/SKILL.md) and [`/maintain-formal-verification-skill`](../../skills/maintain-formal-verification-skill/SKILL.md). [Verify and ship](./06-verify-and-ship.md#prove-a-property-with-a-formal-verification-skill) covers both kinds.
+引数を指定せずに実行すると、履歴から独自にミスのパターンを洗い出します。`/reflect` と `/correct` は役割を分担しています。`/reflect` は1つのセッションからスキルを改善し、`/correct` は同じ種類のミスが二度と起きないようにリポジトリ側を変更します。新しい境界を設けるような修正の場合は `/architect` と組み合わせてください。[複数のプロジェクトを並列で走らせる](./07-overnight.md#複数のプロジェクトを並列で走らせる) には、リポジトリ全体に対してこの両方を実行するプロンプト例が載っています。
 
-## Write docs to a standard with `/technical-writing`
+## 特定の目的に特化したスキルを作成する
 
-Skills aren't the only prose you ship. For docs, RFCs, readmes, PR descriptions, and commit messages:
+定着させたいワークフローがすでに明確な場合は、次のように依頼します：
 
 ```text
-/technical-writing review the readme changes
+/poteto-mode このリポジトリでデータベースのマイグレーションを検証するためのスキルを書いて
 ```
 
-[`/technical-writing`](../../skills/technical-writing/SKILL.md) applies a layered standard. Its goal is prose that a tired engineer understands on the first read. It picks the document's mode first (tutorial, how-to, reference, or explanation), then works sentence by sentence: who does what, one thought per sentence, nothing readable two ways. Use it to review what you or an agent just wrote, or name it up front when you ask for a doc.
+スキルの新規作成は [Authoring or modifying a skill プレイブック](../../skills/poteto-mode/playbooks/authoring-a-skill.md) にマッチングされ、Cursor 組み込みの `create-skill` を経由してフロントマターやリンクの妥当性を検証したうえで、Opening a PR プレイブックを通じて成果物を PR 化します。エージェント向けの文章には人間向けの文章よりも高い基準が求められます。なぜなら、役に立たない曖昧な1文が、将来のエージェントが従う指示になってしまうからです。フリーハンドで `SKILL.md` を書くのではなく、プレイブックにその品質基準を維持させましょう。
 
-## Test a skill change blind
+なお、2つの特殊なケースには専用のジェネレーターが用意されています。アプリを実際に操作して挙動を証明するスキルは「検証スキル」なので、代わりに [`/create-verification-skill`](../../skills/create-verification-skill/SKILL.md) と [`/maintain-verification-skill`](../../skills/maintain-verification-skill/SKILL.md) を使用してください。モデルチェッカーや数学的証明、その他の検証器を使ってコードの性質をチェックするスキルは「形式検証スキル」なので、[`/create-formal-verification-skill`](../../skills/create-formal-verification-skill/SKILL.md) と [`/maintain-formal-verification-skill`](../../skills/maintain-formal-verification-skill/SKILL.md) を使用します。どちらも [結果を検証し、PR を作成する](./06-verify-and-ship.md#形式検証スキルでコードの性質を証明する) で詳しく解説しています。
 
-A skill edit affects every future session, so test it like the experiment it is. The same goes for adopting someone else's skill. Check that it makes the agent better on your work before you keep it.
+## `/technical-writing` で一定の基準を満たすドキュメントを書く
+
+リリースする文章はスキルだけではありません。ドキュメント、RFC、README、PR 説明文、コミットメッセージには次を使います：
 
 ```text
-/poteto-mode run the eval playbook on this skill change. same task for both variants, candidates stay blind.
+/technical-writing README の変更箇所をレビューして
 ```
 
-When a skill keeps missing and you know what it should do, change and test it in one task:
+[`/technical-writing`](../../skills/technical-writing/SKILL.md) は重層的なドキュメント基準を適用します。目指すのは、疲れ切ったエンジニアでも一読しただけで理解できる文章です。まずドキュメントのモード（チュートリアル、ハウツー、リファレンス、または解説）を選択し、次に1文ずつ精査します。「誰が何をするのか」を明確にし、1文に1つの思考だけを込め、二通りの意味に解釈できる表現を排除します。あなたやエージェントが書いたばかりの文章をレビューするために使うことも、ドキュメント作成を依頼する最初から名前を指定しておくこともできます。
+
+## スキルの変更をブラインドテストする
+
+スキルの編集は将来のすべてのセッションに影響を与えるため、実験と同じようにテストしてください。他の人のスキルを取り入れる場合も同様です。本格的に採用する前に、自分の作業においてエージェントのパフォーマンスが本当に向上するかを確かめましょう。
 
 ```text
-/poteto-mode update the review skill so it flags missing migrations, and eval the change.
+/poteto-mode このスキル変更に対して eval プレイブックを実行して。両方のバリエーションに同じタスクを与え、候補側は何も知らされないブラインドの状態に保って。
 ```
 
-Asking for the eval up front keeps the edit honest. A fix written from one bad session tends to overfit that session, and over many edits the skill drifts. The eval catches the drift before it ships.
+スキルが何度も見落としをしていて、本来どう動くべきかが分かっている場合は、変更とテストを1つのタスクでまとめて行います：
 
-The [Eval playbook](../../skills/poteto-mode/playbooks/eval.md) is built around one failure mode, the observer effect. An agent that knows it's being evaluated behaves differently. So candidate agents get an organic-looking task in sanitized directories, never the words "eval" or "candidate", and never each other's existence. One judge scores all outputs under neutral labels, and chain-following gets graded from which files each candidate actually read, not from what it claims.
+```text
+/poteto-mode マイグレーションの漏れを指摘するようにレビュースキルを更新し、その変更を eval で評価して。
+```
 
-Read every output yourself before accepting the verdict. If you disagree with the judge, suspect the rubric before you suspect your judgment.
+最初から eval（評価）を要求しておくことで、編集の妥当性が保たれます。1回の失敗セッションだけをもとに書かれた修正はそのセッションに過剰適合（オーバーフィット）しがちで、編集を重ねるうちにスキル本来の目的からズレていきます。eval を使えば、リリース前にそのズレを検知できます。
 
-## Build a bot UI with `/make-bot-ui`
+[Eval プレイブック](../../skills/poteto-mode/playbooks/eval.md) は、1つの失敗モード、すなわち「観察者効果（observer effect）」を防ぐことを中心に設計されています。評価されていると気づいたエージェントは普段と違う振る舞いをしてしまうからです。そのため、候補エージェントにはサニタイズされたディレクトリ内で自然なタスクを与え、「eval」や「候補（candidate）」といった言葉や、他の候補の存在を一切知らせません。1人の審査員（judge）が中立的なラベルのもとですべての出力を採点し、参照の連鎖をたどったか（chain-following）はエージェントの自己申告ではなく「実際にどのファイルを読み込んだか」に基づいて採点されます。
 
-One situational skill is for Grok Bot users. [`/make-bot-ui`](../../skills/make-bot-ui/SKILL.md) builds a small page whose buttons wake a bot over a webhook routine. For example, you could swipe through a review queue and have each swipe ask the bot to act on that item. A server on your machine holds the webhook's sender key, so the key never reaches the browser or the chat. The skill also covers exposing the page on Tailscale.
+判定結果（verdict）を受け入れる前に、すべての出力にあなた自身で目を通してください。もし審査員の判定に納得がいかない場合は、自分の判断を疑う前に、まず評価基準（ルーブリック）のほうを疑ってください。
 
-**Pitfall:** don't edit a skill mid-task because it's misbehaving. Fix it in its own PR and keep the task moving. A skill edit that ships tangled into feature work is invisible to review and impossible to evaluate.
+## `/make-bot-ui` でボット操作用の UI を構築する
 
-Next: [Recipes and pitfalls](./10-recipes-and-pitfalls.md).
+特定の状況で役立つスキルとして、Grok Bot ユーザー向けの機能があります。[`/make-bot-ui`](../../skills/make-bot-ui/SKILL.md) は、ボタンを押すと Webhook ルーチン経由でボットを起動する小さなページを構築します。たとえば、レビューキューをスワイプしながら確認し、スワイプするたびにボットへその項目の処理を依頼するといった UI を作れます。Webhook の送信者キー（sender key）はローカルマシン上のサーバーに保持されるため、ブラウザやチャットにキーが漏れることはありません。また、このスキルは Tailscale 上にページを公開する手順もカバーしています。
+
+**落とし穴（Pitfall）：** スキルの挙動がおかしいからといって、タスクの途中でスキルを編集しないでください。スキルの修正は独立した別の PR で行い、元のタスクはそのまま進めましょう。機能開発の作業に絡み合った状態で出荷されたスキル変更は、レビューで見落とされ、評価することも不可能になります。
+
+次へ：[レシピと落とし穴](./10-recipes-and-pitfalls.md)

@@ -1,182 +1,182 @@
-# Recipes and pitfalls
+# レシピと落とし穴
 
-Prompts worth copying, then the mistakes everyone makes once. Swap in your own paths and finish conditions. The recipes are deliberately informal. That's how they get typed in practice, and the skills read intent fine.
+コピーしてすぐ使えるプロンプト集と、誰もが一度は踏む失敗パターン（落とし穴）をまとめました。パスや完了条件は自分の環境に合わせて書き換えて使ってください。レシピの文体はあえてくだけた調子にしています。実際の現場でもそのように入力されますし、スキルは意図を問題なく読み取ってくれます。
 
-![She tastes a finished dish while robots cook from a recipe box, with pinned cards reading /how, /tdd, and /loop above the counter.](./images/recipes.jpg)
+![カウンターの上に /how、/tdd、/loop と書かれたカードが留められている中、ロボットたちがレシピボックスを見ながら調理し、彼女が完成した料理を味見している様子。](./images/recipes.jpg)
 
-## Understand an unfamiliar subsystem
+## 馴染みのないサブシステムを理解する
 
 ```text
-use /how first to understand how this initialization works. then use /why to figure out why it broke recently.
+まず /how を使ってこの初期化処理の仕組みを理解して。そのあと /why を使って最近壊れた理由を突き止めて。
 ```
 
-Mechanics first, history second. Each skill's report tells you which sources it searched, so you know what the answer is grounded in.
+最初に仕組み（メカニクス）を押さえ、次に経緯（ヒストリー）を追います。各スキルのレポートには調査した情報源が明記されるため、その回答が何に基づいているかを把握できます。
 
-## Restate a noisy report before touching code
+## コードを触る前にノイズの多い報告を言い直させる
 
 ```text
-/poteto-mode read this thread. restate the underlying issue in your own words, in plain english. don't change any code yet.
+/poteto-mode このスレッドを読んで、根本にある問題を平易な日本語で自分の言葉に言い直して。まだコードは一切変更しないで。
 ```
 
-A misreading shows up in the restatement, where it costs one message to correct. Keep your own theory to yourself until the agent has stated its own. `/in-your-own-words` asks for the restatement alone, with no playbook.
+読み違いがあればこの言い直しの段階で表面化するため、メッセージ1通のやり取りだけで修正できます。エージェント自身の理解を語らせるまでは、あなたの推測は胸の内にしまっておきましょう。プレイブックを使わずに言い直しだけを求めたい場合は、[`/in-your-own-words`](../../skills/in-your-own-words/SKILL.md) を使います。
 
-## Sharpen a prompt before you send it
+## 送信前にプロンプトを研ぎ澄ます
 
 ```text
-/sharpen write the onboarding doc for the new billing service.
+/sharpen 新しい課金サービス向けのオンボーディングドキュメントを書いて。
 ```
 
-The agent names what an expert would do that you didn't ask for, the raw material they'd start from, their methods and tools, and an outside check that the result is right. It hands back your prompt rewritten to ask for that and doesn't do the task. Send the rewrite when it reads right.
+エージェントは、トッププロフェッショナルなら当然行うがあなたが指示していなかったこと、出発点となる一次資料、使用する手法とツール、そして結果の正しさを証明する外部チェックを提示します。そのうえで、それらを盛り込んで書き直したプロンプトを返してくれます（タスク自体は実行しません）。内容を確認して問題なければ、その書き直されたプロンプトを送信してください。
 
-## Prototype before you pick
+## 選ぶ前にプロトタイプを作る
 
 ```text
-/poteto-mode prototype a few options for the settings layout. put them behind a switcher and send me screenshots of each.
+/poteto-mode 設定画面のレイアウト案をいくつかプロトタイプで作って。切り替えて比較できるようにスイッチャーを付けて、それぞれのスクリーンショットを送って。
 ```
 
-You pick from things that run, not from descriptions. The agent answers its own layout and timing questions along the way.
+説明文ではなく、実際に動くものを見て選びます。レイアウトやタイミングに関する細かな疑問も、エージェントが作る過程で自ら答えを出していきます。
 
-## Turn a settled design into a plan
+## 固まった設計を計画に落とし込む
 
 ```text
-/poteto-mode turn this design into a plan. small verifiable PRs, each with its own proof.
+/poteto-mode この設計を計画書に落とし込んで。それぞれ独自の検証証拠を備えた、小さく検証可能な PR 単位に分割して。
 ```
 
-Ask only after the design settles. The plan is the deliverable, and it names the playbook that will execute it.
+必ず設計が固まった後に依頼してください。ここでの成果物は計画書そのものであり、計画書の中にはそれを実行する際に使うプレイブック名も記載されます。
 
-## Get a second opinion on a design
+## 設計についてセカンドオピニオンを得る
 
 ```text
-ask /arena for a second opinion on this thread and our approach
+このスレッドと現在の実装アプローチについて /arena にセカンドオピニオンを求めて
 ```
 
-Your current design becomes one candidate among several, and the synthesis tells you whether the panel found something better or confirmed what you had. It costs little next to a design that is expensive to reverse.
+あなたの現在の設計案が複数候補の1つとして扱われ、統合結果を通じて「パネルがより良い案を見つけたか、それとも元の案が妥当だと裏付けられたか」が分かります。後から覆すコストが高い設計に比べれば、ごくわずかなコストで済みます。
 
-## Check independent slices in parallel
+## 独立した領域を並列でチェックする
 
 ```text
-/swarm check every package under packages/ against its check.sh. one worker per package. one report.
+/swarm packages/ 配下のすべてのパッケージをそれぞれの check.sh でチェックして。パッケージごとに1ワーカーを割り当てて、1つのレポートにまとめて。
 ```
 
-Each worker owns one package. The parent waits for every slice and returns one `PASS`, `ISSUES`, or `BLOCKED` report instead of raw worker dumps.
+各ワーカーが1つのパッケージを担当します。親エージェントはすべての領域の完了を待ち、ワーカーの生ログを垂れ流すのではなく、`PASS`、`ISSUES`、または `BLOCKED` に整理された1つのレポートを返します。
 
-## Review a branch skeptically
+## ブランチを懐疑的な視点でレビューする
 
 ```text
-/interrogate the whole branch, but skeptically. don't change anything yet. no nitpicks unless it's an actual bug or regression in behavior.
+/interrogate ブランチ全体を懐疑的な視点で検証して。まだ何も変更しないで。実際のバグや挙動のリグレッションでない限り、細かい重箱の隅をつつくような指摘は不要。
 ```
 
-The qualifiers do real work. "don't change anything yet" keeps it read-only, and the nitpick rule pre-filters the noise so the verified findings are worth your time.
+添えられた条件がしっかり機能します。「まだ何も変更しないで」によって読み取り専用に保たれ、重箱の隅をつつく指摘を禁止するルールによってノイズが事前にフィルタリングされるため、検証済みの指摘事項だけがあなたの時間を割く価値のあるものとして残ります。
 
-## Fix a bug through a failing test
+## 失敗するテストからバグを修正する
 
 ```text
-/poteto-mode repro the duplicate write first. if there's a cheap test path, /tdd it. then fix and rerun.
+/poteto-mode まず重複書き込みの不具合を再現させて。低コストで書けるテストパスがあるなら /tdd で進めて。そのあと修正して再実行して。
 ```
 
-"if there's a cheap test path" matters. Forcing a test through brittle mocks proves less than running the real command, and the playbook is allowed to say so.
+「低コストで書けるテストパスがあるなら」という条件が重要です。壊れやすいモックを無理やり組んでテストを書くよりも、実際のコマンドを実行するほうが強力な証明になる場合があり、プレイブック側もその判断を下せるようになっています。
 
-## Repro and fix a report with proof
+## 証拠付きで不具合報告を再現・修正する
 
 ```text
-/poteto-mode repro this with /verify-<app>. if it repros on main, fix it and show me a video as proof.
+/poteto-mode /verify-<app> でこの不具合を再現させて。main ブランチでも再現するなら修正し、証拠として動画を提示して。
 ```
 
-"if it repros on main" lets the run stop early when the bug is already gone. The video lets you check the fix before you read the diff.
+「main ブランチでも再現するなら」と添えることで、すでに修正済みのバグであれば早期に作業を打ち切ることができます。また、動画があることで、差分を読む前に修正が正しく機能しているかを確認できます。
 
-## Prove a property tests rarely reach
+## 通常のテストでは到達しにくい性質を証明する
 
 ```text
-/create-formal-verification-skill the retry queue. a message must never be delivered twice.
+/create-formal-verification-skill リトライキューを対象にして。メッセージが二度配信されることは決してない、という性質を検証したい。
 ```
 
-You get one property checked in every case within a stated scope, a counterexample in your code's terms if the code already breaks it, and a project skill the next agent runs on any change to that code.
+指定されたスコープ内のあらゆるケースについて1つの性質が検証され、現在のコードがすでにそれに違反している場合はコード内の用語を使った反例（カウンターエグザンプル）が得られます。さらに、次回以降に別のエージェントがそのコードを変更した際に実行するプロジェクト固有スキルも生成されます。
 
-## Vet a number before you post it
+## 公開する前に計測値を精査する
 
 ```text
-/benchmark-checklist vet this 40% speedup before it goes in the pr description
+/benchmark-checklist PR の説明文に載せる前に、この「40% 高速化」という数値が妥当か精査して
 ```
 
-You get faster, slower, no measurable difference, or inconclusive, with the run count, the range, and what limits the number.
+試行回数、数値の範囲（レンジ）、および数値を制限しているボトルネック要因とともに、`faster`（高速化）、`slower`（低速化）、`no measurable difference`（計測可能な差なし）、または `inconclusive`（判断不能）のいずれかの判定が返ってきます。
 
-## Stop correcting the same mistake
+## 同じミスを何度も手動で直すのをやめる
 
 ```text
-/correct agents keep adding new config flags without registering them in the schema
+/correct エージェントがスキーマに登録せずに新しい設定フラグを追加し続けてしまう
 ```
 
-The fix lands in the repo as architecture, a type, a lint, or a test, so the next agent can't make the mistake.
+アーキテクチャ、型定義、Lint ルール、またはテストとしてリポジトリ側に修正が組み込まれるため、次のエージェントが同じミスを犯すこと自体を防げます。
 
-## Ask how without starting the work
+## 作業を開始せずにやり方だけ尋ねる
 
 ```text
-/poteto-help how do i get poteto-mode to stay on every turn?
+/poteto-help 毎ターン poteto-mode を有効にしたままにするにはどうすればいい？
 ```
 
-You get an answer, a prompt to send, and a link to the source. Nothing runs until you send that prompt.
+質問への回答、そのまま送信できるプロンプト、そして参照元へのリンクが返ってきます。提示されたプロンプトをあなたが送信するまで、実際の作業は何も実行されません。
 
-## Keep a run honest while you're away
+## 席を外している間も逸脱せずに作業を進めさせる
 
 ```text
-im going to bed, keep going autonomously until every fixture passes. do not stop. keep a decision log i can audit in the morning.
+これから寝る。すべてのテストデータ（フィクスチャ）がパスするまで自律的に進め続けて。途中で止まらないで。朝になってから監査できるように意思決定ログを残しておいて。
 ```
 
-The full contract is on the [overnight page](./07-overnight.md). The short form works once the task and finish condition are already in the conversation.
+完全な取り決めについては [寝ている間に作業を進める](./07-overnight.md) を参照してください。すでに会話の中でタスク内容と完了条件が共有されている場合は、この短縮形でも機能します。
 
-## Redirect a drifting run
+## 脱線しかけた実行の軌道修正をする
 
-Steering prompts are one line:
-
-```text
-i said the goal is to repro. i did not ask for a fix yet.
-```
+軌道修正（ステアリング）のプロンプトは1行で十分です：
 
 ```text
-apply prove it works. show me the real output, not the build log.
+目的は再現させることだと言ったはず。まだ修正は頼んでいない。
 ```
 
 ```text
-/unslop that, no emdashes
+「prove it works（動作を証明する）」を適用して。ビルドログではなく実際の出力を見せて。
 ```
 
-You rarely need more words. You need the right name, and [the principles page](./08-principles.md) is the vocabulary.
+```text
+/unslop そこを整えて。em ダッシュ（—）は使わないで
+```
 
-## Get the reply in plain words
+長々と説明する必要はほとんどありません。必要なのは適切な「原則の名前」であり、[原則の名前を指定して舵を取る](./08-principles.md) がその語彙集になります。
+
+## 平易な言葉で言い直してもらう
 
 ```text
 /bro
 ```
 
-That's the whole prompt. [`/bro`](../../skills/bro/SKILL.md) restates the last message like one human talking to another, no jargon, shorter. Use it when a reply is technically thorough and you still don't know what it said.
+プロンプトはこれだけです。[`/bro`](../../skills/bro/SKILL.md) は、直前のメッセージを専門用語なしの平易な人間の言葉で、より短く言い直します。技術的には網羅されているものの、結局どういう意味なのかピンとこない返信が来たときに使ってください。
 
-## Catch up on a chat you left running
+## 動かしっぱなしにしていたチャットの状況を把握する
 
 ```text
 /ketchup
 ```
 
-[`/ketchup`](../../skills/ketchup/SKILL.md) tells you in plain words what changed since your last message, then lists each call waiting on you with its pick, evidence, and risk. It changes nothing while it reports.
+[`/ketchup`](../../skills/ketchup/SKILL.md) は、あなたの最後のメッセージ以降に何が変化したかを平易な言葉で説明し、続けてあなたの判断待ちとなっている各項目を推奨案・根拠・リスクとともにリストアップします。報告するだけで、コードや状態は一切変更しません。
 
-To watch the catch-up instead, run [`/ketchup-video`](../../skills/ketchup-video/SKILL.md). It shows what happened in a short subtitled video of slides, and lists the calls waiting on you as text under it.
+テキストではなく動画でキャッチアップしたい場合は、[`/ketchup-video`](../../skills/ketchup-video/SKILL.md) を実行してください。何が起きたかを字幕付きの短いスライド動画で再生し、その下にあなたの判断待ち項目をテキストで一覧表示します。
 
-## The pitfalls
+## よくある落とし穴
 
-- **Enumerating skills in the prompt.** "use /architect then /arena then /interrogate" reorders steps the playbook already sequences. State the goal and constraints. Name a skill only to override a default.
-- **A vague finish condition.** "make it better" gives `/loop` nothing to check. Give a command or artifact that can pass or fail.
-- **Leading with your theory of the cause.** The agent searches wherever you pointed. Ask it to restate the problem first, then share your hunch.
-- **Taking the first design.** One attempt locks in the first shape the model thought of. Ask for prototypes or `/architect` and pick from evidence.
-- **Polishing an abstract plan.** Adversarial review of a plan with no code behind it invents risks that will never happen. Settle the open questions with prototypes, then review what got built.
-- **Parallel agents in one worktree.** They overwrite each other, and nobody can tell which agent changed what. Run them as cloud agents, or say "own worktree per attempt".
-- **Looping before you trust the loop.** A loop that can't verify its own work only makes unchecked work faster. Get the verification skill working first.
-- **Trusting an unvetted number.** A warm cache or a skipped code path can fake a speedup. Run `/benchmark-checklist` before the number goes anywhere.
-- **Correcting the same mistake by hand.** A correction in chat helps one run. `/correct` fixes the repo so no later run repeats it.
-- **Using `/arena` for coverage.** `/arena` repeats one design or code brief, then picks a base and grafts the best parts. `/swarm` partitions slices or declared race arms and aggregates one report.
-- **Accepting every review comment.** Bots and humans both file real catches and noise in one list. `/interrogate` keeps only the findings a rerun proves and lists what it dropped and why, and you can override either way.
-- **Treating `auto` as a model slug.** `auto` and `inherit-parent` mean "omit the model field so the subagent inherits the parent chat model." [Setup](./01-setup.md) covers the roles.
-- **Reporting success off a green build.** A build proves it compiles. Ask for the real command, flow, stored value, or profile, and expect the evidence in the reply.
-- **Writing a `SKILL.md` freehand.** Route it through the [Authoring or modifying a skill playbook](../../skills/poteto-mode/playbooks/authoring-a-skill.md) so validation and review happen.
+- **プロンプト内でスキルを列挙すること。** 「/architect を使って、次に /arena、その次に /interrogate を使って」と指定すると、プレイブック側ですでに順序立てられているステップが狂ってしまいます。伝えるのはゴールと制約だけにし、スキル名を明示するのはデフォルトの挙動を上書きしたいときだけにしましょう。
+- **曖昧な完了条件。** 「もっと良くして」では `/loop` がチェックできる基準がありません。合格（pass）か不合格（fail）かを判定できるコマンドや成果物を指定してください。
+- **最初から原因の推測を伝えること。** エージェントはあなたが指し示した場所ばかりを探してしまいます。まずは問題を自分の言葉で言い直させ、その後にあなたの直感を共有してください。
+- **最初の設計案をそのまま採用すること。** 1回の試行だけでは、モデルが最初に思いついた形に固定されてしまいます。プロトタイプや `/architect` を求め、証拠に基づいて選びましょう。
+- **抽象的な計画書を磨き上げること。** 裏付けとなるコードがない計画書に対して敵対的レビューを行っても、実際には起こり得ない架空のリスクをひねり出すだけです。未解決の疑問はプロトタイプで決着をつけ、実際に構築されたものをレビューしてください。
+- **1つの worktree で並列エージェントを動かすこと。** 互いの変更を上書きし合い、どのエージェントが何を変えたのか分からなくなります。クラウドエージェントとして実行するか、「試行ごとに専用の worktree を割り当てて」と指示してください。
+- **信頼できる状態になる前にループを回すこと。** 自分の作業を自ら検証できないループは、未確認の作業を高速に量産するだけです。まずは検証スキルを機能させてください。
+- **精査されていない数値を鵜呑みにすること。** 温まったキャッシュやスキップされたコードパスによって、見かけ上の高速化が簡単に生じます。数値をどこかに載せる前に必ず `/benchmark-checklist` を実行してください。
+- **同じミスを手作業で直し続けること。** チャット上での訂正はその1回の実行にしか効きません。`/correct` を使ってリポジトリ側を修正し、以降の実行で同じミスが再発しないようにしましょう。
+- **網羅性チェックに `/arena` を使うこと。** `/arena` は同じ設計やコード指示書を複数回試してベース案を選び、最良の部分を移植するツールです。領域ごとの網羅やレース実行とレポート集約には `/swarm` を使ってください。
+- **すべてのレビューコメントを無条件に受け入れること。** ボットも人間も、本当のバグ指摘と単なるノイズを同じリストに並べてきます。`/interrogate` は再実行によって証明された指摘だけを残し、取り下げた指摘とその理由も一覧表示してくれるため、あなたはどちらの判定も自分の意思で覆すことができます。
+- **`auto` を特定のモデルスラッグとして扱うこと。** `auto` と `inherit-parent` は「サブエージェントが親チャットのモデルを継承するよう、`model` フィールドを省略する」という意味です。ロールの設定については [セットアップ](./01-setup.md) を参照してください。
+- **ビルドが通っただけで成功とみなすこと。** ビルドが示すのは「コンパイルが通ること」だけです。実際のコマンド実行、動作フロー、保存された値、またはプロファイルを求め、返信の中にその証拠が含まれていることを確認してください。
+- **`SKILL.md` をフリーハンドで書くこと。** 妥当性検証とレビューが確実に行われるよう、[Authoring or modifying a skill プレイブック](../../skills/poteto-mode/playbooks/authoring-a-skill.md) を通じて作成してください。
 
-That's the guide. If you skipped ahead, go back to [setup](./01-setup.md) and run one real task. The habits stick from use, not from reading.
+ガイドは以上です。途中のページを読み飛ばした方は、[セットアップ](./01-setup.md)に戻って実際のタスクを1つ実行してみてください。こうした習慣は読むことではなく、実際に使うことで身につきます。
 
-Back to the [guide index](./README.md).
+[ガイド目次](./README.md)に戻る

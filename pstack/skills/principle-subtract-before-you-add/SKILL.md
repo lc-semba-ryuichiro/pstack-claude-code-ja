@@ -1,18 +1,18 @@
 ---
 name: principle-subtract-before-you-add
-description: "Apply when sequencing an addition, refactor, or rewrite. Remove dead code, redundant validators, and stub references first, then build on the simpler base."
+description: "追加、リファクタリング、または書き換えの順序を決めるときに適用します。デッドコード、冗長なバリデーター、スタブへの参照を先に削除し、その後でよりシンプルなベースの上に構築します。"
 disable-model-invocation: true
 ---
 
 # Subtract Before You Add
 
-When evolving a system, remove complexity first, then build. Default to subtraction.
+システムを進化させるときは、まず複雑さを取り除き、その後に構築すること。デフォルトは削除（subtraction）です。
 
-Make simplification a continual investment. Leave the design slightly simpler and more capable behind the same or smaller surface than you found it.
+シンプル化への投資を継続的に行います。見つけたときと同じかより小さな表面（surface）の背後に、わずかにシンプルでより高機能な設計を残します。
 
-- Sequence removal before construction
-- Cut before you polish (get to the minimum before investing in quality)
-- Design for observed usage, not speculative edge cases
-- No speculative validators, parsers, or guards beyond what the spec demands
-- Simplify prompts (remove redundant instructions, excessive templates)
-- When a reference has no novel content, delete it rather than leaving a stub
+- 構築の前に削除の順序を組む
+- 磨く前に削る（品質に投資する前に最小限まで減らす）
+- 観測された用途に合わせて設計し、推測によるエッジケースには対応しない
+- 仕様が要求する以上の推測によるバリデーター、パーサー、またはガードを設けない
+- プロンプトをシンプルにする（冗長な指示、過剰なテンプレートを削除する）
+- 参照に新規のコンテンツがない場合、スタブとして残すのではなく削除する

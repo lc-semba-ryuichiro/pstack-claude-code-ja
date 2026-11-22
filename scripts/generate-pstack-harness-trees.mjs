@@ -18,17 +18,17 @@ const GITHUB = "https://github.com/cursor/plugins";
 const LINK = /\]\(([^)\s]+)\)/g;
 const README = `# pstack harness tree
 
-This folder is generated from \`pstack/skills\`, \`pstack/agents\`, \`pstack/${GUIDE}\`, \`pstack/${ADAPTER}\`, \`pstack/README.md\`, \`pstack/LICENSE\`, and \`pstack/plugin.json\`. Do not edit it by hand.
+このフォルダは、\`pstack/skills\`、\`pstack/agents\`、\`pstack/${GUIDE}\`、\`pstack/${ADAPTER}\`、\`pstack/README.md\`、\`pstack/LICENSE\`、および \`pstack/plugin.json\` から自動生成されています。手動で編集しないでください。
 
-Cursor uses \`pstack/\` directly, and Claude Code installs \`${TREE}/\`. The tree leaves out the rest of \`pstack/\`, such as \`pstack/automations\` and \`pstack/assets\`. A relative link to a pstack file that the tree leaves out points at that file on GitHub \`main\` instead.
+Cursor は \`pstack/\` を直接使用し、Claude Code は \`${TREE}/\` をインストールします。このツリーでは、\`pstack/automations\` や \`pstack/assets\` など、\`pstack/\` 内のその他のディレクトリは除外されています。ツリーから除外された pstack 内のファイルへの相対リンクは、代わりに GitHub の \`main\` ブランチ上の該当ファイルを指すようになっています。
 
-After editing those sources, run \`${COMMAND}\` from the repository root and commit the result.
+上記のソースファイルを編集した後は、リポジトリのルートディレクトリから \`${COMMAND}\` を実行し、生成された結果をコミットしてください。
 `;
 
 const TERMS = [
   { key: "`Task`", re: /`Task`|\bTask (tool|subagent|call)/ },
   { key: "`AskQuestion`", re: /AskQuestion/ },
-  { key: "todolist", re: /\btodo ?list\b/i },
+  { key: "todolist", re: /\btodo ?list\b|\btodo ?リスト/i },
   { key: "generalPurpose", re: /generalPurpose/ },
   { key: "poteto-agent", re: /poteto-agent/ },
   { key: "comment-sicko", re: /comment-sicko/ },
@@ -69,10 +69,11 @@ const skills = readdirSync(SKILLS).filter((name) => existsSync(join(SKILLS, name
 function classify(skill) {
   const dir = join(SKILLS, skill);
   const others = skills.filter((name) => name !== skill).join("|");
-  const route = new RegExp(`the \\*\\*(?<bold>${others})\\*\\* skill|\`/(?<command>${others})\``, "g");
+  // 和訳では "the **name** skill" が「**name** スキル」になるため、両方の形を拾う。
+  const route = new RegExp(`the \\*\\*(?<bold>${others})\\*\\* skill|\\*\\*(?<boldJa>${others})\\*\\* ?スキル|\`/(?<command>${others})\``, "g");
   const linksToSkill = (line, name) => line.includes(`(../${name}/`);
   const namesBareSkill = (line) =>
-    [...line.matchAll(route)].some(({ groups }) => !linksToSkill(line, groups.bold ?? groups.command));
+    [...line.matchAll(route)].some(({ groups }) => !linksToSkill(line, groups.bold ?? groups.boldJa ?? groups.command));
   const usesCursorNames = new Set();
   for (const path of walk(dir).filter((path) => path.endsWith(".md"))) {
     const text = readFileSync(path, "utf8");
@@ -126,8 +127,8 @@ function render() {
   ];
   const files = new Map(copies.map((path) => [relative(PSTACK, path), file(path)]));
   const line =
-    `In Claude Code, read [the Claude Code adapter](../../${ADAPTER}) once per session before you follow this skill. ` +
-    "It maps the Cursor names in pstack skills to Claude Code.";
+    `Claude Code で使用する場合は、このスキルに従う前にセッションごとに1回 [Claude Code アダプター](../../${ADAPTER}) を読み込んでください。` +
+    "pstack スキル内の Cursor 固有の名称を Claude Code 用にマッピングします。";
   for (const [skill, { wrap }] of classes) {
     const path = `skills/${skill}/SKILL.md`;
     const text = files.get(path).bytes.toString("utf8");

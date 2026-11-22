@@ -1,41 +1,41 @@
 ---
 name: swarm
-description: "Fan out N parallel workers, drain them, and return one report. Use for /swarm, 'swarm this', or parallel coverage, races, gauntlets, and exploration."
+description: "N 個の並行ワーカーにファンアウト（fan-out）し、完了を待って1つのレポートにまとめます。/swarm、'swarm this'（これを swarm で実行して）、または並列カバレッジ、レース、ガントレット、探索に使用します。"
 disable-model-invocation: true
 ---
 
 # Swarm
 
-## Start
+## 開始する
 
-Open a todolist with one entry per phase before launching anything.
+何かを起動する前に、フェーズごとに1つのエントリを持つ todolist を開きます。
 
-1. Frame
-2. Fan out
-3. Aggregate
-4. Report
+1. Frame（枠組み設定）
+2. Fan out（並列展開）
+3. Aggregate（集約）
+4. Report（報告）
 
-## Phase A: Frame
+## フェーズ A：Frame（課題設定）
 
-1. State the done predicate and the artifact or report the swarm must return.
-2. Choose the shape. Partition into slices, race N workers on identical briefs, or mix both. For a race or mixed shape, declare `first pass`, `rank all`, or `best-of` before spawning.
-3. Pick the worker model from the `swarm workers` line in `~/.cursor/rules/pstack-models.mdc`. If the rule or that line is missing, use `claude-opus-5-5-high-fast`. For `auto` or `inherit-parent`, omit `model` so the workers run on the parent model. If the Task tool rejects a slug, use the default and say so. If it rejects the default, use the closest valid slug of the same family from its error message. For a model race, name each arm's model up front. Pick each subagent's reasoning level for the job, per the Subagents section of the **poteto-mode** skill.
-4. Give each worker its own writable output when it writes. When workers verify or measure commits, each brief names the exact SHAs. A measurement brief also names the method (sample count, what one sample is, order). The worker records both in its result.
+1. 完了述語（done predicate）と、swarm が返すべきアーティファクトまたはレポートを明記します。
+2. 実行形態を選択します。スライスに分割するか、同一の指示書（brief）で N 個のワーカーを競わせる（レース）か、あるいはその両方を組み合わせます。レースまたは混合形態の場合は、スポーンする前に `first pass`、`rank all`、または `best-of` を宣言します。
+3. `~/.cursor/rules/pstack-models.mdc` の `swarm workers` 行からワーカーモデルを選択します。ルールまたは該当行がない場合は、`claude-opus-5-5-high-fast` を使用します。`auto` または `inherit-parent` の場合は、ワーカーが親モデルで実行されるよう `model` を省略します。Task ツールがスラグを拒否した場合はデフォルトを使用し、その旨を伝えます。デフォルトも拒否された場合は、エラーメッセージから同じファミリーの最も近い有効なスラグを使用します。モデルレースの場合は、各アームのモデルを事前に明記します。ジョブに応じた各サブエージェントの推論レベルは、**poteto-mode** スキルの Subagents セクションに従って選択します。
+4. 書き込みを行うワーカーには、それぞれ専用の書き込み先出力を与えます。ワーカーがコミットを検証または測定する場合、各指示書には正確な SHA を明記します。測定用の指示書には測定方法（サンプル数、1サンプルの定義、順序）も明記します。ワーカーは結果にその両方を記録します。
 
-## Phase B: Fan out
+## フェーズ B：Fan out（並列展開）
 
-Spawn all N workers in one message with `subagent_type: generalPurpose`, `environment: "cloud"`, `run_in_background: true`, and the step 3 model, left unset for `auto` or `inherit-parent`. Use `environment: "local"` only when the worker needs access to something on the user's computer.
+ステップ3のモデル（`auto` や `inherit-parent` の場合は未設定）を指定し、`subagent_type: generalPurpose`、`environment: "cloud"`、`run_in_background: true` で、1つのメッセージ内で N 個すべてのワーカーをスポーンします。ユーザーのコンピュータ上の何かにアクセスする必要がある場合にのみ `environment: "local"` を使用します。
 
-When a worker must start from a non-default pushed branch, pass `cloud_base_branch`.
+ワーカーがデフォルト以外のプッシュ済みブランチから開始する必要がある場合は、`cloud_base_branch` を渡します。
 
-Every brief stands alone. Include the goal, scope, exact slice or race arm, how to verify, and what to report. Reports use `PASS`, `ISSUES`, or `BLOCKED` with evidence. A worker that can prove a defect reports `ISSUES` and lists every issue it can prove, not only the first.
+すべての指示書は単体で完結させます。目標、スコープ、正確なスライスまたはレースアーム、検証方法、および報告内容を含めます。レポートには証拠を添えて `PASS`、`ISSUES`、または `BLOCKED` を使用します。欠陥を証明できるワーカーは `ISSUES` を報告し、最初の1つだけでなく証明できるすべての問題を列挙します。
 
-If a worker drops out, proceed with N-1 and note it.
+ワーカーが脱落（ドロップアウト）した場合は、N-1 で続行し、その旨を記録します。
 
-## Phase C: Aggregate
+## フェーズ C：Aggregate（集約）
 
-Read the terminal results. Drop a result that does not record the SHAs and method its brief names, and respawn that worker once. After a second miss, record a gap. A gap does not count as a pass. For coverage, every required slice needs a result. For a race, apply the selection rule declared up front. Use first pass, rank all, or best-of. Do not paste raw worker dumps.
+終了した結果（terminal results）を読み取ります。指示書で指定された SHA と測定方法が記録されていない結果は破棄し、そのワーカーを1回だけ再スポーンします。2回目も漏れていた場合はギャップとして記録します。ギャップはパス（合格）としてカウントしません。カバレッジ調査では、必要なすべてのスライスに結果が必要です。レースでは、事前に宣言した選択ルール（`first pass`、`rank all`、または `best-of`）を適用します。ワーカーの生ダンプをそのまま貼り付けないこと。
 
-## Phase D: Report
+## フェーズ D：Report（報告）
 
-Return one consolidated in-chat report with a result table, issue one-liners, gaps or dropouts, and the race rule when used.
+結果テーブル、問題の1行サマリー、ギャップやドロップアウト、および使用した場合はレースルールを含む、1つの統合されたチャット内レポートを返します。

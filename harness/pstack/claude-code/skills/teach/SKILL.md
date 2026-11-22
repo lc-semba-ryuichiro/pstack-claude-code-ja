@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Teach
 
-Claude Code では、このスキルに従う前にセッションごとに一度 [the Claude Code adapter](../../docs/harness/claude-code.md) を読んでください。ここには pstack スキル内の Cursor の名前と Claude Code のマッピングが記載されています。
+Claude Code で使用する場合は、このスキルに従う前にセッションごとに1回 [Claude Code アダプター](../../docs/harness/claude-code.md) を読み込んでください。pstack スキル内の Cursor 固有の名称を Claude Code 用にマッピングします。
 
 **それが何であるか、どう動くか、そしてなぜそのように作られているかを、相手のペースに合わせて1つの平易な説明として伝えます。目標は相手が理解することであり、あなたが何かを変更することではありません。**
 

@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Recall
 
-Claude Code では、このスキルに従う前にセッションごとに一度 [the Claude Code adapter](../../docs/harness/claude-code.md) を読んでください。ここには pstack スキル内の Cursor の名前と Claude Code のマッピングが記載されています。
+Claude Code で使用する場合は、このスキルに従う前にセッションごとに1回 [Claude Code アダプター](../../docs/harness/claude-code.md) を読み込んでください。pstack スキル内の Cursor 固有の名称を Claude Code 用にマッピングします。
 
 **作業を開始または再開する前に、ユーザーの直近の作業コンテキストを再構築し、現在の状況と次に行うべきことの簡潔な要約（カプセル）を返します。**
 

@@ -1,142 +1,120 @@
-# Bugbot triage
+# Bugbot トリアージ
 
-Use this reference when the Babysit playbook (`../playbooks/babysit.md`) handles Bugbot or review-automation comments. The goal is not to ignore Bugbot by default. The goal is to stop treating every comment as a required code change.
+このリファレンスは、Babysit プレイブック（`../playbooks/babysit.md`）で Bugbot や自動レビューツールのコメントをさばく際に使用します。目的は Bugbot の指摘を最初から無視することではありません。すべてのコメントを「必須のコード修正」として反射的に受け入れるのをやめることです。
 
-## Decision rubric
+## 判定基準（Decision rubric）
 
-Classify each Bugbot thread before acting:
+アクションを起こす前に、各 Bugbot スレッドを以下の3つに分類してください：
 
-- `fix`: The comment identifies a plausible correctness, security, privacy, data loss, auth, billing, migration, idempotency, race, or shipped-behavior issue. Fix it in the lowest owning PR, then reply with the commit SHA and resolve the thread.
-- `dismiss`: The comment matches a documented low-risk noisy pattern, and the current code/context proves the concern does not need a code change. Reply with a short reason and resolve the thread.
-- `ask`: The comment is novel, high-severity, security/privacy/data-related, or ambiguous. Ask the user instead of guessing.
+- `fix`：正当性、セキュリティ、プライバシー、データ損失、認証、課金、マイグレーション、べき等性（idempotency）、競合状態（レースコンディション）、またはすでにリリース済みの挙動に関する妥当な不具合を指摘しているケース。そのコードを所有する最も下位の PR で修正したうえで、コミット SHA を返信し、スレッドを解決済み（resolve）にします。
+- `dismiss`：ドキュメント化された低リスクなノイズパターンに該当し、現在のコードや文脈からコード変更が不要であることを証明できるケース。短い理由を返信してスレッドを解決済みにします。
+- `ask`：新規性の高い指摘、重大度（severity）が高い指摘、セキュリティ・プライバシー・データに関わる指摘、あるいは判断が曖昧なケース。推測で進めるのではなく、必ずユーザーに確認します。
 
-When in doubt, ask. Skipping a noisy code-quality comment is cheap; skipping a real data or security bug is not.
+迷ったら聞くこと。ノイズ交じりのコード品質コメントを1つ見送るコストは微々たるものですが、本物のデータ破壊やセキュリティバグを見逃す代償は取り返しがつきません。
 
-## Learned pattern format
+## 学習済みパターンのフォーマット
 
-Add future patterns in this shape:
+今後新たにパターンを追記する際は、以下の形式で追加してください：
 
 ```markdown
-### <short pattern name>
+### <短いパターン名>
 
 - Confidence: candidate | recurring | strong
-- Skip when: <conditions that must be true>
-- Do not skip when: <risk boundaries>
-- Example signal: <phrases or code context that identify the pattern>
-- Source: <PR/comment URL or short historical note>
+- Skip when: <スキップするために満たすべき条件>
+- Do not skip when: <スキップしてはいけないリスク境界>
+- Example signal: <このパターンを特定できる典型的なフレーズやコードの文脈>
+- Source: <PR・コメントの URL、または簡単な経緯メモ>
 ```
 
-Use `candidate` for one or two examples. Use `recurring` after multiple real dismissals. Use `strong` only when the pattern is narrow, repeatedly verified, and low-risk.
+実例が1〜2件の段階では `candidate`、実際に複数回妥当に却下（dismiss）された実績ができたら `recurring` を使います。`strong` を使ってよいのは、適用範囲が明確に狭く、繰り返し検証済みで、かつ低リスクなパターンのみです。
 
-## Recurring skip candidates
+## 繰り返し発生するスキップ候補
 
-### Intentional UI or design-system visual changes
-
-- Confidence: candidate
-- Skip when: The PR description, screenshots, design review, or nearby code makes the visual change explicit, and the Bugbot comment is only restating that a shared visual default changed.
-- Do not skip when: The comment points to accessibility, focus visibility, keyboard navigation, color contrast, or a component API contract that the PR did not intentionally change.
-- Example signal: Comments about focus outlines, button sizes, spacing, or shared component visual defaults where the owner replies "intentional" or "intended".
-
-### Upstack or stack-local usage Bugbot cannot see
+### 意図的な UI やデザインシステム上の見た目変更
 
 - Confidence: candidate
-- Skip when: Bugbot flags an export, component, helper, or file as unused, and the active forge's PR list and diffs, upper-stack diffs, or PR context show it is used by a later PR in the stack.
-- Do not skip when: The current PR is not part of a stack, the symbol is public API, or the supposed upstack use cannot be verified.
-- Example signal: "Exported component is never used" with a human reply like "used upstack".
+- Skip when: PR の説明文、スクリーンショット、デザインレビュー、または周辺コードによって見た目の変更が意図的であることが明示されており、Bugbot のコメントが「共通のデフォルト表示が変わった」という事実をなぞっているだけの場合。
+- Do not skip when: アクセシビリティ、フォーカスの視認性、キーボード操作、色のコントラスト、あるいは PR が意図的には変更していないコンポーネントの API 契約に関する指摘である場合。
+- Example signal: フォーカス時のアウトライン、ボタンサイズ、余白（スペーシング）、共通コンポーネントのデフォルトスタイルに対するコメントで、オーナーが「意図的（intentional / intended）」と返信しているケース。
 
-### Temporary duplication during parallel implementation
-
-- Confidence: candidate
-- Skip when: The PR intentionally duplicates a small amount of code to keep a new path parallel to an old path that is being deleted, replaced, or proven out.
-- Do not skip when: The duplicated code changes security, billing, data access, API behavior, or a long-lived shared abstraction would clearly reduce risk.
-- Example signal: "Significant duplication" or "duplicated validation logic" where the owner explains the old path will be deleted or the duplicate logic is intentionally local.
-
-### Existing framework or component invariant covers the warning
+### Bugbot から見えていない上位スタック（upstack）やスタック内での利用
 
 - Confidence: candidate
-- Skip when: The concern is already guaranteed by a shared component, framework contract, type invariant, or single source of truth visible in the current diff or nearby code.
-- Do not skip when: The invariant is assumed but not enforced, depends on timing, or crosses async/state boundaries where values can diverge.
-- Example signal: Comments about missing max-height on an inner popover when the shared popover enforces viewport bounds, or nullable values where the local checked value and passed value share the same source.
+- Skip when: Bugbot がエクスポート、コンポーネント、ヘルパー、またはファイルを「未使用」と指摘しているものの、現在使用中のフォージ（Git ホスティングツール）上の PR 一覧と差分、上位スタックの差分、または PR の文脈から、スタック内の後続 PR で使われていることが確認できる場合。
+- Do not skip when: 現在の PR がスタックの一部ではない場合、対象シンボルが外部向けの公開 API である場合、または上位スタックでの利用実績を実際に裏取りできない場合。
+- Example signal: 「エクスポートされたコンポーネントが一度も使われていない」という指摘に対し、人間が「上位スタック（upstack）で使用中」と返信しているケース。
 
-### Owner-declared follow-up or deferred cleanup
+### 並行実装期間中の一時的なコード重複
 
 - Confidence: candidate
-- Skip when: The PR owner explicitly says the issue is a known follow-up, the behavior is not made worse by the current PR, and the comment is not about a high-risk area.
-- Do not skip when: The agent is acting without owner input, the issue is medium/high severity product behavior, or deferring would merge a new regression.
-- Example signal: "I'll worry about that later" or "we'll delete this eventually".
+- Skip when: 削除・置き換え・検証中の古い処理パスと並行して新しいパスを安全に動かすために、PR が意図的に少量のコードを重複させている場合。
+- Do not skip when: 重複させたコードがセキュリティ、課金、データアクセス、API の挙動に影響する場合、または長期的に維持される共通抽象化に切り出したほうが明らかにリスクを下げられる場合。
+- Example signal: 「大幅な重複（Significant duplication）」や「バリデーションロジックの重複」という指摘に対し、オーナーが「古いパスは後で削除する」「意図的にローカルへ閉じ込めている」と説明しているケース。
 
-### Self-withdrawn or explicit false-positive rule comments
+### 既存のフレームワークやコンポーネントの不変条件（インバリアント）で担保されている警告
+
+- Confidence: candidate
+- Skip when: 指摘されている懸念事項が、現在の差分または周辺コードから読み取れる共通コンポーネント、フレームワークの仕様契約、型の不変条件、あるいは単一の信頼できる情報源（Single Source of Truth）によってすでに保証されている場合。
+- Do not skip when: 不変条件が「そうなっているはず」という思い込みに過ぎず強制力がない場合、タイミングに依存する場合、または非同期処理や状態境界をまたいで値が食い違う可能性がある場合。
+- Example signal: 親の共通ポップオーバー側でビューポート境界内の高さ制限を強制しているのに内側のポップオーバーに `max-height` がないと指摘されるケースや、ローカルで null チェック済みの値と渡される値が同じ発生源を共有しているのに nullable 警告が出るケース。
+
+### PR オーナーが明言したフォローアップや後回しのクリーンアップ
+
+- Confidence: candidate
+- Skip when: PR オーナー自身が「既知のフォローアップ課題である」と明言しており、今回の PR によって挙動が悪化しておらず、かつ高リスクな領域に関するコメントではない場合。
+- Do not skip when: エージェントがオーナーの指示なしに自律判断している場合、プロダクトの挙動に関わる中〜高重大度の問題である場合、または先送りにすると新たなリグレッションをマージすることになる場合。
+- Example signal: 「それは後で対応する（I'll worry about that later）」や「いずれ削除する予定（we'll delete this eventually）」といったコメントが見られるケース。
+
+### 自己撤回された指摘、または明確な誤検知（false positive）ルールコメント
 
 - Confidence: recurring
-- Skip when: The comment body or a later Bugbot reply explicitly says the finding is withdrawn, compliant, or a false positive, and the agent can verify the relevant rule locally.
-- Do not skip when: The only evidence is a human saying "false positive" on a high-risk issue without explanation.
-- Example signal: A file-naming rule comment whose body says the file is already compliant.
+- Skip when: コメント本文または後続の Bugbot 自身の返信に「この指摘は撤回された」「ルールに準拠済み」「誤検知（false positive）」と明記されており、かつエージェントがローカルで該当ルールへの適合を検証できる場合。
+- Do not skip when: 高リスクな指摘に対して、人間が具体的な説明なしに「false positive」とだけ書いているのが唯一の根拠である場合。
+- Example signal: ファイル命名規則に関するコメントでありながら、本文中に「このファイルはすでに規則に準拠している」と書かれているケース。
 
-## Ask by default
+## デフォルトで人間に確認（Ask）すべき領域
 
-Do not auto-skip these categories, even if a previous PR dismissed something similar:
+過去の PR で似たような指摘が却下（dismiss）されていたとしても、以下のカテゴリは絶対に自動スキップしないでください：
 
-- Security, privacy, auth, billing, data retention, training-data, and permission-boundary findings.
-- High-severity findings.
-- Migration, schema, idempotency, concurrency, and cross-system behavior findings.
-- Comments where the suggested fix is small and clearly reduces risk without changing product intent.
+- セキュリティ、プライバシー、認証、課金、データ保持、学習データ利用、および権限境界に関する指摘。
+- 重大度（severity）が High の指摘。
+- マイグレーション、スキーマ変更、べき等性（idempotency）、並行処理（concurrency）、およびシステム間連携の挙動に関する指摘。
+- 提案されている修正が小規模であり、プロダクトの意図を変えることなく明らかにリスクを低減できるコメント。
 
-Historical data showed humans sometimes dismiss security/data-flow comments. Treat those as owner judgment calls, not team-wide skip rules.
+過去の履歴を見ると、人間がセキュリティやデータフローに関するコメントを却下しているケースもありますが、それらはあくまでオーナー個人の責任による判断（judgment call）として扱い、チーム全体のスキップルールには組み込まないでください。
 
-## Candidate learnings from recent babysits
+## 最近の監視（babysit）から得られた学習候補
 
-Append new candidate learnings here during or after babysitting when they look team-useful but not yet mature. Prefer promoting recurring candidates into the section above once several PRs confirm the pattern.
+監視（babysit）の最中や完了後に、チーム全体にとって有用そうだがまだ実績が浅い知見が見つかった場合は、ここに新しい学習候補を追記してください。複数の PR でパターンが裏付けられたら、上の「繰り返し発生するスキップ候補」セクションへ昇格させるのが望ましい運用です。
 
-### Manual reimplementations of native browser behavior
-
-- Confidence: candidate
-- Skip when: Practically never. When a diff replaces native browser behavior with a manual equivalent (native sticky → JS-positioned clones, native scroll targeting → forwarded wheel/touch events, paint-order occlusion → masks/clip-path), Bugbot's logic-bug findings against that code have been consistently legitimate.
-- Do not skip when: The finding concerns event-forwarding gaps (wheel deltaMode, touch pans, scroll-chaining at edges, tap slop), mask/clip hit-testing divergence, or observer-vs-React state timing races in such code. Default to fix.
-- Example signal: "masks do not affect hit-testing", "overlay blocks wheel scroll", "ignores deltaMode", "runs in the IntersectionObserver callback before React applies state".
-- Source: one sticky-occlusion PR: six Bugbot passes, roughly eighteen findings, every one fixed rather than dismissed.
-
-### Contract-test drift claims are cheaply verifiable — run the test first
+### ブラウザ標準挙動の手動再実装
 
 - Confidence: candidate
-- Skip when: Never skip the verification itself; it costs one command. When a PR
-  ships a contract test that pins protocol or documentation prose (regexes over
-  a SKILL.md, snapshot of doc wording), and Bugbot claims "the test no longer
-  matches the doc" (or vice versa), run that test on the PR tip before
-  classifying. A red run confirms the claim empirically; a green run is a
-  concrete disproof for the dismissal reply.
-- Do not skip when: n/a — this is a verification shortcut, not a dismissal
-  pattern. Note that repeat-pass lean-dismiss heuristics would misfire here:
-  prose-pinning tests drift precisely BECAUSE earlier fix rounds edit the prose.
-- Example signal: "Contract test omits the pre-fix wait" on a PR whose earlier
-  fix commits reworded the pinned passage; the test run on the tip failed on
-  exactly the cited assertion.
-- Source: one prose-pinning PR with eight Bugbot passes; the claim was real on
-  pass 7 despite every earlier pass being fixed-and-resolved.
+- Skip when: ほぼ皆無（スキップしない）。差分がブラウザ標準（ネイティブ）の挙動を手動の自前実装で置き換えている場合（ネイティブの `sticky` → JS による座標計算クローン、ネイティブのスクロール対象指定 → `wheel`/`touch` イベントの手動転送、描画順による遮蔽 → `masks`/`clip-path` など）、そのコードに対する Bugbot のロジックバグ指摘は一貫して的確です。
+- Do not skip when: イベント転送の抜け漏れ（`wheel` の `deltaMode`、タッチ操作のパン、端に達したときのスクロールチェーン、タップ判定の遊び）、`mask`/`clip` によるヒットテスト判定のズレ、あるいはその種のコードにおける `IntersectionObserver` と React 状態のタイミング競合に関する指摘である場合。原則としてすべて修正（fix）してください。
+- Example signal: 「マスクはヒットテストに影響しない」「オーバーレイがホイールスクロールをブロックしている」「`deltaMode` を無視している」「React が状態を適用する前に `IntersectionObserver` のコールバックが走っている」など。
+- Source: ある `sticky` 遮蔽対応 PR での実績：Bugbot のレビュー6巡で約18件の指摘が上がり、却下したものは1件もなくすべて修正された。
 
-### Stale security-review finding already fixed later in the same PR
+### コントラクトテストのズレ（ドリフト）指摘は低コストで検証可能——まずテストを回すこと
 
 - Confidence: candidate
-- Skip when: An agentic security review (or similar) claims a missing authz/validation call, and the current PR tip clearly includes that exact gate (with tests), typically added in a later hardening commit after the review ran.
-- Do not skip when: The cited helper is a no-op for the principal under discussion, the check runs after the side effect it guards, or coverage for the claimed principal is missing.
-- Example signal: A HIGH "missing authorization check" finding while the exact guard is already called before the side effect on the tip.
-- Source: one webhook-endpoint PR whose hardening commit postdated the review run.
+- Skip when: 検証そのものは絶対にスキップしないこと（コマンド1発で済むため）。プロトコルやドキュメントの文面を固定検証するコントラクトテスト（`SKILL.md` に対する正規表現チェックやドキュメント文言のスナップショットなど）を含む PR において、Bugbot が「テストとドキュメントが一致しなくなっている（またはその逆）」と指摘した場合は、分類を決める前にまず PR の最新コミット（tip）でそのテストを実行してください。テストが落ちれば指摘が事実であると経験的に裏付けられ、テストが通れば却下返信に添える決定的な反証になります。
+- Do not skip when: 該当なし（これは却下パターンではなく検証のショートカット手法であるため）。なお、「何度も指摘が繰り返されたら却下寄りに倒す」といったヒューリスティックはここでは誤爆するので注意してください。文面固定テストは、まさに**前の修正ラウンドでドキュメントの文面を書き換えたせいで**ズレが生じるからです。
+- Example signal: 前の修正コミットで文言を書き換えた PR に対して「コントラクトテストに修正前の待機処理の記述が抜けている」と指摘され、最新コミットでテストを実行するとまさに指摘通りのアサーションで失敗したケース。
+- Source: 文面固定テストを含む PR で Bugbot のレビューが8巡した事例：それまでの6巡はすべて修正・解決済みだったにもかかわらず、7巡目で指摘されたズレは本物だった。
 
-### Widening a deliberately narrow error condition would mask the real error
+### 同一 PR 内の後続コミットですでに修正済みの古いセキュリティレビュー指摘
 
 - Confidence: candidate
-- Skip when: The finding asks to broaden a narrow error condition (a specific
-  `errno`, error code, or status class) into a catch-all, and that narrowness
-  encodes a real distinction. The canonical shape is a dependency fallback
-  gated on `ENOENT`: "binary is not installed" is a different situation from
-  "the command ran and failed". Retrying on any non-zero exit would re-run a
-  legitimate failure (not found, expired auth, network) against the fallback
-  and then report the fallback's error, hiding the true one.
-- Do not skip when: The narrow condition misses a case in the SAME category
-  (another "binary unusable" errno such as `EACCES`, another transport-level
-  failure), the unhandled path loses data or leaves partial state, or the retry
-  is idempotent AND the original error is still surfaced.
-- Example signal: "only retries when X fails with ENOENT … never tries the
-  fallback even when a working Y exists", pointing at code whose fallback
-  exists for a missing dependency rather than a failed operation.
-- Source: one CLI-rename PR whose fallback existed for a missing binary rather
-  than a failed command.
+- Skip when: エージェントによるセキュリティレビュー等が「認可（authz）やバリデーションの呼び出しが欠落している」と指摘しているものの、現在の PR の最新コミット（tip）には——通常、レビュー実行後に追加されたセキュリティ強化（hardening）コミットによって——まさにその関門（ゲート）がテスト付きで明確に実装されている場合。
+- Do not skip when: 引き合いに出されているヘルパー関数が対象のプリンシパル（主体）に対して実質何もしない（no-op）場合、保護すべき副作用が発生した**後**にチェックが走っている場合、または指摘されたプリンシパルに対するテストカバレッジが欠けている場合。
+- Example signal: 重大度 HIGH の「認可チェックの欠落」という指摘が出ているが、最新コミットでは副作用の直前にすでに該当のガード処理が呼び出されているケース。
+- Source: レビュー実行後にセキュリティ強化コミットが追加された Webhook エンドポイントの PR 事例。
+
+### 意図的に狭く絞ったエラー条件を広げると、本来のエラーが隠蔽されるケース
+
+- Confidence: candidate
+- Skip when: 特定の `errno`、エラーコード、または HTTP ステータスクラスに限定した狭いエラー条件を「何でもキャッチする広い条件（catch-all）」に広げるよう求められているものの、その狭さ自体が重要な意味上の区別を表現している場合。典型的なパターンは `ENOENT` を条件にした依存コマンドのフォールバックです。「バイナリがインストールされていない」のと「コマンドは実行されたが失敗した」のとでは状況がまったく異なります。ゼロ以外の終了コードすべてでリトライしてしまうと、本来正当な失敗（対象が見つからない、認証期限切れ、ネットワークエラーなど）に対してフォールバック側を再実行してしまい、結果としてフォールバック側のエラーが報告されて「真のエラー原因」が隠蔽されてしまいます。
+- Do not skip when: 狭い条件が**同じカテゴリ**の別ケース（`EACCES` のような別の「バイナリ実行不能」系 `errno` や、別のトランスポート層障害など）を取りこぼしている場合、未処理のパスを通るとデータが失われたり中途半端な状態が残ったりする場合、またはリトライがべき等であり、かつ元のエラー内容もきちんと表面化される場合。
+- Example signal: 「`ENOENT` で失敗したときしかリトライせず、正常に動く代替コマンド Y が存在する場合でもフォールバックを試みない」という指摘で、対象のコードが「処理の失敗」ではなく「依存バイナリの未インストール」に備えたフォールバックであるケース。
+- Source: 失敗したコマンドではなく「バイナリが存在しない場合」のためにフォールバックを用意していた CLI リネーム PR の事例。

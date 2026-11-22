@@ -1,23 +1,23 @@
-# Route work through `/poteto-mode`
+# `/poteto-mode` を通じて作業をルーティングする
 
-`/poteto-mode` is the front door. You give it a goal, it matches one of twenty-two playbooks, copies that playbook's steps into the todo list, and calls the other skills as the steps need them. In this page you learn what a good prompt looks like, and how little of one you actually need.
+`/poteto-mode` はすべての入り口（フロントドア）です。ゴールを伝えるだけで、22種類のプレイブックから最適なものをマッチングし、そのステップを Todo リストにコピーし、必要に応じて他のスキルを呼び出します。このページでは、良いプロンプトとはどのようなものか、そして実際にはどれほど短い指示で済むのかを解説します。
 
-![A dispatcher pulls a switch lever to route robots on rail handcars toward lit gates, under a /poteto-mode departure board listing BUG FIX, FEATURE, and INVESTIGATION.](./images/router.jpg)
+![BUG FIX、FEATURE、INVESTIGATION と書かれた /poteto-mode の発車案内板の下で、指令員がポイント切り替えレバーを引き、軌道自転車に乗ったロボットたちをライトの点灯したゲートへと振り分けている様子。](./images/router.jpg)
 
-## What happens to your prompt
+## プロンプトに起こる処理の流れ
 
 ```mermaid
 flowchart TD
-    A[Your prompt] --> B[poteto-mode]
-    B --> C[Read the Principles section]
-    C --> D{Match the task}
-    D -->|Read-only question| E[Investigation]
-    D -->|Defect| F[Bug fix]
-    D -->|New behavior| G[Feature]
-    D -->|Structure only| H[Refactoring]
-    D -->|Measured slowness| I[Perf issue]
-    D -->|Large work or no match| J[figure-it-out]
-    E --> K[Verify and report]
+    A[ユーザーのプロンプト] --> B[poteto-mode]
+    B --> C[原則（Principles）セクションを読み込む]
+    C --> D{タスクを分類}
+    D -->|読み取り専用の質問| E[Investigation（調査）]
+    D -->|不具合| F[Bug fix（バグ修正）]
+    D -->|新しい挙動| G[Feature（機能開発）]
+    D -->|構造のみの変更| H[Refactoring（リファクタリング）]
+    D -->|計測された遅延| I[Perf issue（パフォーマンス問題）]
+    D -->|大規模作業または該当なし| J[figure-it-out]
+    E --> K[検証して報告]
     F --> K
     G --> K
     H --> K
@@ -25,115 +25,115 @@ flowchart TD
     J --> K
 ```
 
-The diagram shows the common routes. There are also playbooks for hillclimbing a metric, diagnosing runtime symptoms and captured traces, prototypes, visual parity, authoring and evaluating skills, autonomous runs, opening a PR, babysitting a PR or stack to merge-ready, shipping a verified stack, running a PR queue or a stack on autopilot, session pickup, pausing safely, multi-phase plans, and worktree cleanup. The [playbook directory](../../skills/poteto-mode/playbooks/) has the full set.
+この図は一般的なルーティングを示しています。このほかにも、メトリクスのヒルクライム改善、実行時の症状やキャプチャ済みトレースの診断、プロトタイプ作成、UI の視覚的パリティ（完全一致）、スキルの作成と評価、自律実行、PR の作成、PR やスタックをマージ可能状態まで導く babysit、検証済みスタックのシッピング、PR キューやスタックのオートパイロット実行、セッションの引き継ぎ、安全な一時停止、マルチフェーズ計画、worktree のクリーンアップといったプレイブックが用意されています。全一覧は[プレイブックディレクトリ](../../skills/poteto-mode/playbooks/)にあります。
 
-## Say the goal, not the ceremony
+## 儀礼的な前置きではなく、ゴールを伝える
 
-You don't write a spec. You say what's wrong or what you want, plus anything you already know that saves the agent time:
+仕様書を書く必要はありません。何が問題なのか、あるいは何を実現したいのかと、エージェントの探索時間を節約できる既知の情報を伝えるだけです：
 
 ```text
-/poteto-mode users get two notifications after a retry. repro first, then fix and verify.
+/poteto-mode リトライ後に通知が2通届いてしまう。まず再現させてから、修正して検証して。
 ```
 
-That's a Bug fix prompt. "repro first" is a real constraint, not politeness, and the playbook honors it. Watch the todo list fill with the Bug fix steps.
+これは Bug fix（バグ修正）のプロンプトです。「まず再現させて（repro first）」は単なる礼儀ではなく実際の制約として機能し、プレイブックはそれを厳格に守ります。Todo リストが Bug fix のステップで埋まっていく様子を見てみてください。
 
-## What goes in a prompt
+## プロンプトに含めるべき要素
 
-A useful prompt carries up to five things, and each one fits in a sentence:
+実用的なプロンプトには最大5つの要素が含まれ、それぞれ1文に収まります：
 
-- **The goal.** Say what's wrong, or what you want.
-- **The done check.** It must be able to pass or fail. "Make it better" and "work on it for an hour" aren't checks.
-- **The proof you want to see.** Ask for the real command output, a video of the flow, the stored value, or a before-and-after number.
-- **What you already know.** A symptom, a repro step, a log line, or a link saves the agent a search.
-- **The real constraints.** "repro first", "don't change any code yet", "zero behavior change", and "let me review before proceeding" each change what the agent does.
+- **ゴール（The goal）：** 何が問題なのか、または何を実現したいのかを伝えます。
+- **完了条件（The done check）：** 合格（pass）か不合格（fail）かを明確に判定できる基準である必要があります。「もっと良くして」「1時間作業して」などはチェック基準になりません。
+- **提示してほしい証拠（The proof you want to see）：** 実際のコマンド出力、動作フローの動画、保存された値、変更前後の数値などを求めます。
+- **すでに分かっていること（What you already know）：** 症状、再現手順、ログの1行、リンクなどを共有すれば、エージェントが調査する手間を省けます。
+- **実際の制約条件（The real constraints）：** 「まず再現させて」「まだコードを変更しないで」「挙動を一切変えないで」「次に進む前にレビューさせて」といった指示は、それぞれエージェントの行動を具体的に制御します。
 
-Here's one prompt with all five:
+5つの要素をすべて含んだプロンプトの例はこちらです：
 
 ```text
-/poteto-mode the csv export drops its last row since yesterday's deploy. failing job id is 4812. repro first, then fix. done means the 60k-row fixture exports every row. show me the row counts before and after.
+/poteto-mode 昨日のデプロイ以降、CSV エクスポートで最終行が欠落する。失敗しているジョブ ID は 4812。まず再現させてから修正して。6万行のテストデータ（フィクスチャ）ですべての行がエクスポートされたら完了とする。修正前後の行数を提示して。
 ```
 
-Two things are worth leaving out:
+逆に、省いたほうがよいものが2つあります：
 
-- **The how.** Say what to achieve, and leave the agent room to find a better path than the one you'd pick. The same goes for a list of skills, covered in the pitfall below.
-- **Your theory of the cause, at first.** A stated guess narrows the search to wherever you pointed. Let the agent restate the problem before you share your hunch.
+- **具体的な手段（The how）：** 何を達成すべきかを伝え、あなた自身が思いつくよりも優れた解決策をエージェントが見つける余地を残してください。スキルのリストを並べることも同様です（詳細は後述の「落とし穴」を参照）。
+- **最初から原因の推測を伝えること（Your theory of the cause, at first）：** 推測を先に伝えてしまうと、探索範囲がその方向に狭まってしまいます。自分の直感を共有する前に、まずはエージェント自身の言葉で問題を言い直させてください。
 
-For a noisy report, such as a long thread or a vague bug, make the restatement the first step:
+長いスレッドや曖昧なバグ報告など、ノイズの多いレポートの場合は、問題言い直し（restatement）を最初のステップにします：
 
 ```text
-/poteto-mode read this thread. restate the underlying issue in your own words, in plain english. don't change any code yet.
+/poteto-mode このスレッドを読んで、根本にある問題を平易な日本語で自分の言葉に言い直して。まだコードは一切変更しないで。
 ```
 
-A misreading shows up in the restatement, before any code exists. Correct it there, and it costs you one message instead of one wrong fix. For the restatement alone, with no playbook, run [`/in-your-own-words`](../../skills/in-your-own-words/SKILL.md). It restates what the agent thinks your goals are and what problem you're trying to solve.
+読み違いがあれば、コードを1行も書く前のこの言い直しの段階で表面化します。ここで訂正すれば、間違った修正を1回行うコストではなく、メッセージ1通分のコストで済みます。プレイブックを使わずに言い直しだけを行いたい場合は、[`/in-your-own-words`](../../skills/in-your-own-words/SKILL.md) を実行してください。エージェントがあなたのゴールと解決しようとしている課題をどのように理解しているかを自分の言葉で言い直します。
 
-When you're unsure whether a prompt is aimed right, run [`/sharpen`](../../skills/sharpen/SKILL.md) on it before you send it:
+プロンプトの狙いが的確かどうか迷ったときは、送信する前に [`/sharpen`](../../skills/sharpen/SKILL.md) を実行してください：
 
 ```text
-/sharpen write a migration guide for the v2 config format.
+/sharpen v2 設定フォーマット向けのマイグレーションガイドを書いて。
 ```
 
-The agent says what a top professional would do that you didn't ask for, the rawest material they would start from, the methods and tools they would use, and what other than you or the agent would show the result is right. Then it rewrites your prompt to ask for exactly that, deeper but not bigger. The rewrite asks the agent to prototype any choice an experiment can settle and to recommend an option from what it observed, and it leaves product and preference choices to you. It doesn't do the task. Read the rewrite, then send it, for example with `/poteto-mode`.
+エージェントは、トッププロフェッショナルなら当然行うがあなたが指示していなかったこと、出発点となる最も生に近い一次資料、使用する手法とツール、そしてあなたやエージェント以外の第三者・外部手段によって結果の正しさを証明する方法を提示します。そのうえで、あなたのプロンプトを「肥大化」させるのではなく「深化」させた形に書き直します。書き直されたプロンプトでは、実験で決着がつく選択についてはプロトタイプを作成して観察結果から推奨案を出すようエージェントに指示し、プロダクトや好みの選択はあなたに委ねる形になります（タスク自体は実行しません）。書き直された内容を確認してから、たとえば `/poteto-mode` を付けて送信してください。
 
-## Follow up short
+## 短いフォローアップで進める
 
-When the conversation already carries the context, the prompt shrinks to almost nothing. All of these are enough:
-
-```text
-/poteto-mode do it
-```
+会話にすでにコンテキストが共有されている場合、プロンプトは極限まで短くなります。以下のどれでも十分に機能します：
 
 ```text
-continue
+/poteto-mode やって
 ```
 
 ```text
-keep going until done
+続けて
 ```
-
-Short works because the playbook holds the structure, and a Custom Mode keeps `/poteto-mode` in context on every turn. [Set up pstack](./01-setup.md#run-your-first-task) shows how to start one. Your words carry the intent, and the skill carries the rigor.
-
-## Switch tasks with "new task"
-
-A long chat accumulates context from the last task. When you change subjects, say so:
 
 ```text
-/poteto-mode new task. figure out why the cache entry survives logout. don't change any code yet.
+完了するまで進めて
 ```
 
-"new task" tells `/poteto-mode` to re-match rather than continue the prior playbook. "don't change any code yet" pins this one to Investigation. Without those two phrases, a mode mid-Feature tends to treat your question as the next feature step.
+短い指示で機能するのは、プレイブックが全体の構造を保持しており、カスタムモード（Custom Mode）によって毎ターンのコンテキストに `/poteto-mode` が維持されているからです。カスタムモードの開始方法は [pstack のセットアップ](./01-setup.md#最初のタスクを実行する) を参照してください。あなたの言葉が「意図」を伝え、スキルが「厳密さ」を担います。
 
-## Give parallel work its own machine
+## 「new task」でタスクを切り替える
 
-If you run several agents against one repository on one computer, they will fight over the working tree, the ports, and the build output. The cleanest isolation is a [cloud subagent](https://cursor.com/docs/subagents#cloud-subagents). Each one gets its own VM and branch, so it can install dependencies, run your app, and record video of the result without touching your machine. Type `/in-cloud` before the task, or ask the parent chat to hand work to cloud subagents.
-
-When the work has to stay local, ask for a worktree up front:
+長いチャットには直前のタスクのコンテキストが蓄積されています。話題や作業を切り替えるときは、その旨を明示してください：
 
 ```text
-/poteto-mode new task. branch off <base> in a fresh worktree, then port the parser change there.
+/poteto-mode new task（新しいタスク）。ログアウト後もキャッシュエントリが残ってしまう原因を調べて。まだコードは変更しないで。
 ```
 
-Each task in its own branch and worktree means no agent stomps another's files. Worktrees cost disk and machine resources, so a laptop runs only a handful at once. The [Opening a PR playbook](../../skills/poteto-mode/playbooks/opening-a-pr.md) already works from a worktree for code changes, so mostly you only say this when a specific base or location matters.
+「new task」と伝えることで、`/poteto-mode` は前のプレイブックを続行するのではなく、新しくプレイブックのマッチングを行います。また、「まだコードは変更しないで（don't change any code yet）」と添えることで、このタスクが Investigation（調査）プレイブックに固定されます。これら2つのフレーズがないと、Feature（機能開発）プレイブックの途中で質問した際に、それを新機能開発の次のステップとして扱ってしまう傾向があります。
 
-Worktrees accumulate. When disk gets tight, ask:
+## 並列作業には専用の環境（マシン）を与える
+
+1台のコンピュータ上で1つのリポジトリに対して複数のエージェントを同時に走らせると、作業ツリー（working tree）、ポート、ビルド出力の奪い合いが発生します。最もクリーンな隔離方法は[クラウドサブエージェント（cloud subagent）](https://cursor.com/docs/subagents#cloud-subagents)です。各サブエージェントに専用の VM とブランチが割り当てられるため、あなたのローカルマシンに一切触れることなく、依存関係のインストール、アプリの実行、結果の動画録画を行えます。タスクの前に `/in-cloud` と入力するか、親チャットにクラウドサブエージェントへ作業を振り分けるよう指示してください。
+
+ローカル環境で作業を維持しなければならない場合は、最初に worktree の使用を指示します：
 
 ```text
-/poteto-mode what's eating my disk? prune the worktrees that are safe to prune.
+/poteto-mode new task（新しいタスク）。新しい worktree で <base> からブランチを切って、そこにパーサーの変更を移植して。
 ```
 
-The [Worktree cleanup playbook](../../skills/poteto-mode/playbooks/worktree-cleanup.md) classifies every worktree by merge state, uncommitted work, and which chats still touch it. It deletes only what that evidence clears and pauses for your call on anything holding uncommitted work.
+タスクごとに専用のブランチと worktree を割り当てることで、エージェント同士が互いのファイルを上書きするのを防げます。worktree はディスク容量とマシンリソースを消費するため、ノート PC で同時に動かせるのは数個程度です。[Opening a PR プレイブック](../../skills/poteto-mode/playbooks/opening-a-pr.md) ではコード変更時にすでに worktree を使用するようになっているため、この指定が必要になるのは主に特定のベースブランチや配置場所が重要な場合だけです。
 
-## Leave it running
-
-When you step away, say what done means and go:
+worktree は次第に溜まっていきます。ディスク容量が逼迫してきたら、次のように依頼してください：
 
 ```text
-/poteto-mode im stepping away. keep going until the migration check reports zero old callers. log your decisions.
+/poteto-mode ディスク容量を圧迫している原因は何？安全に削除できる worktree を整理して。
 ```
 
-Work you'll review later routes through [`/figure-it-out`](../../skills/figure-it-out/SKILL.md), which designs the run's phases and keeps a [`/show-me-your-work`](../../skills/show-me-your-work/SKILL.md) decision log. [Run work while you sleep](./07-overnight.md) covers the full overnight contract.
+[Worktree cleanup プレイブック](../../skills/poteto-mode/playbooks/worktree-cleanup.md) は、すべての worktree をマージ状態、未コミットの作業有無、どのチャットがまだ参照しているかに基づいて分類します。証拠によって安全と確認されたものだけを削除し、未コミットの作業が残っているものについてはあなたの判断を仰ぐために一時停止します。
 
-**Pitfall:** don't enumerate skills in your prompt ("use /architect, then /arena, then /interrogate..."). The playbook already sequences them, and a hand-written sequence usually reorders or drops steps the playbook would have kept. Name a skill only when you want to override a specific choice.
+## 起動したまま席を離れる
 
-Read [`poteto-mode`](../../skills/poteto-mode/SKILL.md) itself for the full routing rules.
+席を離れるときは、完了条件を伝えてそのまま任せてください：
 
-Next: [Understand the code](./03-understand.md).
+```text
+/poteto-mode これから席を外す。マイグレーションチェックで古い呼び出し元がゼロになるまで進め続けて。意思決定のログも残しておいて。
+```
+
+後であなたがレビューする前提の作業は [`/figure-it-out`](../../skills/figure-it-out/SKILL.md) にルーティングされ、実行フェーズの設計と [`/show-me-your-work`](../../skills/show-me-your-work/SKILL.md) による意思決定ログの記録が行われます。夜間実行の全体像については [寝ている間に作業を進める](./07-overnight.md) で詳しく解説しています。
+
+**落とし穴（Pitfall）：** プロンプト内でスキルを列挙しないでください（「/architect を使って、次に /arena、その次に /interrogate を使って…」など）。プレイブック側ですでに適切な順序が組まれており、人間が手書きで順序を指定すると、本来プレイブックが維持するはずのステップの順序が狂ったり抜け落ちたりしがちです。スキル名を明示するのは、特定の選択を意図的に上書きしたい場合のみにしてください。
+
+完全なルーティングルールについては、[`poteto-mode`](../../skills/poteto-mode/SKILL.md) 自体を参照してください。
+
+次へ：[コードを理解する](./03-understand.md)

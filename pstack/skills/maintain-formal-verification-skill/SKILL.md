@@ -1,58 +1,58 @@
 ---
 name: maintain-formal-verification-skill
-description: "Bring a project's formal verification back in line with the code after the code changes: find the commits that touched verified code, update the model, harness, or properties to describe the code as it is now, rerun, and say whether each failure is drift in the verification or a bug in the code. Use for /maintain-formal-verification-skill, \"is the model still true to the code\", or after merges and refactors that touched verified code without rechecking it."
+description: "コードの変更後にプロジェクトの形式検証を最新のコードと再び整合させます。検証対象コードに触れたコミットを特定し、現在のコードの実態に合うようモデル・ハーネス・検証する性質（プロパティ）を更新して再実行し、各失敗が検証側のズレ（ドリフト）なのかコード側のバグなのかを判定します。/maintain-formal-verification-skill、「モデルは今でもコードに忠実か」の問いかけ、あるいは検証対象コードに触れたにもかかわらず再チェックをスキップしたマージやリファクタリングの後に使用します。"
 disable-model-invocation: true
 ---
 
-# Maintain a formal verification skill
+# 形式検証スキルをメンテナンスする
 
-A formal check proves a property of what it describes. When the code changes and the verification does not, the check can keep passing while it describes code that no longer exists. That pass is the dangerous case, because it looks like a proof. This skill is the upkeep loop for a verify skill that `/create-formal-verification-skill` generated, or for any project-local skill that runs a model checker, prover, or code-level verifier against named code. The project-local skill handles a change that an agent makes while it uses that skill. This skill handles the changes that skipped it: merges, edits made without the skill, and drift that builds up across many commits.
+形式チェックが証明するのは、あくまで「検証モデルやハーネスが記述している対象」の性質です。コード側が変更されたのに検証側が更新されないままだと、すでに存在しない古いコードの記述に対してチェックがパスし続けるという事態が起こり得ます。見た目は「証明完了」に見えるため、こうしたパスこそが最も危険です。このスキルは、`/create-formal-verification-skill` が生成した検証スキル、あるいは特定のコードに対してモデルチェッカー・定理証明器・コードレベル検証器を実行するあらゆるプロジェクト固有スキルを最新状態に保つためのメンテナンスループです。エージェントが検証スキルを使いながら変更を加えるケースはプロジェクト固有スキル自身が処理しますが、このスキルが扱うのはそれをすり抜けた変更——マージ、スキルを使わずに行われた編集、そして複数のコミットを経て徐々に蓄積したズレ（ドリフト）——です。
 
-## Outcomes
+## 判定結果（Outcomes）
 
-Give each check one outcome, and say which:
+各チェックに対して以下のいずれか1つの判定結果を割り当て、明記してください：
 
-- **in sync**: no change since the last sync alters what the check describes, and the check passes.
-- **updated**: the code changed, the verification now describes the new code, and the check passes.
-- **bug**: the verification describes the current code, and the code breaks the property. This is a finding about the code. It is not drift.
-- **blocked**: the check could not be brought back in line or could not run. Say exactly why.
+- **in sync（同期済み）：** 前回の同期以降、チェックが記述する対象を変えるような変更はなく、チェックもパスしている状態。
+- **updated（更新済み）：** コードが変更されたため、新しいコードの実態を記述するように検証側を更新し、チェックがパスした状態。
+- **bug（バグ）：** 検証側が現在のコードを正しく記述しているにもかかわらず、コードがその性質に違反している状態。これは検証のズレではなく、プロダクトコード側の不具合です。
+- **blocked（ブロック）：** 検証側を最新のコードと整合させることができなかった、またはチェックを実行できなかった状態。具体的な理由を明記してください。
 
-A check can be both updated and bug: the update makes the verification describe the code again, and then the property fails on it.
+なお、1つのチェックが `updated` と `bug` の両方に該当することもあります。検証側を更新して現在のコードを正しく記述できるようにした結果、そのコード上で検証する性質が失敗するケースです。
 
-## Edit scope
+## 編集スコープ
 
-Edit only the verification: models, harnesses, property files, and the verify skill itself. Never edit product code during a run, unless the user asks you to. When a property fails on the current code, do not weaken the property or the model to make it pass. Report the failure.
+編集してよいのは検証側のファイル（モデル、ハーネス、プロパティ定義ファイル、および検証スキル自体）のみです。ユーザーから明示的に指示されない限り、実行中にプロダクトコードには一切手を触れないでください。現在のコード上で検証する性質が失敗した場合でも、チェックを通すために性質の条件やモデルを緩めてはいけません。そのまま失敗として報告してください。
 
-## Pass
+## メンテナンス手順
 
-1. **Find the checks.** A verify skill has no fixed name, so find it by what it does: a project skill that runs a model checker, a prover, or another verifier against named code. Read each one you find, or the one the user named. For each check, collect the property, the code it covers, the bounds and assumptions, the command that runs it, and the commit where it was last confirmed to describe the code. If no verify skill exists, stop and point at `/create-formal-verification-skill`. If the skill does not record a sync commit, use the last commit that changed the verification files, and say that you did.
+1. **チェック対象を特定する（Find the checks）。** 検証スキルには決まった名前がないため、その役割——特定のコードに対してモデルチェッカーや証明器などの検証ツールを実行するプロジェクトスキルであること——を手がかりに探します。見つかったすべての検証スキル（またはユーザーが名指ししたもの）を読み込んでください。各チェックについて、「検証する性質」「カバー対象のコード」「境界条件（バウンド）と前提条件」「実行コマンド」、そして「コードと一致していると最後に確認されたコミット（同期済みコミット）」を収集します。検証スキルが存在しない場合は処理を停止し、`/create-formal-verification-skill` の使用を案内してください。スキル内に同期済みコミットが記録されていない場合は、検証用ファイルを最後に変更したコミットを基準として使用し、その旨を報告に明記します。
 
-2. **Run it as it is.** Run each check once before you change anything, and record the result. A pass here does not tell you that the code is correct. It tells you that the old description still holds. A failure here can be drift or a bug. Do not decide which until step 5.
+2. **現状のまま実行する（Run it as it is）。** 何かに手を加える前に、まず各チェックを現在の状態のまま1回実行し、結果を記録します。ここでパスしたとしても、現在のコードが正しいという証明にはなりません。あくまで「古い記述に対しては今でも成り立つ」ことが分かっただけです。また、ここで失敗した場合でも、それが検証側のドリフトなのかコード側のバグなのかは、ステップ 5 まで判断を保留してください。
 
-3. **Read every change to covered code.** Diff the covered files from the sync commit to the current commit, and read each commit message. Also look for code that moved: a covered function that is renamed, split, or moved to another file is still covered code. Also look for new code that touches the state that a check guards, such as a new function that writes the same fields. For each change, decide which of these it is:
-   - **No effect.** The change does not alter anything the verification describes, such as formatting, comments, or code paths that the verification does not cover. Check this against the model or harness, not against the commit message.
-   - **The verification no longer describes the code.** A step that was one indivisible action is now two, a branch was added or removed, a check moved, a new path reaches the guarded state, or a value now has a different range. The model or harness must change.
-   - **The promise changed on purpose.** The change alters what the code promises, and evidence in the change says that this is intended: the doc comment, the tests, the changelog, or the commit message. The property must change, and you must cite that evidence.
-   - **The promise may be broken.** The code changed, and no evidence says that the promise changed. Treat a failure that follows as a bug candidate.
+3. **カバー対象コードへのすべての変更を読む（Read every change to covered code）。** 同期済みコミットから現在のコミットまでの間におけるカバー対象ファイルの差分（diff）を確認し、各コミットメッセージを読みます。また、コードの移動にも目を光らせてください。カバー対象の関数がリネームされたり、分割されたり、別ファイルへ移動したりしていても、引き続きカバー対象コードです。さらに、チェックが保護している状態に触れる「新しいコード」（同じフィールドに書き込む新しい関数など）が追加されていないかも確認します。それぞれの変更について、以下のどれに該当するかを判定してください：
+   - **影響なし（No effect）：** フォーマット調整、コメント変更、あるいは検証がカバーしていないコードパスなど、検証が記述している内容に一切影響を与えない変更。コミットメッセージの文面ではなく、実際のモデルやハーネスと照らし合わせて判定してください。
+   - **検証側がコードの実態と合わなくなった（The verification no longer describes the code）：** これまで分割不可能な1ステップ（アトミック操作）だった処理が2つに分かれた、分岐が追加・削除された、チェック処理の位置が移動した、保護された状態に到達する新しい経路ができた、あるいは値が取り得る範囲が変わった、といったケースです。モデルまたはハーネスを修正する必要があります。
+   - **仕様の約束事が意図的に変更された（The promise changed on purpose）：** コードが保証する仕様（約束事）自体が変わっており、ドキュメントコメント、テスト、変更履歴（changelog）、またはコミットメッセージの中にそれが意図的な変更である証拠が残っているケースです。検証する性質（プロパティ）自体を更新する必要があり、その際には必ず根拠となる証拠を引用してください。
+   - **仕様の約束事が壊れた可能性がある（The promise may be broken）：** コードは変更されているものの、仕様自体が変わったという証拠はどこにもないケースです。この後に検証が失敗した場合は、バグの有力候補として扱います。
 
-4. **Update from the code, not from the result.** Change the model or harness so that each changed part again points to code that a reviewer can open, and keep one indivisible step in the code as one step in the verification. Write the update from the code before you rerun, and do not shape it by what makes the check pass. Change a property only for a promise that changed on purpose. Write down the old wording, the new wording, and the evidence. Keep the bounds unless the change makes them wrong. If you must reduce a bound, say so in the report.
+4. **実行結果ではなく、実際のコードに基づいて更新する（Update from the code, not from the result）。** 変更された各部分が再び「レビュアーが実際に開いて確認できるコード」と対応するよう、モデルやハーネスを修正します。コード上で分割不可能な1ステップである処理は、検証上でも1ステップとして維持してください。再実行する前にまず実際のコードを見て更新内容を書き上げ、チェックをパスさせる都合に合わせて形を歪めてはいけません。検証する性質（プロパティ）を変更してよいのは、仕様が意図的に変更された場合のみです。その際は「古い表現」「新しい表現」「意図的変更の根拠」を書き残してください。境界条件（バウンド）は、コード変更によって前提が崩れない限りそのまま維持します。やむを得ず境界を縮小する必要がある場合は、レポートにその旨を明記してください。
 
-5. **Rerun and judge each result.**
-   - **Pass:** the check can now pass on a description that has lost the ability to fail. Break the new code the way the property guards against, such as removing a new check or reordering a new step, and confirm that the check catches it. Then drop the break.
-   - **Fail:** replay the counterexample against the real code, step by step. If a step cannot happen in the code, the verification is wrong. Fix the verification, and say what was wrong. If every step can happen, it is a bug. Name the commit that introduced it, tell the counterexample as a sequence of steps in the code's own words, and state the harm in one sentence. If a cheap test or reproduction against the real code shows the bug, add it to the report as evidence. Do not commit it to the product code.
+5. **再実行し、各結果を判定する（Rerun and judge each result）。**
+   - **パスした場合（Pass）：** 検証記述を更新した結果、「そもそも失敗する能力を失った骨抜きのチェック」になってしまってパスしている可能性もあります。更新後の新しいコードに対し、その性質が本来防ぐべき壊し方（新しいチェック処理の削除や、新しいステップの順序入れ替えなど）を意図的に加え、更新したチェックがそれを確実に捕捉できることを確認してください。確認できたら、意図的に加えた破壊変更は元に戻します。
+   - **失敗した場合（Fail）：** 反例（カウンターエグザンプル）を実際のコードと照らし合わせ、1ステップずつトレースして再現します。もし実際のコード上では起こり得ないステップが含まれているなら、検証側の記述が誤っています。検証側を修正し、何が間違っていたのかを明記してください。すべてのステップが実際のコード上で起こり得るなら、それはコード側のバグです。バグ混入の原因となったコミットを特定し、反例をコード内の用語を使ったステップの連続として説明し、それによって生じる被害を1文で述べてください。実際のコードに対して低コストなテストや再現スクリプトでそのバグを実証できる場合は、証拠としてレポートに添付してください（ただし、プロダクトコード側にはコミットしないでください）。
 
-6. **Update the verify skill.** Update the code that each check covers, the commands, the bounds, the assumptions, and the sync commit. Set the sync commit to the commit that you checked. Do not move the sync commit for a blocked check, and say so in the report. Then follow the verify skill once as the next agent would, so that you know its steps still run.
+6. **検証スキル自体を更新する（Update the verify skill）。** 各チェックがカバーするコード範囲、実行コマンド、境界条件、前提条件、および同期済みコミットを更新します。同期済みコミットには、今回チェックを完了したコミットハッシュを設定してください。`blocked` 判定となったチェックについては同期済みコミットを進めてはならず、その旨をレポートに記載します。最後に、次のエージェントが実行するのと同じ手順で検証スキルを一度通しで実行し、すべてのステップが問題なく動くことを確認してください。
 
-## Report
+## 報告内容
 
-Tell the user, for each check:
+各チェックについて、以下の内容をユーザーに報告してください：
 
-- the outcome, and the commits that you read;
-- what changed in the verification and why, with a short reason for each change: the code changed shape, or the promise changed on purpose (with the evidence);
-- the rerun result, and the break that you used to show the updated check can still fail;
-- each bug, in plain words: the counterexample as steps in the code's words, the harm, and the commit that introduced it;
-- what the verification still does not cover, including new code that it should cover and does not.
+- 判定結果（Outcome）と、確認したコミット一覧
+- 検証側で変更した内容とその理由（それぞれ「コードの構造が変わったため」または「仕様の約束事が意図的に変更されたため（根拠付き）」といった短い理由を添える）
+- 再実行の結果と、更新後のチェックが今でも失敗を検知できることを証明するために用いた破壊テストの内容
+- 見つかった各バグの平易な説明（コード内の用語を使ったステップ形式の反例、発生する被害、およびバグを導入したコミット）
+- 検証が依然としてカバーできていない範囲（新たにカバーすべきなのに未対応となっている新規コードを含む）
 
-Say outright which failures were drift in the verification and which were bugs in the code. For a check that passed before you updated it and fails after, say that the old pass was on a stale description.
+どの失敗が「検証側のドリフト」であり、どの失敗が「コード側のバグ」であったかを包み隠さず明言してください。また、更新前にはパスしていたのに更新後に失敗するようになったチェックについては、「以前のパスは古い記述（陳腐化したモデル）に対するものだった」と明確に伝えてください。
 
-Put the verification updates in a change of their own, separate from any product fix.
+検証側の更新は、プロダクトコードのバグ修正とは切り離し、独立した変更（コミット／PR）としてまとめてください。

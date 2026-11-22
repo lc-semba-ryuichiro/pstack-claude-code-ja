@@ -1,21 +1,21 @@
 ### Feature
 
-**You own the design. Plan, review, verify.** Delegate implementation. Stay in the lead.
+**設計はあなたが所有します。計画し、レビューし、検証すること。** 実装は委譲し、あなたは指揮を執り続けます。
 
-1. Trace the affected subsystem.
-2. `architect` for the shape.
-3. Write the throughput checkpoint as four todo items. A dimension that genuinely does not apply (single file, no fan-out) keeps its item with `n/a: <reason>` rather than being dropped:
-   - **Blocking first steps.** Gates run before fan-out.
-   - **Independent workstreams.** Disjoint files, services, or layers parallelize. Shared writes serialize.
-   - **Shared mutable state.** Default to splitting the target (the **separate-before-serializing-shared-state** principle skill). Serialize only for real invariants.
-   - **Smallest safe decomposition.** If one worker is best, name why.
-4. Delegate code-writing to a subagent using your configured feature model (default `claude-opus-5-5-xhigh-fast`) with a specific scope (file paths, named data shape and its organizing structure per **principle-model-the-domain**, a state machine over scattered booleans, a table/registry over branching, a typed model over repeated shape assumptions, chosen before the delegate writes logic, and success criteria). Pick each subagent's reasoning level for the job, per the Subagents section. When the implementation admits multiple valid shapes (error handling, abstraction layer, test structure), delegate via the **arena** skill instead so the runners surface the alternatives and the cross-judge guards the pick. Mandatory: no skip-with-reason escape, and Laziness Protocol does not override it (the gain is review separation, not lines saved). A subagent forbidden to spawn satisfies this by owning the diff directly with the same review separation. No "standing by" reply that waits on a nested agent. Surgical edits, re-ground against the source for upstream-derived files. Port shared-primitive improvements to all consumers and verify each. Commit liberally.
-5. Verify on the matching surface. "Inconclusive" or wrong-surface is not a pass. Flag it.
-6. Rebase into small, ordered commits. Stack follow-ups.
-   Use the **sequence-verifiable-units** principle skill, building, verifying, and committing each small unit before the next.
-7. If the design is contested, `interrogate` before shipping.
-8. Run **Opening a PR**.
+1. 影響を受けるサブシステムをトレースします。
+2. 全体像（shape）を決めるために `architect` を実行します。
+3. スループットチェックポイントを4つの todo 項目として書き出します。単一ファイルやファンアウト（fan-out）なしなど、本当に当てはまらない次元についても、削除せずに `n/a: <理由>` として項目を残します。
+   - **ブロッキングとなる最初のステップ:** ファンアウト前に実行するゲート。
+   - **独立したワークストリーム:** 互いに素なファイル、サービス、レイヤーは並列化し、共有書き込みは直列化する。
+   - **共有ミュータブル状態:** デフォルトではターゲットを分割し（`separate-before-serializing-shared-state` 原則スキル）、真の不変条件（invariant）に対してのみ直列化する。
+   - **最小の安全な分解:** 1ワーカーが最善である場合は、その理由を明記する。
+4. コードの記述は、設定された feature モデル（デフォルトは `claude-opus-5-5-xhigh-fast`）を使用し、具体的なスコープを指定してサブエージェントに委譲します。スコープには、ファイルパス、**principle-model-the-domain** に従った名前付きデータ形状とその構成構造（散らばったブーリアンではなくステートマシン、分岐ではなくテーブル／レジストリ、繰り返される形状の前提ではなく型付けされたモデルを、委譲先がロジックを書く前に選択したもの）、および成功基準を含めます。ジョブに応じた各サブエージェントの推論レベルは、Subagents セクションに従って選択します。実装に複数の有効な形状（エラーハンドリング、抽象化レイヤー、テスト構造など）が許容される場合は、代わりに **arena** スキル経由で委譲し、ランナーに代替案を出させてクロスジャッジに選択をガードさせます。必須事項：理由を付けてスキップする逃げ道は禁止であり、Laziness Protocol もこれを上書きしません（得られる利益は行数の節約ではなくレビューの分離だからです）。スポーンを禁じられたサブエージェントは、同じレビュー分離を保ったまま diff を直接所有することでこれを満たします。ネストされたエージェントを待つ「待機中（standing by）」の返信は禁止です。外科的な編集を行い、上流由来のファイルについてはソースと照合し直します。共有プリミティブの改善はすべてのコンシューマーに移植し、それぞれを検証します。コミットは惜しみなく（liberally）行います。
+5. 一致するサーフェス上で検証します。「結論が出ない（Inconclusive）」や異なるサーフェスでの確認は合格とみなさず、フラグを立てます。
+6. 小さく順序立てられたコミットにリベースし、フォローアップをスタックします。
+   **sequence-verifiable-units** 原則スキルを使用し、次の単位に進む前に各小さな単位を構築、検証、コミットします。
+7. 設計に異論や議論の余地がある場合は、出荷前に `interrogate` を実行します。
+8. **Opening a PR** を実行します。
 
-Code-coupled work (one feature, one migration) goes to a single owner with the checkpoint inline. That owner fans out internally after the blocking phase. Parent-level fan-out is for slices that produce independent artifacts (audits, cross-subsystem investigations, competing experiments). Rewrite the checkpoint at phase boundaries. Spawn a fresh owner rather than chaining interrupts.
+コードが密結合した作業（1つの機能、1つのマイグレーション）は、チェックポイントをインライン化した単一のオーナーに割り当てます。そのオーナーがブロッキングフェーズの後に内部でファンアウトを行います。親レベルでのファンアウトは、独立した成果物を生むスライス（監査、サブシステム横断調査、競合実験）にのみ使用します。フェーズの境界でチェックポイントを書き直し、割り込みを連鎖させるのではなく新しいオーナーをスポーンしてください。
 
-**Reply:** what you built, what you chose and why, the throughput checkpoint, open decisions. Tables for design alternatives.
+**返信形式：** 何を構築したか、何を選択しなぜそうしたか、スループットチェックポイント、未決の決定事項。設計の代替案にはテーブルを使用します。

@@ -1,178 +1,182 @@
-# Cursor plugins
+# Cursor プラグイン
 
-Official Cursor plugins for popular developer tools, frameworks, and SaaS products. Each plugin is a standalone directory at the repository root with its own `.cursor-plugin/plugin.json` manifest.
+> [!NOTE]
+> このリポジトリは、[cursor/plugins](https://github.com/cursor/plugins) を日本語に訳した**非公式**の翻訳版です。Cursor／Anysphere とは関係ありません。各プラグインの著作権表示とライセンス文は、それぞれの `LICENSE` に原文のまま残しています。
 
-## Plugins
+よく使われる開発ツール、フレームワーク、SaaS 製品向けの Cursor 公式プラグイン集です。各プラグインはリポジトリ直下にある独立したディレクトリで、それぞれ専用の `.cursor-plugin/plugin.json` マニフェストを持ちます。
 
-| `name` | Plugin | Author | Category | `description` (from marketplace) |
+## プラグイン一覧
+
+| `name` | プラグイン | 作者 | カテゴリ | 説明（マーケットプレイスの `description` を和訳） |
 |:-------|:-------|:-------|:---------|:-------------------------------------|
-| `teaching` | [Teaching](teaching/) | Cursor | Utilities | Skill mapping, practice plans, and learning retrospectives. |
-| `continual-learning` | [Continual Learning](continual-learning/) | Eric Zakariasson | Developer Tools | Incremental transcript-driven memory updates for AGENTS.md using high-signal bullet points only. |
-| `cursor-team-kit` | [Cursor Team Kit](cursor-team-kit/) | Eric Zakariasson | Developer Tools | Internal team workflows for CI, code review, shipping, local automation, and verification. |
-| `thermos` | [Thermos](thermos/) | Cursor | Developer Tools | Thermo-nuclear branch review: deep security/correctness audits, harsh code-quality rubrics, parallel subagents, thermos orchestration, and optional merge-ready PR flows. |
-| `create-plugin` | [Create Plugin](create-plugin/) | Cursor | Developer Tools | Scaffold and validate new agent plugins. |
-| `ralph-loop` | [Ralph Loop](ralph-loop/) | Cursor | Developer Tools | Iterative self-referential AI loops using the Ralph Wiggum technique. |
-| `agent-compatibility` | [Agent Compatibility](agent-compatibility/) | Cursor | Developer Tools | CLI-backed repo compatibility scans plus agents that audit startup, validation, and docs against reality. |
-| `cli-for-agent` | [CLI for Agents](cli-for-agent/) | Eric Zakariasson | Developer Tools | Patterns for designing CLIs that coding agents can run reliably: flags, help with examples, pipelines, errors, idempotency, dry-run. |
-| `pr-review-canvas` | [PR Review Canvas](pr-review-canvas/) | Cursor | Developer Tools | Render PR diffs as review canvases grouped by importance. |
-| `docs-canvas` | [Docs Canvas](docs-canvas/) | Cursor | Developer Tools | Render documentation as a navigable canvas. |
-| `cursor-sdk` | [Cursor SDK](cursor-sdk/) | Cursor | Developer Tools | Build apps, scripts, and automations with the TypeScript SDK. |
-| `origin-apps` | [Origin Apps](origin-apps/) | Cursor | Developer Tools | Skills for building on the Cursor Origin API. Fetch the live spec first, then follow the Origin rules for credentials, scopes, webhooks, paging, and errors. Includes a skill that plans the port of an existing GitHub App. |
-| `orchestrate` | [Orchestrate](orchestrate/) | Cursor | Developer Tools | Fan large tasks out across parallel cloud agents with planners, workers, verifiers, and structured handoffs. |
-| `pstack` | [pstack](pstack/) | Lauren Tan | Developer Tools | if you want to go fast, go deep first. pstack helps you write less, but higher quality code. rigorous agent workflows you can parallelize with confidence. |
-| `dyl-stack` | [dyl-stack](dyl-stack/) | Dylan Gattey | Developer Tools | Dylan's agent style on top of pstack: root causes over symptom patches, The Algorithm before design, terse verified delivery, a PR review that fits in a paste, and Figma-to-UI with a visual judge. |
-| `advisor` | [Advisor](advisor/) | Cursor | Developer Tools | Consult a stronger model before major decisions, when stuck, and before declaring done. |
-| `grok-voice` | [Grok Voice](grok-voice/) | Eric Zakariasson | Developer Tools | Add Grok voice to an app: realtime speech-to-speech, speech-to-text dictation, text-to-speech read-aloud, and a log-driven fix loop for voice sessions. |
-| `gmail` | [Gmail](third_party/gmail/) | Cursor | Productivity | Search, read, draft, and manage email. |
-| `google-drive` | [Google Drive](third_party/google-drive/) | Cursor | Productivity | Search, read, create, and share files. |
-| `google-calendar` | [Google Calendar](third_party/google-calendar/) | Cursor | Productivity | Search events and schedule meetings. |
-| `google-docs` | [Google Docs](third_party/google-docs/) | Cursor | Productivity | Read, create, and edit documents. |
-| `google-sheets` | [Google Sheets](third_party/google-sheets/) | Cursor | Productivity | Read, write, and append spreadsheet data. |
-| `google-slides` | [Google Slides](third_party/google-slides/) | Cursor | Productivity | Create, edit, and render presentations. |
-| `google-ads` | [Google Ads](third_party/google-ads/) | Cursor | Integrations | Report on campaigns, research keywords, and make previewed changes. |
-| `google-analytics` | [Google Analytics](third_party/google-analytics/) | Cursor | Integrations | Run GA4 reports and manage property configuration. |
-| `google-search-console` | [Google Search Console](third_party/google-search-console/) | Cursor | Integrations | Query search performance, inspect URLs, and manage sitemaps. |
-| `gong` | [Gong](third_party/gong/) | Cursor | Integrations | Pull account summaries, deal insights, and call briefs. |
-| `salesforce` | [Salesforce](third_party/salesforce/) | Cursor | Integrations | Query, create, and update records in your org. |
-| `salesforce-headless-360` | [Salesforce (Headless 360, Beta)](third_party/salesforce-headless-360/) | Cursor | Integrations | Manage records, users, and org setup across Salesforce. |
-| `playwright` | [Playwright](third_party/playwright/) | Cursor | Integrations | Navigate, click, screenshot, and test in a real browser. |
-| `github` | [GitHub](third_party/github/) | Cursor | Integrations | Manage repos, issues, pull requests, and Actions. |
-| `ashby` | [Ashby](third_party/ashby/) | Cursor | Integrations | Search candidates, prep interviews, and manage pipeline tasks. |
-| `hubspot` | [HubSpot](third_party/hubspot/) | Cursor | Integrations | Search and update contacts, companies, deals, and tickets. |
-| `intercom` | [Intercom](third_party/intercom/) | Cursor | Integrations | Search conversations, contacts, and Help Center articles. |
-| `zoom` | [Zoom](third_party/zoom/) | Cursor | Integrations | Search meetings, pull transcripts, and work with Zoom Docs. |
-| `x` | [X](third_party/x/) | Cursor | Integrations | Search posts, read timelines, pull trends, explore Spaces and communities, manage lists and bookmarks, access X Chat, schedule X calls, and manage livestreams. |
-| `clay` | [Clay](third_party/clay/) | Cursor | Integrations | Enrich people and companies, run AI research agents. |
-| `circleback` | [Circleback](third_party/circleback/) | Cursor | Integrations | Search meetings, transcripts, action items, and emails. |
-| `docusign` | [Docusign](third_party/docusign/) | Cursor | Integrations | Manage envelopes, templates, workflows, and agreements. |
-| `navan` | [Navan](third_party/navan/) | Cursor | Integrations | Query expenses, travel bookings, policies, and cards. |
-| `profound` | [Profound](third_party/profound/) | Cursor | Integrations | Track AI visibility, sentiment, and citations. |
-| `juicebox` | [Juicebox](third_party/juicebox/) | Cursor | Integrations | Query recruiting analytics, shortlists, and sourcing agents. |
-| `outreach` | [Outreach](third_party/outreach/) | Cursor | Integrations | Search sequences, prospects, and Kaia meetings. |
-| `amplemarket` | [Amplemarket](third_party/amplemarket/) | Cursor | Integrations | Search people and companies, enrich leads, run sequences. |
-| `klaviyo` | [Klaviyo](third_party/klaviyo/) | Cursor | Integrations | Manage profiles, segments, campaigns, and flows. |
-| `customer-io` | [Customer.io](third_party/customer-io/) | Cursor | Integrations | Build campaigns, manage segments, and query people. |
-| `mailerlite` | [MailerLite](third_party/mailerlite/) | Cursor | Integrations | Manage subscribers, groups, campaigns, and automations. |
-| `brevo` | [Brevo](third_party/brevo/) | Cursor | Integrations | Manage contacts, email and SMS campaigns, and CRM deals. |
-| `typeform` | [Typeform](third_party/typeform/) | Cursor | Integrations | Build forms, analyze responses, and manage contacts. |
-| `jotform` | [Jotform](third_party/jotform/) | Cursor | Integrations | Create and edit forms, then read submissions. |
-| `semrush` | [Semrush](third_party/semrush/) | Cursor | Integrations | Research keywords, backlinks, traffic, and competitors. |
-| `ahrefs` | [Ahrefs](third_party/ahrefs/) | Cursor | Integrations | Research keywords, backlinks, rankings, and site health. |
-| `godaddy` | [GoDaddy](third_party/godaddy/) | Cursor | Integrations | Brainstorm domain names and check availability. |
-| `upwork` | [Upwork](third_party/upwork/) | Cursor | Integrations | Search talent, post jobs, and manage contracts. |
-| `workable` | [Workable](third_party/workable/) | Cursor | Integrations | Search candidates, move pipelines, and manage HR records. |
-| `brex` | [Brex](third_party/brex/) | Cursor | Integrations | Query expenses, receipts, bills, cards, and travel. |
-| `todoist` | [Todoist](third_party/todoist/) | Cursor | Integrations | Create, find, and complete tasks and projects. |
-| `calendly` | [Calendly](third_party/calendly/) | Cursor | Integrations | Check availability and book, cancel, or reschedule. |
-| `smartsheet` | [Smartsheet](third_party/smartsheet/) | Cursor | Integrations | Query and update sheets, rows, and workspaces. |
-| `wrike` | [Wrike](third_party/wrike/) | Cursor | Integrations | Search projects, create tasks, and post comments. |
-| `coda` | [Coda](third_party/coda/) | Cursor | Integrations | Search docs, read pages, and update tables. |
-| `guru` | [Guru](third_party/guru/) | Cursor | Integrations | Search company knowledge and draft verified answers. |
-| `fireflies` | [Fireflies](third_party/fireflies/) | Cursor | Integrations | Search meeting transcripts, summaries, and action items. |
-| `otter` | [Otter.ai](third_party/otter/) | Cursor | Integrations | Search meeting history and pull full transcripts. |
-| `fathom` | [Fathom](third_party/fathom/) | Cursor | Integrations | Search meetings and pull transcripts and summaries. |
-| `craft` | [Craft](third_party/craft/) | Cursor | Integrations | Search, create, and update documents and daily notes. |
-| `mem` | [Mem](third_party/mem/) | Cursor | Integrations | Capture, search, and organize notes and collections. |
-| `readwise` | [Readwise](third_party/readwise/) | Cursor | Integrations | Search highlights and Reader documents, save articles. |
-| `similarweb` | [Similarweb](third_party/similarweb/) | Cursor | Integrations | Analyze website traffic, audiences, and competitors. |
-| `xero` | [Xero](third_party/xero/) | Cursor | Integrations | Read and write invoices, contacts, reports, and payroll. |
-| `x-ads` | [X Ads](third_party/x-ads/) | Cursor | Integrations | Manage ad campaigns, create ads, track conversions, and pull performance stats. |
-| `meta-ads` | [Meta Ads](third_party/meta-ads/) | Cursor | Integrations | Manage campaigns, ads, audiences, and catalogs, and pull performance insights. |
-| `attio` | [Attio](third_party/attio/) | Cursor | Integrations | Search and update CRM records, lists, notes, and tasks. |
-| `hunter` | [Hunter](third_party/hunter/) | Cursor | Integrations | Find and verify emails, discover companies, and save leads. |
-| `stable` | [Stable](third_party/stable/) | Cursor | Integrations | Find mail, read scanned documents, and call Stable API endpoints. |
-| `gamma` | [Gamma](third_party/gamma/) | Cursor | Integrations | Generate presentations, documents, and webpages. |
-| `teams` | [Teams](third_party/teams/) | Cursor | Productivity | Search, read, and send Microsoft Teams chats and channel messages. |
-| `sharepoint` | [SharePoint](third_party/sharepoint/) | Cursor | Productivity | Search and read Microsoft SharePoint sites, document libraries, files, and lists. |
-| `power-bi` | [Power BI](third_party/power-bi/) | Cursor | Integrations | Browse Microsoft Power BI workspaces and render report pages. |
-| `finance` | [Finance](third_party/finance/) | Cursor | Integrations | Securely connect your accounts so Grok can help with questions about your spending, subscriptions, balances, and investments. |
-| `webull` | [Webull](third_party/webull/) | Cursor | Integrations | View accounts, positions, orders, watchlists, and market data. |
-| `sp-global` | [S&P Global](third_party/sp-global/) | Cursor | Integrations | Query S&P Capital IQ financials, prices, and transcripts. |
-| `interactive-brokers` | [Interactive Brokers](third_party/interactive-brokers/) | Cursor | Integrations | Review positions, balances, P&L, and draft trade instructions. |
-| `meltwater` | [Meltwater](third_party/meltwater/) | Cursor | Integrations | Search media and social mentions and pull analytics. |
-| `daloopa` | [Daloopa](third_party/daloopa/) | Cursor | Integrations | Pull source-linked fundamentals, KPIs, filings, and prices. |
-| `pitchbook` | [PitchBook](third_party/pitchbook/) | Cursor | Integrations | Research private companies, deals, investors, and funds. |
-| `excalidraw` | [Excalidraw](third_party/excalidraw/) | Cursor | Integrations | Draw and export hand-drawn diagrams from chat. |
-| `google-cloud-bigquery` | [Google Cloud BigQuery](third_party/google-cloud-bigquery/) | Cursor | Integrations | Explore datasets and tables and run SQL queries. |
-| `statsig` | [Statsig](third_party/statsig/) | Cursor | Integrations | Inspect and manage feature gates, experiments, dynamic configs, and metrics. |
-| `robinhood` | [Robinhood](third_party/robinhood/) | Cursor | Integrations | View portfolios, positions, orders, watchlists, and market data, and trade in a Robinhood Agentic account. |
-| `coinbase` | [Coinbase](third_party/coinbase/) | Cursor | Integrations | Check balances, get quotes, and preview or place trades. |
-| `etoro-trading` | [eToro Trading](third_party/etoro-trading/) | Cursor | Integrations | View your eToro portfolio, balances, positions, and watchlists, research instruments and traders, and prepare and place trades. |
-| `x-money` | [X Money](third_party/x-money/) | Cursor | Integrations | Use your X Money Card, send money to users on X, manage your finances, view your balance and browse through your transaction history. |
-| `shopify-store` | [Shopify](third_party/shopify-store/) | Cursor | Integrations | Connect your Shopify store so Grok can answer questions about products, orders, customers, inventory, and sales. |
-| `quickbooks-online` | [Intuit QuickBooks](third_party/quickbooks-online/) | Cursor | Finance and Legal | QuickBooks works with Grok Bot to help you manage your business finances, get paid faster and keep key business tasks moving with bots that run on your schedule. See how your business is doing with profit and loss, cash flow, balance sheet, and accounts receivable and payable aging reports, plus sales by customer and product. Compare your profit, revenue, and expenses against similar businesses in your region. Create, send, and follow up on invoices and estimates, set up recurring invoices, and send payment links (US and Canada). Manage customers, products, and employees, review payslips, and preview your next payroll run. Import transactions from a CSV straight into QuickBooks, and get answers about QuickBooks Capital financing. |
-| `workday` | [Workday](third_party/workday/) | Cursor | Integrations | Look up workers, organizations, time off, payroll, and recruiting data in Workday. |
-| `whatsapp-business` | [WhatsApp Business](third_party/whatsapp-business/) | Cursor | Integrations | Send messages and manage templates, contacts, and phone numbers in WhatsApp Business. |
-| `zoho-crm` | [Zoho CRM](third_party/zoho-crm/) | Cursor | Integrations | Work with leads, contacts, accounts, deals, and other Zoho CRM records. |
-| `zoho-desk` | [Zoho Desk](third_party/zoho-desk/) | Cursor | Integrations | Work with tickets, contacts, tasks, and knowledge base articles in Zoho Desk. |
-| `zoho-books` | [Zoho Books](third_party/zoho-books/) | Cursor | Integrations | Work with contacts, invoices, estimates, and items in Zoho Books. |
-| `business-central` | [Microsoft Dynamics 365 Business Central](third_party/business-central/) | Cursor | Integrations | Work with customers, vendors, items, sales and purchase documents, and the general ledger in Business Central. |
-| `sap-s4hana-cloud` | [SAP S/4HANA Cloud](third_party/sap-s4hana-cloud/) | Cursor | Integrations | Work with business partners, products, sales and purchase orders, supplier invoices, and journal entry items in SAP S/4HANA Cloud. |
-| `square` | [Square](third_party/square/) | Cursor | Integrations | Work with payments, orders, catalog, customers, and invoices. |
-| `tailscale` | [Tailscale](third_party/tailscale/) | Cursor | Integrations | Let Grok Bot reach MCP servers on your private Tailscale network: connect your own tailnet, or your team's company tailnets turned on by a team admin, with each member using their own device. |
-| `highlevel` | [HighLevel](third_party/highlevel/) | Cursor | Integrations | Work with contacts, conversations, opportunities, calendars, and payments. |
-| `finary` | [Finary](third_party/finary/) | Cursor | Integrations | Read your net worth, accounts, holdings, spending, and budgets. |
-| `tiktok-for-business` | [TikTok for Business](third_party/tiktok-for-business/) | Cursor | Integrations | Manage TikTok ad campaigns, ad groups, ads, audiences, creatives, and reports. |
-| `gusto` | [Gusto](third_party/gusto/) | Cursor | Integrations | Work with payroll, employees, contractors, time off, and reports. |
-| `gopuff` | [Gopuff](third_party/gopuff/) | Cursor | Integrations | Shop Gopuff from Grok Bot through Gopuff's official MCP server. Sign in with your Gopuff account; Gopuff handles the sign-in, and your searches, carts, and orders go to Gopuff under that account, so any order you place is charged and delivered like a normal Gopuff order. |
-| `databricks-genie` | [Databricks Genie](third_party/databricks-genie/) | Cursor | Integrations | Ask Databricks Genie questions about your workspace's data in plain language. |
-| `lark` | [Lark](third_party/lark/) | Cursor | Integrations | Search, create, and update Lark Suite docs, and read Lark messages and groups. |
-| `lark-base` | [Lark Base](third_party/lark-base/) | Cursor | Integrations | Read and update tables, fields, views, and records in Lark Base. |
-| `feishu` | [Feishu](third_party/feishu/) | Cursor | Integrations | Search, create, and update Feishu docs, and read Feishu messages and groups. |
-| `vanta` | [Vanta](third_party/vanta/) | Cursor | Integrations | Query and remediate compliance tests, controls, frameworks, risks, and vulnerabilities in Vanta. |
-| `ringcentral-phone` | [RingCentral Phone](third_party/ringcentral-phone/) | Cursor | Integrations | Read call activity, AI call notes, SMS, voicemail, and fax, and send SMS. |
-| `ringcentral-chat` | [RingCentral Chat](third_party/ringcentral-chat/) | Cursor | Integrations | Read team chats and posts, send messages, and manage teams, tasks, and notes. |
-| `servicenow` | [ServiceNow](third_party/servicenow/) | Cursor | Integrations | Call the tools your admin publishes on a ServiceNow instance. |
-| `rippling` | [Rippling](third_party/rippling/) | Cursor | Integrations | Look up people, time off, and company policy in Rippling, and file time-off requests and draft hires. |
-| `onepay` | [OnePay](third_party/onepay/) | Cursor | Integrations | Access your OnePay accounts: balances, transactions, credit, Pay Later, investments, crypto, and rewards. |
-| `questrade` | [Questrade](third_party/questrade/) | Cursor | Integrations | Read your Questrade portfolio, get live market data, and discuss potential trades. |
-| `tesla` | [Tesla](third_party/tesla/) | Cursor | Integrations | Read your Tesla cars and energy sites, and send commands you confirm. |
-| `uber-courier` | [Uber Courier](third_party/uber-courier/) | Cursor | Integrations | Get a price, book, track, and cancel a package delivery on your Uber account. |
-| `fitmetrics` | [FitMetrics](third_party/fitmetrics/) | Cursor | Integrations | Review Trainerize clients and check-ins, and update macros, messages, and programs. |
-| `mixpanel` | [Mixpanel](third_party/mixpanel/) | Cursor | Integrations | Query events, funnels, flows, and retention in Mixpanel, and manage dashboards, cohorts, experiments, and feature flags. |
-| `metricool` | [Metricool](third_party/metricool/) | Cursor | Integrations | Plan and publish social posts, pull metrics and reports, and manage inbox, reviews, and ads across your Metricool brands. |
-| `eight-sleep` | [Eight Sleep](third_party/eight-sleep/) | Cursor | Integrations | Connect your Eight Sleep account to see your sleep scores, stages and heart metrics, check your Pod's status and temperature settings, and manage your alarms and your side of the Pod, with your approval for each change. |
-| `netsuite` | [NetSuite](third_party/netsuite/) | Cursor | Integrations | Work with records, reports, saved searches, and SuiteQL queries in NetSuite. |
-| `front` | [Front](third_party/front/) | Cursor | Integrations | Search conversations, draft and send replies, and manage tags, tasks, and inboxes. |
-| `paypal` | [PayPal](third_party/paypal/) | Cursor | Integrations | Work with invoices, orders, refunds, subscriptions, disputes, and transactions in PayPal. |
-| `engine` | [Engine](third_party/engine/) | Cursor | Integrations | Search and book hotels, shorten or cancel stays, and check support cases in Engine. |
-| `squarespace` | [Squarespace](third_party/squarespace/) | Cursor | Integrations | Brainstorm business names and check domain availability, pricing, and checkout links on Squarespace. |
-| `runta` | [Runta](third_party/runta/) | Cursor | Integrations | Create and run persistent agent runtimes, publish ports, and manage egress, checkpoints, and images in Runta. |
-| `hospitable` | [Hospitable](third_party/hospitable/) | Cursor | Integrations | Manage short-term rental properties, reservations, calendars, guest messages, tasks, payouts, and owner statements in Hospitable. |
-| `close` | [Close](third_party/close/) | Cursor | Integrations | Search and update leads, contacts, opportunities, tasks, and conversations in Close. |
-| `factset` | [FactSet](third_party/factset/) | Cursor | Integrations | Query FactSet fundamentals, prices, estimates, ownership, and company data. |
-| `redo` | [Redo](third_party/redo/) | Cursor | Integrations | Look up orders and customers, create and process returns, work support tickets, review marketing campaigns and automations, manage fulfillment and inventory, and build analytics reports in Redo. |
-| `strava` | [Strava](third_party/strava/) | Cursor | Integrations | Connect your Strava account so Grok can read your activities, stats, and athlete profile to answer questions about your training. You'll share your profile and activity data, including private activities. Access is read-only, and you can disconnect anytime from Strava's My Apps settings. |
-| `expensify` | [Expensify](third_party/expensify/) | Cursor | Integrations | Connect your Expensify account so Grok can search your expenses, reports, receipts, and invoices to answer questions about your spending. You'll share the Expensify data your account can already see. Access is read-only, and you can revoke it anytime. |
-| `rillet` | [Rillet](third_party/rillet/) | Cursor | Integrations | Query financial reports and manage customers, invoices, bills, contracts, and vendors in Rillet. |
-| `item` | [Item](third_party/item/) | Cursor | Integrations | Search, create, and update CRM contacts, companies, and custom objects, run saved views, manage lists, notes, and tasks, and ask the Item assistant about your customer data. |
-| `hq` | [HQ](third_party/hq/) | Cursor | Integrations | Read and capture company knowledge, projects, policies, files, and skills, message teammates and bots, and call governed integrations in HQ by Indigo. |
-| `createos` | [CreateOS](third_party/createos/) | Cursor | Integrations | Deploy and manage projects, environments, deployments, domains, logs, cron jobs, security scans, templates, and sandboxes on NodeOps CreateOS. |
-| `fiscal-ai` | [Fiscal.ai](third_party/fiscal-ai/) | Cursor | Integrations | Pull source-linked financials, filings, ratios, prices, segments, KPIs, ownership, fund letters, and news from Fiscal.ai. |
-| `lmty` | [LMTY](third_party/lmty/) | Cursor | Integrations | Read tracked competitors, competitive intelligence reports, change logs, evidence, social mentions, and market feeds for your products, and browse LMTY's public Markets, event timelines, and company, product, and person profiles. |
-| `sabre-developer-hub` | [Sabre Developer Hub](third_party/sabre-developer-hub/) | Cursor | Integrations | Search and read Sabre Developer Hub documentation, OpenAPI specs, and Sabre-published agent skills for travel APIs, SDKs, and product collections. |
-Author values match each plugin’s `plugin.json` `author.name` (Cursor lists `plugins@cursor.com` in the manifest).
+| `teaching` | [Teaching](teaching/) | Cursor | Utilities | スキルの棚卸し、練習計画、学習の振り返り。 |
+| `continual-learning` | [Continual Learning](continual-learning/) | Eric Zakariasson | Developer Tools | 重要度の高い要点だけを箇条書きにして、会話記録をもとに AGENTS.md の記憶を少しずつ更新する。 |
+| `cursor-team-kit` | [Cursor Team Kit](cursor-team-kit/) | Eric Zakariasson | Developer Tools | CI、コードレビュー、リリース、ローカルの自動化、検証のための社内チーム向けワークフロー。 |
+| `thermos` | [Thermos](thermos/) | Cursor | Developer Tools | ブランチを徹底的にレビューする。セキュリティと正しさの深い監査、厳しいコード品質ルーブリック、並列サブエージェント、thermos によるオーケストレーション、任意でマージ可能な PR まで進めるフロー。 |
+| `create-plugin` | [Create Plugin](create-plugin/) | Cursor | Developer Tools | 新しいエージェントプラグインのひな形を作り、検証する。 |
+| `ralph-loop` | [Ralph Loop](ralph-loop/) | Cursor | Developer Tools | Ralph Wiggum 手法を使った、自己参照的に繰り返す AI ループ。 |
+| `agent-compatibility` | [Agent Compatibility](agent-compatibility/) | Cursor | Developer Tools | CLI によるリポジトリの互換性スキャンと、起動手順・検証・ドキュメントが実態と合っているかを監査するエージェント。 |
+| `cli-for-agent` | [CLI for Agents](cli-for-agent/) | Eric Zakariasson | Developer Tools | コーディングエージェントが確実に実行できる CLI を設計するためのパターン。フラグ、例付きのヘルプ、パイプライン、エラー、冪等性、ドライラン。 |
+| `pr-review-canvas` | [PR Review Canvas](pr-review-canvas/) | Cursor | Developer Tools | PR の差分を、重要度ごとにまとめたレビュー用キャンバスとして表示する。 |
+| `docs-canvas` | [Docs Canvas](docs-canvas/) | Cursor | Developer Tools | ドキュメントを、たどりやすいキャンバスとして表示する。 |
+| `cursor-sdk` | [Cursor SDK](cursor-sdk/) | Cursor | Developer Tools | TypeScript SDK でアプリ、スクリプト、自動化を作る。 |
+| `origin-apps` | [Origin Apps](origin-apps/) | Cursor | Developer Tools | Cursor Origin API の上で開発するためのスキル。まず最新の仕様を取得し、認証情報、スコープ、Webhook、ページング、エラーについて Origin のルールに従う。既存の GitHub App の移植を計画するスキルも含む。 |
+| `orchestrate` | [Orchestrate](orchestrate/) | Cursor | Developer Tools | 大きなタスクを、プランナー、ワーカー、検証役、構造化された引き継ぎを使って、並列のクラウドエージェントに分散させる。 |
+| `pstack` | [pstack](pstack/) | Lauren Tan | Developer Tools | 速く進みたいなら、まず深く掘り下げること。pstack は、より少ないコード量でより高品質なコードを書く手助けをします。自信を持って並列化できる、厳格なエージェントワークフロー。 |
+| `dyl-stack` | [dyl-stack](dyl-stack/) | Dylan Gattey | Developer Tools | pstack の上に Dylan のエージェントのスタイルを載せたもの。症状への対処より根本原因、設計の前に The Algorithm、簡潔で検証済みの納品、貼り付けて収まる PR レビュー、ビジュアル審査役付きの Figma から UI への変換。 |
+| `advisor` | [Advisor](advisor/) | Cursor | Developer Tools | 大きな判断の前、行き詰まったとき、完了を宣言する前に、より強いモデルに相談する。 |
+| `grok-voice` | [Grok Voice](grok-voice/) | Eric Zakariasson | Developer Tools | アプリに Grok の音声機能を追加する。リアルタイムの音声対音声、音声入力（speech-to-text）、読み上げ（text-to-speech）、ログをもとに音声セッションを直していくループ。 |
+| `gmail` | [Gmail](third_party/gmail/) | Cursor | Productivity | メールを検索、閲覧、下書き、管理する。 |
+| `google-drive` | [Google Drive](third_party/google-drive/) | Cursor | Productivity | ファイルを検索、閲覧、作成、共有する。 |
+| `google-calendar` | [Google Calendar](third_party/google-calendar/) | Cursor | Productivity | 予定を検索し、会議を設定する。 |
+| `google-docs` | [Google Docs](third_party/google-docs/) | Cursor | Productivity | ドキュメントを閲覧、作成、編集する。 |
+| `google-sheets` | [Google Sheets](third_party/google-sheets/) | Cursor | Productivity | スプレッドシートのデータを読み取り、書き込み、追記する。 |
+| `google-slides` | [Google Slides](third_party/google-slides/) | Cursor | Productivity | プレゼンテーションを作成、編集、描画する。 |
+| `google-ads` | [Google Ads](third_party/google-ads/) | Cursor | Integrations | キャンペーンをレポートし、キーワードを調査し、プレビューしたうえで変更する。 |
+| `google-analytics` | [Google Analytics](third_party/google-analytics/) | Cursor | Integrations | GA4 のレポートを実行し、プロパティの設定を管理する。 |
+| `google-search-console` | [Google Search Console](third_party/google-search-console/) | Cursor | Integrations | 検索パフォーマンスを照会し、URL を検査し、サイトマップを管理する。 |
+| `gong` | [Gong](third_party/gong/) | Cursor | Integrations | アカウントの要約、商談のインサイト、通話の概要を取得する。 |
+| `salesforce` | [Salesforce](third_party/salesforce/) | Cursor | Integrations | 組織内のレコードを照会、作成、更新する。 |
+| `salesforce-headless-360` | [Salesforce (Headless 360, Beta)](third_party/salesforce-headless-360/) | Cursor | Integrations | Salesforce 全体のレコード、ユーザー、組織設定を管理する。 |
+| `playwright` | [Playwright](third_party/playwright/) | Cursor | Integrations | 実際のブラウザで移動、クリック、スクリーンショット、テストを行う。 |
+| `github` | [GitHub](third_party/github/) | Cursor | Integrations | リポジトリ、Issue、プルリクエスト、Actions を管理する。 |
+| `ashby` | [Ashby](third_party/ashby/) | Cursor | Integrations | 候補者を検索し、面接を準備し、選考パイプラインのタスクを管理する。 |
+| `hubspot` | [HubSpot](third_party/hubspot/) | Cursor | Integrations | コンタクト、会社、取引、チケットを検索・更新する。 |
+| `intercom` | [Intercom](third_party/intercom/) | Cursor | Integrations | 会話、コンタクト、ヘルプセンターの記事を検索する。 |
+| `zoom` | [Zoom](third_party/zoom/) | Cursor | Integrations | ミーティングを検索し、文字起こしを取得し、Zoom Docs を操作する。 |
+| `x` | [X](third_party/x/) | Cursor | Integrations | 投稿の検索、タイムラインの閲覧、トレンドの取得、スペースとコミュニティの閲覧、リストとブックマークの管理、X Chat の利用、X の通話の予約、ライブ配信の管理。 |
+| `clay` | [Clay](third_party/clay/) | Cursor | Integrations | 人物と企業の情報を補完し、AI リサーチエージェントを実行する。 |
+| `circleback` | [Circleback](third_party/circleback/) | Cursor | Integrations | ミーティング、文字起こし、アクションアイテム、メールを検索する。 |
+| `docusign` | [Docusign](third_party/docusign/) | Cursor | Integrations | エンベロープ、テンプレート、ワークフロー、契約を管理する。 |
+| `navan` | [Navan](third_party/navan/) | Cursor | Integrations | 経費、出張の予約、規程、カードを照会する。 |
+| `profound` | [Profound](third_party/profound/) | Cursor | Integrations | AI 上での露出度、評判、引用を追跡する。 |
+| `juicebox` | [Juicebox](third_party/juicebox/) | Cursor | Integrations | 採用分析、候補者リスト、ソーシングエージェントを照会する。 |
+| `outreach` | [Outreach](third_party/outreach/) | Cursor | Integrations | シーケンス、見込み客、Kaia のミーティングを検索する。 |
+| `amplemarket` | [Amplemarket](third_party/amplemarket/) | Cursor | Integrations | 人物と企業を検索し、リード情報を補完し、シーケンスを実行する。 |
+| `klaviyo` | [Klaviyo](third_party/klaviyo/) | Cursor | Integrations | プロファイル、セグメント、キャンペーン、フローを管理する。 |
+| `customer-io` | [Customer.io](third_party/customer-io/) | Cursor | Integrations | キャンペーンを作成し、セグメントを管理し、人物を照会する。 |
+| `mailerlite` | [MailerLite](third_party/mailerlite/) | Cursor | Integrations | 購読者、グループ、キャンペーン、自動化を管理する。 |
+| `brevo` | [Brevo](third_party/brevo/) | Cursor | Integrations | コンタクト、メールと SMS のキャンペーン、CRM の取引を管理する。 |
+| `typeform` | [Typeform](third_party/typeform/) | Cursor | Integrations | フォームを作成し、回答を分析し、コンタクトを管理する。 |
+| `jotform` | [Jotform](third_party/jotform/) | Cursor | Integrations | フォームを作成・編集し、送信内容を読み取る。 |
+| `semrush` | [Semrush](third_party/semrush/) | Cursor | Integrations | キーワード、被リンク、トラフィック、競合を調査する。 |
+| `ahrefs` | [Ahrefs](third_party/ahrefs/) | Cursor | Integrations | キーワード、被リンク、順位、サイトの健全性を調査する。 |
+| `godaddy` | [GoDaddy](third_party/godaddy/) | Cursor | Integrations | ドメイン名の候補を考え、空き状況を確認する。 |
+| `upwork` | [Upwork](third_party/upwork/) | Cursor | Integrations | 人材を検索し、仕事を掲載し、契約を管理する。 |
+| `workable` | [Workable](third_party/workable/) | Cursor | Integrations | 候補者を検索し、選考パイプラインを進め、人事記録を管理する。 |
+| `brex` | [Brex](third_party/brex/) | Cursor | Integrations | 経費、領収書、請求書、カード、出張を照会する。 |
+| `todoist` | [Todoist](third_party/todoist/) | Cursor | Integrations | タスクとプロジェクトを作成、検索、完了する。 |
+| `calendly` | [Calendly](third_party/calendly/) | Cursor | Integrations | 空き状況を確認し、予約、キャンセル、日程変更を行う。 |
+| `smartsheet` | [Smartsheet](third_party/smartsheet/) | Cursor | Integrations | シート、行、ワークスペースを照会・更新する。 |
+| `wrike` | [Wrike](third_party/wrike/) | Cursor | Integrations | プロジェクトを検索し、タスクを作成し、コメントを投稿する。 |
+| `coda` | [Coda](third_party/coda/) | Cursor | Integrations | ドキュメントを検索し、ページを読み、テーブルを更新する。 |
+| `guru` | [Guru](third_party/guru/) | Cursor | Integrations | 社内のナレッジを検索し、検証済みの回答を下書きする。 |
+| `fireflies` | [Fireflies](third_party/fireflies/) | Cursor | Integrations | ミーティングの文字起こし、要約、アクションアイテムを検索する。 |
+| `otter` | [Otter.ai](third_party/otter/) | Cursor | Integrations | ミーティングの履歴を検索し、文字起こしの全文を取得する。 |
+| `fathom` | [Fathom](third_party/fathom/) | Cursor | Integrations | ミーティングを検索し、文字起こしと要約を取得する。 |
+| `craft` | [Craft](third_party/craft/) | Cursor | Integrations | ドキュメントとデイリーノートを検索、作成、更新する。 |
+| `mem` | [Mem](third_party/mem/) | Cursor | Integrations | メモとコレクションを記録、検索、整理する。 |
+| `readwise` | [Readwise](third_party/readwise/) | Cursor | Integrations | ハイライトと Reader のドキュメントを検索し、記事を保存する。 |
+| `similarweb` | [Similarweb](third_party/similarweb/) | Cursor | Integrations | Web サイトのトラフィック、利用者層、競合を分析する。 |
+| `xero` | [Xero](third_party/xero/) | Cursor | Integrations | 請求書、取引先、レポート、給与のデータを読み書きする。 |
+| `x-ads` | [X Ads](third_party/x-ads/) | Cursor | Integrations | 広告キャンペーンを管理し、広告を作成し、コンバージョンを計測し、成果データを取得する。 |
+| `meta-ads` | [Meta Ads](third_party/meta-ads/) | Cursor | Integrations | キャンペーン、広告、オーディエンス、カタログを管理し、成果のインサイトを取得する。 |
+| `attio` | [Attio](third_party/attio/) | Cursor | Integrations | CRM のレコード、リスト、メモ、タスクを検索・更新する。 |
+| `hunter` | [Hunter](third_party/hunter/) | Cursor | Integrations | メールアドレスを検索・検証し、企業を見つけ、リードを保存する。 |
+| `stable` | [Stable](third_party/stable/) | Cursor | Integrations | 郵便物を探し、スキャンした書類を読み、Stable API のエンドポイントを呼び出す。 |
+| `gamma` | [Gamma](third_party/gamma/) | Cursor | Integrations | プレゼンテーション、ドキュメント、Web ページを生成する。 |
+| `teams` | [Teams](third_party/teams/) | Cursor | Productivity | Microsoft Teams のチャットとチャネルのメッセージを検索、閲覧、送信する。 |
+| `sharepoint` | [SharePoint](third_party/sharepoint/) | Cursor | Productivity | Microsoft SharePoint のサイト、ドキュメントライブラリ、ファイル、リストを検索・閲覧する。 |
+| `power-bi` | [Power BI](third_party/power-bi/) | Cursor | Integrations | Microsoft Power BI のワークスペースを閲覧し、レポートのページを表示する。 |
+| `finance` | [Finance](third_party/finance/) | Cursor | Integrations | アカウントを安全に接続し、支出、サブスクリプション、残高、投資についての質問に Grok が答えられるようにする。 |
+| `webull` | [Webull](third_party/webull/) | Cursor | Integrations | 口座、ポジション、注文、ウォッチリスト、市場データを表示する。 |
+| `sp-global` | [S&P Global](third_party/sp-global/) | Cursor | Integrations | S&P Capital IQ の財務データ、株価、決算説明会の文字起こしを照会する。 |
+| `interactive-brokers` | [Interactive Brokers](third_party/interactive-brokers/) | Cursor | Integrations | ポジション、残高、損益を確認し、取引指示を下書きする。 |
+| `meltwater` | [Meltwater](third_party/meltwater/) | Cursor | Integrations | メディアとソーシャルでの言及を検索し、分析データを取得する。 |
+| `daloopa` | [Daloopa](third_party/daloopa/) | Cursor | Integrations | 出典にリンクされたファンダメンタルズ、KPI、開示書類、株価を取得する。 |
+| `pitchbook` | [PitchBook](third_party/pitchbook/) | Cursor | Integrations | 未上場企業、ディール、投資家、ファンドを調査する。 |
+| `excalidraw` | [Excalidraw](third_party/excalidraw/) | Cursor | Integrations | チャットから手描き風の図を描き、書き出す。 |
+| `google-cloud-bigquery` | [Google Cloud BigQuery](third_party/google-cloud-bigquery/) | Cursor | Integrations | データセットとテーブルを調べ、SQL クエリを実行する。 |
+| `statsig` | [Statsig](third_party/statsig/) | Cursor | Integrations | フィーチャーゲート、実験、動的設定、メトリクスを確認・管理する。 |
+| `robinhood` | [Robinhood](third_party/robinhood/) | Cursor | Integrations | ポートフォリオ、ポジション、注文、ウォッチリスト、市場データを表示し、Robinhood Agentic 口座で取引する。 |
+| `coinbase` | [Coinbase](third_party/coinbase/) | Cursor | Integrations | 残高を確認し、見積もりを取り、取引をプレビューまたは発注する。 |
+| `etoro-trading` | [eToro Trading](third_party/etoro-trading/) | Cursor | Integrations | eToro のポートフォリオ、残高、ポジション、ウォッチリストを表示し、銘柄とトレーダーを調べ、取引を準備・発注する。 |
+| `x-money` | [X Money](third_party/x-money/) | Cursor | Integrations | X Money Card を使い、X のユーザーに送金し、お金を管理し、残高を確認し、取引履歴を閲覧する。 |
+| `shopify-store` | [Shopify](third_party/shopify-store/) | Cursor | Integrations | Shopify ストアを接続し、商品、注文、顧客、在庫、売上についての質問に Grok が答えられるようにする。 |
+| `quickbooks-online` | [Intuit QuickBooks](third_party/quickbooks-online/) | Cursor | Finance and Legal | QuickBooks は Grok Bot と連携して、事業の財務管理を助け、入金を早め、スケジュールどおりに動くボットで主要な業務を進めます。損益、キャッシュフロー、貸借対照表、売掛金と買掛金の年齢表、顧客別・商品別の売上のレポートで、事業の状況を把握できます。利益、売上、経費を、同じ地域の類似事業と比較できます。請求書と見積書の作成・送付・フォローアップ、定期請求書の設定、支払いリンクの送付（米国とカナダ）ができます。顧客、商品、従業員を管理し、給与明細を確認し、次回の給与計算をプレビューできます。CSV から取引を QuickBooks に直接取り込み、QuickBooks Capital の融資についての回答を得られます。 |
+| `workday` | [Workday](third_party/workday/) | Cursor | Integrations | Workday で従業員、組織、休暇、給与、採用のデータを調べる。 |
+| `whatsapp-business` | [WhatsApp Business](third_party/whatsapp-business/) | Cursor | Integrations | WhatsApp Business でメッセージを送り、テンプレート、連絡先、電話番号を管理する。 |
+| `zoho-crm` | [Zoho CRM](third_party/zoho-crm/) | Cursor | Integrations | リード、コンタクト、アカウント、商談など、Zoho CRM のレコードを扱う。 |
+| `zoho-desk` | [Zoho Desk](third_party/zoho-desk/) | Cursor | Integrations | Zoho Desk のチケット、コンタクト、タスク、ナレッジベースの記事を扱う。 |
+| `zoho-books` | [Zoho Books](third_party/zoho-books/) | Cursor | Integrations | Zoho Books の取引先、請求書、見積書、品目を扱う。 |
+| `business-central` | [Microsoft Dynamics 365 Business Central](third_party/business-central/) | Cursor | Integrations | Business Central の顧客、仕入先、品目、販売・購買の伝票、総勘定元帳を扱う。 |
+| `sap-s4hana-cloud` | [SAP S/4HANA Cloud](third_party/sap-s4hana-cloud/) | Cursor | Integrations | SAP S/4HANA Cloud のビジネスパートナー、製品、受注・発注、仕入先請求書、仕訳明細を扱う。 |
+| `square` | [Square](third_party/square/) | Cursor | Integrations | 決済、注文、カタログ、顧客、請求書を扱う。 |
+| `tailscale` | [Tailscale](third_party/tailscale/) | Cursor | Integrations | プライベートな Tailscale ネットワーク上の MCP サーバーに Grok Bot が到達できるようにする。自分の tailnet を接続するか、チーム管理者が有効にした会社の tailnet を使い、メンバーはそれぞれ自分のデバイスから接続する。 |
+| `highlevel` | [HighLevel](third_party/highlevel/) | Cursor | Integrations | コンタクト、会話、商談、カレンダー、決済を扱う。 |
+| `finary` | [Finary](third_party/finary/) | Cursor | Integrations | 純資産、口座、保有資産、支出、予算を読み取る。 |
+| `tiktok-for-business` | [TikTok for Business](third_party/tiktok-for-business/) | Cursor | Integrations | TikTok の広告キャンペーン、広告グループ、広告、オーディエンス、クリエイティブ、レポートを管理する。 |
+| `gusto` | [Gusto](third_party/gusto/) | Cursor | Integrations | 給与、従業員、業務委託、休暇、レポートを扱う。 |
+| `gopuff` | [Gopuff](third_party/gopuff/) | Cursor | Integrations | Gopuff 公式の MCP サーバーを通じて、Grok Bot から Gopuff で買い物をする。Gopuff アカウントでサインインする。サインインは Gopuff が処理し、検索、カート、注文はそのアカウントで Gopuff に送られるため、注文は通常の Gopuff の注文と同じように請求・配達される。 |
+| `databricks-genie` | [Databricks Genie](third_party/databricks-genie/) | Cursor | Integrations | ワークスペースのデータについて、普段の言葉で Databricks Genie に質問する。 |
+| `lark` | [Lark](third_party/lark/) | Cursor | Integrations | Lark Suite のドキュメントを検索、作成、更新し、Lark のメッセージとグループを読む。 |
+| `lark-base` | [Lark Base](third_party/lark-base/) | Cursor | Integrations | Lark Base のテーブル、フィールド、ビュー、レコードを読み取り・更新する。 |
+| `feishu` | [Feishu](third_party/feishu/) | Cursor | Integrations | Feishu のドキュメントを検索、作成、更新し、Feishu のメッセージとグループを読む。 |
+| `vanta` | [Vanta](third_party/vanta/) | Cursor | Integrations | Vanta のコンプライアンステスト、コントロール、フレームワーク、リスク、脆弱性を照会し、是正する。 |
+| `ringcentral-phone` | [RingCentral Phone](third_party/ringcentral-phone/) | Cursor | Integrations | 通話履歴、AI による通話メモ、SMS、留守番電話、FAX を読み取り、SMS を送信する。 |
+| `ringcentral-chat` | [RingCentral Chat](third_party/ringcentral-chat/) | Cursor | Integrations | チームのチャットと投稿を読み、メッセージを送り、チーム、タスク、メモを管理する。 |
+| `servicenow` | [ServiceNow](third_party/servicenow/) | Cursor | Integrations | 管理者が ServiceNow インスタンスで公開しているツールを呼び出す。 |
+| `rippling` | [Rippling](third_party/rippling/) | Cursor | Integrations | Rippling で人、休暇、社内規程を調べ、休暇申請や採用の下書きを作成する。 |
+| `onepay` | [OnePay](third_party/onepay/) | Cursor | Integrations | OnePay の口座にアクセスする。残高、取引、クレジット、Pay Later、投資、暗号資産、リワード。 |
+| `questrade` | [Questrade](third_party/questrade/) | Cursor | Integrations | Questrade のポートフォリオを読み取り、リアルタイムの市場データを取得し、取引の候補について相談する。 |
+| `tesla` | [Tesla](third_party/tesla/) | Cursor | Integrations | Tesla の車とエネルギーサイトの情報を読み取り、確認したうえでコマンドを送る。 |
+| `uber-courier` | [Uber Courier](third_party/uber-courier/) | Cursor | Integrations | Uber アカウントで、荷物配送の料金確認、予約、追跡、キャンセルを行う。 |
+| `fitmetrics` | [FitMetrics](third_party/fitmetrics/) | Cursor | Integrations | Trainerize のクライアントとチェックインを確認し、マクロ、メッセージ、プログラムを更新する。 |
+| `mixpanel` | [Mixpanel](third_party/mixpanel/) | Cursor | Integrations | Mixpanel のイベント、ファネル、フロー、リテンションを照会し、ダッシュボード、コホート、実験、フィーチャーフラグを管理する。 |
+| `metricool` | [Metricool](third_party/metricool/) | Cursor | Integrations | Metricool の各ブランドで、SNS 投稿の計画と公開、指標とレポートの取得、受信箱・レビュー・広告の管理を行う。 |
+| `eight-sleep` | [Eight Sleep](third_party/eight-sleep/) | Cursor | Integrations | Eight Sleep アカウントを接続し、睡眠スコア、睡眠段階、心拍の指標、Pod の状態と温度設定を確認し、変更ごとに承認したうえでアラームと自分側の Pod を管理する。 |
+| `netsuite` | [NetSuite](third_party/netsuite/) | Cursor | Integrations | NetSuite のレコード、レポート、保存検索、SuiteQL クエリを扱う。 |
+| `front` | [Front](third_party/front/) | Cursor | Integrations | 会話を検索し、返信を下書き・送信し、タグ、タスク、受信箱を管理する。 |
+| `paypal` | [PayPal](third_party/paypal/) | Cursor | Integrations | PayPal の請求書、注文、返金、サブスクリプション、異議申し立て、取引を扱う。 |
+| `engine` | [Engine](third_party/engine/) | Cursor | Integrations | Engine でホテルを検索・予約し、滞在を短縮・キャンセルし、サポートケースを確認する。 |
+| `squarespace` | [Squarespace](third_party/squarespace/) | Cursor | Integrations | Squarespace でビジネス名の候補を考え、ドメインの空き状況、料金、購入リンクを確認する。 |
+| `runta` | [Runta](third_party/runta/) | Cursor | Integrations | Runta で永続的なエージェント実行環境を作成・実行し、ポートを公開し、外向き通信、チェックポイント、イメージを管理する。 |
+| `hospitable` | [Hospitable](third_party/hospitable/) | Cursor | Integrations | Hospitable で、短期賃貸の物件、予約、カレンダー、ゲストとのメッセージ、タスク、支払い、オーナー向け明細を管理する。 |
+| `close` | [Close](third_party/close/) | Cursor | Integrations | Close のリード、コンタクト、商談、タスク、会話を検索・更新する。 |
+| `factset` | [FactSet](third_party/factset/) | Cursor | Integrations | FactSet のファンダメンタルズ、株価、予想、株主構成、企業データを照会する。 |
+| `redo` | [Redo](third_party/redo/) | Cursor | Integrations | Redo で、注文と顧客の検索、返品の作成と処理、サポートチケットの対応、マーケティングキャンペーンと自動化の確認、フルフィルメントと在庫の管理、分析レポートの作成を行う。 |
+| `strava` | [Strava](third_party/strava/) | Cursor | Integrations | Strava アカウントを接続し、アクティビティ、統計、アスリートプロフィールを Grok が読み取ってトレーニングについての質問に答えられるようにする。非公開のアクティビティを含め、プロフィールとアクティビティのデータを共有することになる。アクセスは読み取り専用で、Strava の My Apps 設定からいつでも接続を解除できる。 |
+| `expensify` | [Expensify](third_party/expensify/) | Cursor | Integrations | Expensify アカウントを接続し、経費、レポート、領収書、請求書を Grok が検索して支出についての質問に答えられるようにする。共有されるのは、そのアカウントですでに見られる Expensify のデータ。アクセスは読み取り専用で、いつでも取り消せる。 |
+| `rillet` | [Rillet](third_party/rillet/) | Cursor | Integrations | Rillet の財務レポートを照会し、顧客、請求書、支払請求、契約、仕入先を管理する。 |
+| `item` | [Item](third_party/item/) | Cursor | Integrations | CRM のコンタクト、会社、カスタムオブジェクトを検索・作成・更新し、保存したビューを実行し、リスト、メモ、タスクを管理し、顧客データについて Item アシスタントに質問する。 |
+| `hq` | [HQ](third_party/hq/) | Cursor | Integrations | HQ by Indigo で、社内のナレッジ、プロジェクト、規程、ファイル、スキルを読み取り・記録し、チームメイトやボットにメッセージを送り、管理された連携機能を呼び出す。 |
+| `createos` | [CreateOS](third_party/createos/) | Cursor | Integrations | NodeOps CreateOS で、プロジェクト、環境、デプロイ、ドメイン、ログ、cron ジョブ、セキュリティスキャン、テンプレート、サンドボックスをデプロイ・管理する。 |
+| `fiscal-ai` | [Fiscal.ai](third_party/fiscal-ai/) | Cursor | Integrations | Fiscal.ai から、出典にリンクされた財務データ、開示書類、財務比率、株価、セグメント、KPI、株主構成、ファンドレター、ニュースを取得する。 |
+| `lmty` | [LMTY](third_party/lmty/) | Cursor | Integrations | 自社製品について、追跡中の競合、競合分析レポート、変更履歴、根拠、SNS での言及、市場フィードを読み、LMTY の公開 Markets、イベントのタイムライン、企業・製品・人物のプロフィールを閲覧する。 |
+| `sabre-developer-hub` | [Sabre Developer Hub](third_party/sabre-developer-hub/) | Cursor | Integrations | 旅行関連の API、SDK、製品コレクションについて、Sabre Developer Hub のドキュメント、OpenAPI 仕様、Sabre が公開するエージェントスキルを検索・閲覧する。 |
 
-## Repository structure
+「作者」欄の値は、各プラグインの `plugin.json` にある `author.name` と一致します（Cursor のマニフェストには `plugins@cursor.com` が記載されています）。
 
-This is a multi-plugin marketplace repository. The root `.cursor-plugin/marketplace.json` lists all plugins, and each plugin has its own manifest:
+## リポジトリの構成
+
+このリポジトリは、複数のプラグインをまとめたマーケットプレイスです。ルートの `.cursor-plugin/marketplace.json` が全プラグインを列挙し、各プラグインはそれぞれ自分のマニフェストを持ちます。
 
 ```
 plugins/
 ├── .cursor-plugin/
-│   └── marketplace.json       # Marketplace manifest (lists all plugins)
+│   └── marketplace.json       # マーケットプレイスのマニフェスト（全プラグインを列挙）
 ├── plugin-name/
 │   ├── .cursor-plugin/
-│   │   └── plugin.json        # Per-plugin manifest
-│   ├── skills/                # Agent skills (SKILL.md with frontmatter)
-│   ├── rules/                 # Cursor rules (.mdc files)
-│   ├── mcp.json               # MCP server definitions
+│   │   └── plugin.json        # プラグインごとのマニフェスト
+│   ├── skills/                # エージェントスキル（frontmatter 付きの SKILL.md）
+│   ├── rules/                 # Cursor ルール（.mdc ファイル）
+│   ├── mcp.json               # MCP サーバーの定義
 │   ├── README.md
 │   ├── CHANGELOG.md
 │   └── LICENSE
 └── ...
 ```
 
-## License
+## ライセンス
 
-MIT
+MIT（各プラグインの著作権表示とライセンス文は、それぞれの `LICENSE` を参照してください）

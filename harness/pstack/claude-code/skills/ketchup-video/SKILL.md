@@ -1,6 +1,6 @@
 ---
 name: ketchup-video
-description: "`/ketchup` と同様にユーザーの状況をキャッチアップしますが、何が起きたかの要約を字幕付きの短いスライド動画で提示し、その下に判断待ちの項目をテキストで並べます。/ketchup-video で使用します。"
+description: "/ketchup と同様にユーザーの状況をキャッチアップしますが、何が起きたかの要約を字幕付きの短いスライド動画で提示し、その下に判断待ちの項目をテキストで並べます。/ketchup-video で使用します。"
 disable-model-invocation: true
 ---
 

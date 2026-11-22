@@ -1,47 +1,47 @@
-# Notes verification map
+# Notes 検証マップ
 
-This directory is the maintained source for verifying the user-facing behavior of Notes. Read the index before driving the app, then use the matching feature file as the recipe.
+このディレクトリは、Notes アプリのユーザー向け挙動を検証するための正式なリファレンス（メンテナンス対象）です。アプリを操作する前にまずこのインデックスを読み、該当する機能ファイルをレシピ（検証手順書）として使用してください。
 
-## Baseline preconditions
+## 基本の前提条件（ベースライン）
 
-- Launch Notes at `http://127.0.0.1:4173` with a disposable data directory.
-- Set `NOTES_DATA_DIR=/tmp/notes-verify-$RUN_ID` so concurrent runs do not share state.
-- Seed notes titled `Quarterly plan` and `Grocery list`.
-- Put `control-notes` and the `notes` CLI on `PATH`.
-- Run `control-notes doctor` and require the expected URL, data directory, and build revision.
-- Never drive an instance that was not started by this verification run.
+- 使い捨てのデータディレクトリを指定し、`http://127.0.0.1:4173` で Notes を起動すること。
+- 並行実行時に状態が共有されないよう、`NOTES_DATA_DIR=/tmp/notes-verify-$RUN_ID` を設定すること。
+- 初期データ（シードデータ）として `Quarterly plan` と `Grocery list` というタイトルのノートを用意すること。
+- `control-notes` と `notes` CLI に `PATH` を通しておくこと。
+- `control-notes doctor` を実行し、想定通りの URL、データディレクトリ、ビルドレビジョンが返ってくることを確認すること。
+- この検証実行で起動したものではない既存インスタンスは決して操作しないこと。
 
-## Driving conventions
+## 操作上の規約
 
-- Start every recipe from the baseline state unless its preconditions say otherwise.
-- Prefer ARIA roles and accessible names over CSS selectors or DOM position.
-- Treat every command as literal. Keep quoted names and flags unchanged.
-- Run browser actions through `control-notes browser`.
-- Run terminal actions through `control-notes cli -- <command>`.
-- Restore seeded data after a mutation. Do not remove proof artifacts during cleanup.
+- 前提条件で別途指定されていない限り、すべてのレシピはベースライン状態から開始してください。
+- CSS セレクターや DOM の位置構造ではなく、ARIA ロールとアクセシブルネーム（accessible name）を優先して要素を指定してください。
+- すべてのコマンドは文字通りそのまま扱ってください。クォートされた名前やフラグは一切変更しないでください。
+- ブラウザ操作は `control-notes browser` を通じて実行してください。
+- ターミナル操作は `control-notes cli -- <command>` を通じて実行してください。
+- データの変更・削除を行った後は、初期シードデータを元の状態に復元してください。クリーンアップ時に検証用の証拠アーティファクトを削除してはいけません。
 
-## Proof and skip reporting
+## 証拠の記録とスキップ報告
 
-- Capture the user action and the resulting state, not only the final screen.
-- UI proof includes an ARIA snapshot and a screenshot with the app identity visible.
-- CLI proof includes the command, stdout, stderr, and exit code.
-- Mutation proof includes a read-only second view of the stored value.
-- Record the feature ID and entry point used with every artifact.
-- Report an unreachable path with the attempted command and the unmet precondition.
-- Do not report a skipped entry point as verified through a different path.
+- 最終画面だけでなく、ユーザーの操作内容とそれによって生じた状態変化の両方を記録してください。
+- UI の証拠には、ARIA スナップショットと、アプリの識別情報（タイトルやヘッダーなど）が映ったスクリーンショットの両方を含めてください。
+- CLI の証拠には、実行コマンド、標準出力（stdout）、標準エラー出力（stderr）、および終了コードを含めてください。
+- データの作成・更新に関する証拠には、保存された値を別の読み取り専用画面から確認した結果も含めてください。
+- すべてのアーティファクトに、使用した機能 ID とエントリーポイントを記録してください。
+- 到達できない操作パスがあった場合は、試行したコマンドと満たされなかった前提条件を明記して報告してください。
+- スキップしたエントリーポイントを、別の経路で動作確認できたからといって「検証済み」として報告しないでください。
 
-## Feature entry contract
+## 機能エントリの記述ルール（コントラクト）
 
-Each feature file starts with an H1 title and one paragraph describing the user-visible behavior. It then uses exactly four H2 sections in this order.
+各機能ファイルは、H1 タイトルと「ユーザーから見える挙動を説明する1つの段落」から始めます。その後に、必ず以下の4つの H2 セクションをこの順番で配置してください。
 
-1. `Sub-features` lists short IDs with one line for each behavior.
-2. `How to get to it (user POV)` lists every user entry point.
-3. `Driving it with <harness>` starts with `Preconditions:` and uses labeled bullets that pair each user action with an exact command and observable result.
-4. `Gotchas` lists traps that can waste or invalidate a verification run.
+1. `Sub-features`：各挙動を表す短い ID と、その1行説明をリスト化します。
+2. `How to get to it (user POV)`：ユーザー視点でのすべてのエントリーポイント（操作の入り口）を列挙します。
+3. `Driving it with <harness>`：`Preconditions:`（前提条件）から始め、各ユーザーアクションに対して「正確なコマンド」と「観測可能な結果」をペアにしたラベル付き箇条書きを記述します。
+4. `Gotchas`：検証実行を無駄にしたり無効化したりする恐れのある罠（注意点）を列挙します。
 
-Keep implementation details out of the map. Name only user paths, stable handles, required state, commands, and observable proof.
+内部実装の詳細はマップに書かないでください。記載するのは、ユーザーの操作パス、安定した識別子（ハンドル）、必要な状態、コマンド、および観測可能な証拠のみに絞ります。
 
-## Features
+## 機能一覧
 
-- [Create a note](./create-note.md) covers browser and CLI creation, cancellation, persistence, and cleanup.
-- [Search notes](./search.md) covers toolbar, keyboard, and CLI search with matching, empty, and clear states.
+- [ノートの作成（Create a note）](./create-note.md)：ブラウザおよび CLI からの作成、キャンセル、永続化、クリーンアップをカバーします。
+- [ノートの検索（Search notes）](./search.md)：ツールバー、キーボード、CLI からの検索におけるヒット時、空結果時、検索クリア時の状態をカバーします。

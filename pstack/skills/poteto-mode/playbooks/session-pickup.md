@@ -1,11 +1,11 @@
 ### Session pickup
 
-**You own the resume point. Read the prior trail, don't redo it.**
+**再開地点（resume point）はあなたが所有します。以前の証跡（trail）を読み、やり直さないこと。**
 
-1. Locate the prior trail. A local transcript under the active workspace's `agent-transcripts/` directory (the system prompt names the path. Do not glob across `~/.cursor/projects/*/`, that crosses workspace boundaries and reads private chats from unrelated projects), a cloud-agent URL, or a pushed branch. Read the metadata overview and last messages first, then scan back for the decision points. Parse a long transcript in a subagent and keep the reduced timeline in the main thread (the **principle-guard-the-context-window** skill). Pick each subagent's reasoning level for the job, per the Subagents section.
-2. Reconstruct operational state. The branch and worktree, what already landed (`git log`, `git diff` against the base), the open todos, the decisions made. The prior trail is authoritative input. Resist the bias to re-derive it.
-3. Diff done vs pending. Compare what shipped against what was planned, name the resume point, do not re-run the prior repro or redo completed work. A "let me verify from scratch" pass means you're treating the trail as untrustworthy when it's authoritative.
-4. Route the remaining work to the matching playbook and pick the verdict: continue the execution, ship a finished recommendation, ratify or override a prior conclusion, or postmortem a failed run. The pickup playbook ends here. The routed playbook owns the rest.
-5. Verify the inherited claims against the original goal on the real artifact (the **principle-prove-it-works** skill). A passing prior self-report is not the proof.
+1. 以前の証跡を特定します。アクティブなワークスペースの `agent-transcripts/` ディレクトリ配下にあるローカルトランスクリプト（パスはシステムプロンプトに記載されています。`~/.cursor/projects/*/` 全体で glob 検索しないこと。ワークスペースの境界を越え、無関係なプロジェクトのプライベートチャットを読んでしまいます）、クラウドエージェントの URL、またはプッシュ済みのブランチを確認します。まずメタデータの概要と最後のメッセージを読み、そこから意思決定のポイントまで遡ってスキャンします。長いトランスクリプトはサブエージェントでパースし、要約されたタイムラインをメインスレッドに保持します（`principle-guard-the-context-window` スキル）。ジョブに応じた各サブエージェントの推論レベルは、Subagents セクションに従って選択します。
+2. 運用状態を復元します。ブランチとワークツリー、すでに着地したもの（ベースに対する `git log`、`git diff`）、未完了の todo、下された決定を把握します。以前の証跡は信頼できる一次入力（authoritative input）であるため、ゼロから導き直そうとするバイアスに抗ってください。
+3. 完了済みと未完了の差分を取ります。出荷されたものと計画されていたものを比較し、再開地点を明記します。以前の再現手順を再実行したり、完了済みの作業をやり直したりしないでください。「ゼロから検証させてください」というパスは、権威ある証跡を信頼できないものとして扱っている証拠です。
+4. 残りの作業を一致するプレイブックにルーティングし、判定（実行の継続、完了した推奨案の出荷、以前の結論の追認または上書き、失敗した実行のポストモーテム）を下します。ピックアッププレイブックはここで終了し、残りはルーティング先のプレイブックが所有します。
+5. 引き継いだ主張を、元のゴールに対して実際の成果物上で検証します（`principle-prove-it-works` スキル）。以前のパスしたという自己申告だけでは証明になりません。
 
-**Reply:** where the prior agent stopped, what you inherited vs redid (ideally nothing redone), the resume point, and the outcome.
+**返信形式：** 以前のエージェントがどこで停止したか、引き継いだものとやり直したもの（理想的にはやり直しゼロ）、再開地点、および結果。

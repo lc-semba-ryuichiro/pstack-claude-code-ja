@@ -1,122 +1,122 @@
-# Run work while you sleep
+# 寝ている間に作業を進める
 
-This is the payoff for everything before it. An agent you can trust to verify its own work is an agent you can leave alone with a hard task. What makes that safe isn't hope. It's a checkable finish condition, an isolated worktree or cloud agent, and a decision log you audit in the morning.
+これこそが、これまでの準備すべてが報われる瞬間です。自分の作業を自ら検証できると信頼できるエージェントは、難しいタスクを単独で任せられるエージェントでもあります。それを安全に成立させているのは、単なる願望ではありません。機械的に判定できる完了条件、隔離された worktree またはクラウドエージェント、そして朝になってからあなたが監査できる意思決定ログがあるからです。
 
-![She waves goodnight from the door while robots keep the factory running, one updating a DECISION LOG wall board under a BUILD LOOP ACTIVE sign.](./images/overnight.jpg)
+![BUILD LOOP ACTIVE のサインの下、ロボットたちが工場を稼働させ続け、1体が DECISION LOG のウォールボードを更新している中、彼女がドアから「おやすみ」と手を振っている様子。](./images/overnight.jpg)
 
-## Earn the trust before the loop
+## ループを回す前に信頼を築く
 
-A loop you don't trust just produces unchecked work faster, and the mess compounds with every iteration. Before you leave one running, check that it has earned it:
+信頼できないループを回しても、未確認の作業が高速に量産されるだけで、反復するたびに混乱が雪だるま式に膨れ上がります。エージェントを自律稼働させたまま席を離れる前に、その信頼に値するだけの条件が揃っているか確認してください：
 
-- You've done the task once by hand, or watched an agent do it, so you know what good looks like.
-- The agent has the tools and signals you'd use yourself: the verification skill, the profiler, the logs.
-- Every stage proves its work and can stop the line when the work misses the bar.
-- You've read a few transcripts and turned the repeated failures into tools, skills, or checks.
+- あなた自身がそのタスクを一度手作業で行ったことがあるか、エージェントが実行する様子を見守ったことがあり、「何が正しい状態か（what good looks like）」を把握している。
+- あなた自身が使うのと同じツールやシグナル（検証スキル、プロファイラー、ログなど）をエージェントに与えている。
+- すべてのステージで作業結果が証明され、基準に満たない場合はラインを停止できるようになっている。
+- 過去のトランスクリプト（実行履歴）をいくつか読み、繰り返し発生する失敗パターンをツールやスキル、チェック機構へと落とし込んでいる。
 
-Make the loop autonomous only after all four hold. Until then, run it while you watch.
+これら4つがすべて揃ってから初めて、ループを自律化してください。それまでは、自分の目の届く範囲で実行しましょう。
 
-## The overnight contract
+## 夜間実行の取り決め（オーバーナイト契約）
 
-A good handoff has the goal, the finish condition, permissions, and an escape hatch. It doesn't need to be long:
+優れた引き継ぎには、「ゴール」「完了条件」「許可事項」「緊急脱出口（エスケープハッチ）」の4つが含まれます。長々と書く必要はありません：
 
 ```text
-/poteto-mode im going to bed. migrate every caller to the new parser in a fresh worktree off <base>.
-done means zero old callers, all parser fixtures pass, old api deleted.
-keep a decision log. don't ask me before committing.
-/loop until done. if you're truly stuck after a few hours, stop and write up why.
+/poteto-mode これから寝る。<base> から切った新しい worktree で、すべての呼び出し元を新しいパーサーに移行して。
+古い呼び出し元がゼロになり、すべてのパーサーのテストデータ（フィクスチャ）がパスし、古い API が削除されたら完了とする。
+意思決定ログを記録して。コミット前の確認は不要。
+/loop 完了するまで繰り返して。数時間経っても本当に行き詰まっている場合は、停止して理由を書き出して。
 ```
 
-Walk through what each line buys you:
+各行がどのような役割を果たしているか見てみましょう：
 
-- "im going to bed" is a session override. The agent stops asking and keeps going.
-- "done means..." turns the goal into checks every iteration can run.
-- "fresh worktree off `<base>`" keeps the run from colliding with anything else you have open.
-- "don't ask me before committing" pre-answers the permission the agent would otherwise block on.
-- `/loop` is Cursor's built-in wake mechanism, not a pstack skill. The [Autonomous run playbook](../../skills/poteto-mode/playbooks/autonomous-run.md) uses it to re-check the finish condition on events or a heartbeat.
-- The escape hatch lets it stop at a genuine dead end and write up why, which beats eight hours of creative goal reinterpretation.
+- 「これから寝る（im going to bed）」はセッション全体の上書き指示として機能します。これにより、エージェントは途中で質問するのをやめ、作業を自律的に進め続けます。
+- 「〜したら完了とする（done means...）」は、曖昧なゴールを毎回のイテレーションで実行・判定できる具体的なチェック基準へと変換します。
+- 「`<base>` から切った新しい worktree」と指定することで、あなたが他に開いている作業ツリーと衝突するのを防ぎます。
+- 「コミット前の確認は不要」と伝えることで、通常ならエージェントが確認待ちでブロックしてしまう許可事項に事前回答しておきます。
+- `/loop` は pstack のスキルではなく、Cursor に組み込まれた定期起動（ウェイク）メカニズムです。[Autonomous run プレイブック](../../skills/poteto-mode/playbooks/autonomous-run.md) はこれを利用し、イベント発生時やハートビート間隔で完了条件を再チェックします。
+- 緊急脱出口（行き詰まったら停止して理由を書き出す指示）を設けることで、本当に行き詰まった際に8時間かけてゴールを勝手に独自解釈し続けるような暴走を防ぎ、潔く停止して理由を報告させることができます。
 
-Because you'll review this work after stepping away, `/poteto-mode` routes it through [`/figure-it-out`](../../skills/figure-it-out/SKILL.md), which designs the run's phases before any code and wires in the decision log.
+席を外した後にあなたがレビューする前提の作業であるため、`/poteto-mode` はこれを [`/figure-it-out`](../../skills/figure-it-out/SKILL.md) にルーティングし、コードを1行も書く前に実行フェーズを設計して意思決定ログを組み込みます。
 
-To stop a run on purpose, tell the agent to pause, or that you're about to go offline or restart Cursor. The [Pause safely playbook](../../skills/poteto-mode/playbooks/pause-safely.md) finishes or backs out of the current step, commits a work-in-progress checkpoint, and writes a resume note. A fresh chat picks the work up from that note through the Session pickup playbook. Saying "keep going" never triggers a pause.
+稼働中のループを意図的に止めたい場合は、エージェントに一時停止するよう伝えるか、これからオフラインになる・Cursor を再起動する旨を伝えてください。[Pause safely プレイブック](../../skills/poteto-mode/playbooks/pause-safely.md) が現在のステップを完了またはロールバックし、作業中（WIP）のチェックポイントをコミットしたうえで、再開用のメモを書き出します。新しいチャットを開けば、Session pickup プレイブックを通じてそのメモから作業を引き継ぐことができます。なお、「続けて（keep going）」と伝えただけでは一時停止がトリガーされることはありません。
 
-## What the loop does all night
+## 一晩中ループが実行する処理
 
 ```mermaid
 flowchart TD
-    A[Check the finish condition] --> B[Make the smallest justified change]
-    B --> C[Verify against the real artifact]
-    C --> D{Progress?}
-    D -->|Yes| E[Commit]
-    D -->|No| F[Discard]
-    E --> G[Log one decision row]
+    A[完了条件をチェック] --> B[根拠のある最小限の変更を実施]
+    B --> C[実際の成果物に対して検証]
+    C --> D{前進したか？}
+    D -->|はい| E[コミット]
+    D -->|いいえ| F[破棄]
+    E --> G[意思決定ログを1行記録]
     F --> G
     G --> A
 ```
 
-One change, one check, one log row, every iteration. Changes that didn't help get discarded, not left to ride. A plateau means pivot, not stop, and the finish condition never quietly relaxes to declare victory.
+イテレーションごとに「1つの変更、1つのチェック、1行のログ記録」を繰り返します。改善につながらなかった変更は放置せず、その場で破棄されます。進捗が頭打ち（プラトー）になった場合は停止するのではなく別アプローチへ方向転換し、完了宣言を出すために完了条件をこっそり緩めるようなことは決してしません。
 
-## The morning audit
+## 朝の監査（モーニングオーディット）
 
-[`/show-me-your-work`](../../skills/show-me-your-work/SKILL.md) is what makes the run reviewable. Each row records the time, phase, decision, reason, an evidence pointer, and the result, in a TSV at `decisions.tsv` (or `.audit/<task-slug>.tsv` when several runs share a directory). It stays local by default. Commit it when the work is ambitious enough that a reviewer needs the trail to trust the result.
+夜間の実行内容を後からレビュー可能にしているのが [`/show-me-your-work`](../../skills/show-me-your-work/SKILL.md) です。各行には時刻、フェーズ、意思決定内容、理由、証拠へのポインタ、および結果が `decisions.tsv`（複数の実行が同じディレクトリを共有する場合は `.audit/<task-slug>.tsv`）という TSV ファイルに記録されます。デフォルトではローカルに留まりますが、レビュアーが結果を信頼するために判断の軌跡を必要とするような大掛かりな作業の場合は、リポジトリにコミットしてください。
 
-When you're back, ask for the run in review form:
-
-```text
-/show-me-your-work catch me up on what you did last night
-```
-
-Before the skill hands back its summary, it spawns a reviewer on a different model family to read the trail and the transcript, and the reply ends with an Attention section listing what deserves your scrutiny. Read that section first, then the log rows it points at. You're auditing decisions, not re-reading the whole night.
-
-For a quick status instead of an audit, run [`/ketchup`](../../skills/ketchup/SKILL.md) in the chat that ran the work. It reads only, and tells you in plain words what changed since your last message, with the screenshots and small diagrams the work produced. Then it lists each call waiting on you, such as a merge, an approval, or a choice between options, with its pick, the evidence, and the risk, so you can decide from the reply alone.
-
-## When the night holds a queue, not a task
-
-The contract above drives one task to one finish condition. Some nights hold more, a queue of independent changes or a whole program. Two playbooks and one skill scale the same trust up.
-
-[Autopilot-full](../../skills/poteto-mode/playbooks/autopilot-full.md) runs a queue of independent PRs to merged. Each PR gets one owner agent that carries it from build through merge, and no owner merges on its own verdict. A swarm of fresh verifiers checks the owner's code-ready head. A later rebase or minor fix gets one fresh verifier, and only new behavior or a large new diff calls the full swarm again. Only a clean verdict on the patch that merges authorizes the merge:
+戻ってきたら、レビュー形式で実行結果を報告させてください：
 
 ```text
-/poteto-mode full autopilot on this queue. each item is independent. i want them merged by morning.
+/show-me-your-work 昨晩やったことをレビューできる形でキャッチアップさせて
 ```
 
-[Autopilot-stack](../../skills/poteto-mode/playbooks/autopilot-stack.md) is Autopilot-full without the merge. You wake up to verified PRs, each with its verdict, and you review and land them yourself. A PR stacks only on a PR it builds on. Pick it over Autopilot-full when you want your own eyes on the work before anything merges:
+このスキルは要約を返す前に、別のモデルファミリーのレビュアーサブエージェントを起動して意思決定の軌跡とトランスクリプトを読み込ませます。そして返信の末尾に、あなたが精査すべき項目をまとめた「Attention（要注意事項）」セクションを出力します。まずはそのセクションを読み、次にそこが指し示しているログの行を確認してください。一晩分のログを最初から最後まで読み直す必要はなく、重要な意思決定だけを監査すればよいのです。
+
+監査ではなく手短な状況把握だけをしたい場合は、作業を実行していたチャットで [`/ketchup`](../../skills/ketchup/SKILL.md) を実行してください。読み取り専用で動作し、あなたの最後のメッセージ以降に何が変化したかを、生成されたスクリーンショットや小さな図解とともに平易な言葉で教えてくれます。さらに、マージ、承認、選択肢の決定など、あなたの判断待ちとなっている項目をすべてリストアップし、それぞれの推奨案・根拠・リスクを添えて提示してくれるため、その返信を読むだけで意思決定を完結できます。
+
+## 1つのタスクではなく、作業キューを一晩でさばく場合
+
+先ほどの取り決めは、1つのタスクを1つの完了条件まで導くためのものです。しかし夜間の作業には、独立した複数の変更キューやプロジェクト全体の移行など、さらに規模の大きいものもあります。そうした場合は、2つのプレイブックと1つのスキルで同じ信頼性をスケールアップできます。
+
+[Autopilot-full](../../skills/poteto-mode/playbooks/autopilot-full.md) は、独立した複数の PR のキューをマージ完了まで自動で進めます。各 PR には構築からマージまでを一貫して担当するオーナーエージェントが1体割り当てられますが、オーナー自身の判断だけでマージすることは禁止されています。オーナーが「コード準備完了」とした HEAD コミットに対して、新鮮な検証ワーカーのスウォーム（群れ）がチェックを行います。その後のリベースや軽微な修正には新しい検証ワーカーが1体割り当てられ、新しい挙動の追加や大きな差分が発生した場合にのみ、再度フルスウォームによる検証が行われます。マージ対象となるパッチに対してクリーンな合格判定（verdict）が出た場合にのみ、マージが許可されます：
 
 ```text
-/poteto-mode autopilot these five changes, but don't merge. i'll land them in the morning.
+/poteto-mode このキューをフルオートパイロット（full autopilot）で進めて。各項目は独立しているから、朝までにすべてマージしておいてほしい。
 ```
 
-A whole program, such as a migration across many packages, has no playbook of its own. `/poteto-mode` routes large or cross-cutting work to [`/figure-it-out`](../../skills/figure-it-out/SKILL.md), which designs one rigorous run for it:
+[Autopilot-stack](../../skills/poteto-mode/playbooks/autopilot-stack.md) は、マージを行わない Autopilot-full です。朝起きると、それぞれ検証結果（verdict）が付いた検証済みの PR 群が出来上がっているので、あなた自身でレビューしてマージできます。ある PR の上に別の PR が積み上げられる（スタックされる）のは、前者の変更を前提として構築される場合のみです。何かがマージされる前に必ず自分の目で確認したい場合は、Autopilot-full ではなくこちらを選んでください：
 
 ```text
-/poteto-mode migrate every package to the new store. own it until each one is converted and merged. i'll check in twice a day.
+/poteto-mode これら5つの変更をオートパイロットで進めて。ただしマージはしないで。朝になってから自分でマージする。
 ```
 
-## Run many projects in parallel
-
-A [Cursor Project](https://cursor.com/blog/projects) gives one coordinator agent a persistent thread. The coordinator doesn't write code. It directs subagents, which run in the cloud by default, so the work continues when your laptop is closed. Start your prompts to the coordinator with `/poteto-mode`, and the subagents it spawns follow the playbooks. Each agent it starts reads [`worker.md`](../../skills/poteto-mode/worker.md) first, so workers hold to the kickoff's bar, decide reversible calls instead of asking you, and open PRs ready for review.
-
-A few habits help:
-
-- Give each body of work its own Project, such as a feature, a migration, a perf push, or a tech-debt cleanup. Several can run side by side.
-- Drag related chats into the Project, finished ones included. They become context for every agent in it.
-- Give each PR a verification swarm before it merges, and let Autopilot-stack or Autopilot-full carry the queue.
-- Ask the coordinator for a plan backed by data, and have it answer open questions with prototypes before it asks you.
-
-One prompt can carry a whole Project, from research through execution:
+多数のパッケージにまたがるマイグレーションなど、プログラム全体規模の作業には専用のプレイブックはありません。`/poteto-mode` は大規模または横断的な作業を [`/figure-it-out`](../../skills/figure-it-out/SKILL.md) にルーティングし、そのタスク専用の厳格な実行計画を設計します：
 
 ```text
-/poteto-mode refactor this repo so its architecture is more agent friendly. use /correct and /architect on past commits and review comments to find the mistakes agents make most here. use /recall for context from past chats. answer open questions with prototypes instead of asking me. come back with a plan backed by real data. once i approve it, run it with autopilot-stack or autopilot-full, and ask me which.
+/poteto-mode すべてのパッケージを新しいストアに移行して。各パッケージの変換とマージが完了するまで責任を持って進めて。1日に2回進捗を確認しに来る。
 ```
 
-## Let loops start themselves
+## 複数のプロジェクトを並列で走らせる
 
-Every loop above still waits for you to start it. A scheduled or event-driven automation removes that step. Software maintenance splits into stages that suit this well: triage a report, reproduce it, fix it, verify the fix. Two rules keep such a line trustworthy:
+[Cursor Project](https://cursor.com/blog/projects) を使うと、1つのコーディネーターエージェントに永続的なスレッドを持たせることができます。コーディネーター自身はコードを書きません。サブエージェントに指示を出すことに専念し、サブエージェントはデフォルトでクラウド上で実行されるため、あなたがノート PC を閉じていても作業は進み続けます。コーディネーターへのプロンプトを `/poteto-mode` で始めれば、起動されるすべてのサブエージェントもプレイブックに従います。起動された各エージェントは最初に [`worker.md`](../../skills/poteto-mode/worker.md) を読み込むため、キックオフ時の高い基準を維持しつつ、後から覆せる（可逆な）判断はあなたに尋ねずに自分で決断し、レビュー準備が整った状態で PR を作成します。
 
-- Every stage can stop the line. Triage can decide the report is expected behavior, repro can fail to reproduce it, and the fixer can judge the change too risky. Each of those outcomes is useful, because it keeps bad work from reaching the next stage, where it costs more to undo.
-- Every stage hands over evidence. Repro attaches screenshots and video of the broken state, and the fix attaches before-and-after proof. A human can then check that the agent fixed the right thing before reading a line of code.
+運用をうまく回すコツをいくつか紹介します：
 
-pstack ships this as a dormant [automation pack](../../automations/benny/README.md) for Slack issue reports. One automation triages each report. The other reproduces confirmed bugs and may prepare a small draft fix. Point an agent at its [`FOR_AGENTS.md`](../../automations/benny/FOR_AGENTS.md) and name the target repository to set it up.
+- 機能開発、マイグレーション、パフォーマンス改善、技術的負債の解消など、作業のまとまりごとに専用の Project を作成する。複数の Project を並行して走らせることができます。
+- 関連するチャット（完了済みのものも含む）を Project にドラッグ＆ドロップして放り込む。それらが Project 内のすべてのエージェントにとっての共有コンテキストになります。
+- マージ前の各 PR には検証スウォームを割り当て、キューの消化は Autopilot-stack または Autopilot-full に任せる。
+- コーディネーターにはデータに裏付けられた計画を作成させ、未解決の疑問についてはあなたに質問する前にプロトタイプを作って答えを出させる。
 
-**Pitfall:** a duration is not a finish condition. "work on this for 4 hours" gives the agent nothing to check, and you'll wake up to four hours of motion instead of a result. Give `/loop` a predicate that can pass or fail.
+調査から実行まで、1つのプロンプトで Project 全体を動かすことも可能です：
 
-Next: [Steer with principle names](./08-principles.md).
+```text
+/poteto-mode このリポジトリのアーキテクチャがよりエージェントフレンドリーになるようにリファクタリングして。過去のコミットやレビューコメントに対して /correct と /architect を使い、ここでエージェントが最もよく犯すミスを特定して。過去のチャットからのコンテキスト取得には /recall を使って。未解決の疑問は私に質問する代わりにプロトタイプを作って答えを出して。実際のデータに裏付けられた計画書を持って戻ってきて。私が承認したら autopilot-stack か autopilot-full で実行するから、どちらにするかそのとき尋ねて。
+```
+
+## ループ自体を自動起動させる
+
+ここまでに紹介したループはすべて、あなたが手動でスタートさせる必要があります。スケジュール実行やイベント駆動のオートメーション（Automations）を使えば、その最初のひと手間さえ不要になります。ソフトウェアの保守作業は、まさにこの仕組みにぴったりなステージに分割できます（不具合報告のトリアージ → 再現 → 修正 → 修正の検証）。このライン全体の信頼性を保つためのルールは2つです：
+
+- すべてのステージがラインを停止できること。トリアージ担当は「これは仕様通りの挙動だ」と判断でき、再現担当は「再現しない」と判定でき、修正担当は「この変更はリスクが高すぎる」と判断できます。これらの結果はいずれも非常に有益です。なぜなら、不適切な作業が次のステージへ流れ込み、後から取り消すコストが膨らむのを未然に防げるからです。
+- すべてのステージが証拠を引き渡すこと。再現ステージでは不具合状態のスクリーンショットや動画を添付し、修正ステージでは修正前後の証明を添付します。これにより人間は、コードを1行読む前に「エージェントが本当に正しい対象を直したか」を一目で確認できます。
+
+pstack には、Slack の不具合報告に対応するための休止状態の[オートメーションパック（automation pack）](../../automations/benny/README.md)が同梱されています。一方のオートメーションが各報告をトリアージし、もう一方が確認されたバグを再現し、小さなドラフト修正を作成することもあります。セットアップするには、対象リポジトリを指定したうえでエージェントに [`FOR_AGENTS.md`](../../automations/benny/FOR_AGENTS.md) を参照させてください。
+
+**落とし穴（Pitfall）：** 「作業時間」は完了条件になりません。「4時間この作業をして」と指示しても、エージェントにはチェックすべき基準が何もなく、朝起きたときに残っているのは「成果」ではなく「4時間分の動き回った痕跡」だけになります。`/loop` には必ず、合格（pass）か不合格（fail）かを判定できる述語（条件式）を与えてください。
+
+次へ：[原則の名前を指定して舵を取る](./08-principles.md)

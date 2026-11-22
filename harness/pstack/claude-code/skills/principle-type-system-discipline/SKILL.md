@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Type System Discipline
 
-Claude Code では、このスキルに従う前にセッションごとに一度 [the Claude Code adapter](../../docs/harness/claude-code.md) を読んでください。ここには pstack スキル内の Cursor の名前と Claude Code のマッピングが記載されています。
+Claude Code で使用する場合は、このスキルに従う前にセッションごとに1回 [Claude Code アダプター](../../docs/harness/claude-code.md) を読み込んでください。pstack スキル内の Cursor 固有の名称を Claude Code 用にマッピングします。
 
 あり得ない状態、プリミティブの不一致、未処理のバリアントをコンパイラに弾かせること。
 

@@ -1,39 +1,39 @@
-# Create a note
+# ノートの作成
 
-Create note lets a user save a titled note from the browser or CLI, cancel an unfinished draft, and confirm the saved note from a second user-facing view.
+「ノートの作成」機能では、ブラウザまたは CLI からタイトル付きのノートを保存したり、作成途中の下書きを破棄したり、別のユーザー向け画面から保存済みのノートを確認したりできます。
 
 ## Sub-features
 
-- `create-open` opens a blank editor from each browser entry point.
-- `create-save` persists a title and body.
-- `create-cancel` discards an unfinished browser draft.
-- `create-cli` creates the same note shape from the terminal.
+- `create-open`：ブラウザ上の各エントリーポイントから空のエディタを開きます。
+- `create-save`：タイトルと本文を永続化（保存）します。
+- `create-cancel`：ブラウザ上の作成途中の下書きを破棄します。
+- `create-cli`：ターミナルから同じデータ構造のノートを作成します。
 
 ## How to get to it (user POV)
 
-- Choose the `New note` button in the browser toolbar.
-- Press `n` in the browser while focus is outside an editable field.
-- Run `notes create --title <title> --body <body>` in a terminal.
+- ブラウザのツールバーにある `New note` ボタンを選択します。
+- ブラウザ上で、入力可能なフィールド以外にフォーカスがある状態で `n` キーを押します。
+- ターミナルで `notes create --title <title> --body <body>` を実行します。
 
 ## Driving it with control-notes
 
 Preconditions:
 
-- Notes is healthy at `http://127.0.0.1:4173`.
-- No note is titled `Release checklist`.
-- `control-notes doctor` reports the expected URL and disposable data directory.
+- Notes アプリが `http://127.0.0.1:4173` で正常に稼働していること。
+- `Release checklist` というタイトルのノートが存在しないこと。
+- `control-notes doctor` が想定通りの URL と使い捨て用データディレクトリを報告すること。
 
-- **Open editor.** Choose `New note`. Run `control-notes browser click --role button --name "New note"`. A form named `Note editor` appears with focus in the `Title` textbox.
-- **Enter content.** Type the title and body. Run `control-notes browser fill --role textbox --name "Title" --value "Release checklist"` and `control-notes browser fill --role textbox --name "Body" --value "Tag and publish"`. The `Save note` button becomes enabled.
-- **Save note.** Choose `Save note`. Run `control-notes browser click --role button --name "Save note"`. A status named `Note saved` appears and the heading reads `Release checklist`.
-- **Confirm persistence.** Return to the note list and reopen the note. Run `control-notes browser click --role link --name "All notes"` and `control-notes browser click --role link --name "Release checklist"`. The editor shows both saved values.
-- **Cancel draft.** Open a new note, enter `Discard me`, and choose `Cancel`. Run `control-notes browser click --role button --name "New note"`, `control-notes browser fill --role textbox --name "Title" --value "Discard me"`, and `control-notes browser click --role button --name "Cancel"`. The note list returns and has no `Discard me` link.
-- **CLI entry.** Create a second note. Run `control-notes cli -- notes create --title "CLI note" --body "Created from terminal" --format json`. Exit code `0` and stdout contain the new note ID and title.
-- **Proof.** Reopen both saved notes from `All notes`. Run `control-notes browser snapshot --aria --path artifacts/create-note/list.aria.txt` and `control-notes browser screenshot --path artifacts/create-note/list.png`. The artifacts show `Release checklist` and `CLI note`.
+- **エディタを開く。** `New note` を選択します。`control-notes browser click --role button --name "New note"` を実行すると、`Note editor` という名前のフォームが表示され、`Title` テキストボックスにフォーカスが当たります。
+- **内容を入力する。** タイトルと本文を入力します。`control-notes browser fill --role textbox --name "Title" --value "Release checklist"` と `control-notes browser fill --role textbox --name "Body" --value "Tag and publish"` を実行すると、`Save note` ボタンが有効化されます。
+- **ノートを保存する。** `Save note` を選択します。`control-notes browser click --role button --name "Save note"` を実行すると、`Note saved` というステータスが表示され、見出しが `Release checklist` になります。
+- **永続化を確認する。** ノート一覧に戻り、保存したノートを再度開きます。`control-notes browser click --role link --name "All notes"` と `control-notes browser click --role link --name "Release checklist"` を実行すると、エディタ上に保存したタイトルと本文の両方が表示されます。
+- **下書きをキャンセルする。** 新規ノートを開いて `Discard me` と入力し、`Cancel` を選択します。`control-notes browser click --role button --name "New note"`、`control-notes browser fill --role textbox --name "Title" --value "Discard me"`、`control-notes browser click --role button --name "Cancel"` を順に実行すると、ノート一覧画面に戻り、`Discard me` へのリンクが存在しないことが確認できます。
+- **CLI からの登録。** 2つ目のノートを作成します。`control-notes cli -- notes create --title "CLI note" --body "Created from terminal" --format json` を実行すると、終了コード `0` で完了し、標準出力（stdout）に新しいノートの ID とタイトルが含まれます。
+- **証拠の取得。** `All notes` から保存した2つのノートを両方開き直します。`control-notes browser snapshot --aria --path artifacts/create-note/list.aria.txt` と `control-notes browser screenshot --path artifacts/create-note/list.png` を実行すると、生成されたアーティファクトに `Release checklist` と `CLI note` が記録されます。
 
 ## Gotchas
 
-- Pressing `n` while a textbox has focus types the character instead of opening a new editor.
-- Titles are trimmed on save. Assert the rendered title, not the draft input value.
-- A save status alone is insufficient proof. Reopen the note from the list.
-- Remove `Release checklist` and `CLI note` during fixture cleanup, but retain their proof artifacts.
+- テキストボックスにフォーカスがある状態で `n` を押すと、新規エディタは開かず、単に文字として `n` が入力されます。
+- タイトルは保存時に前後の空白がトリムされます。下書きの入力値ではなく、実際にレンダリングされたタイトルに対してアサートを行ってください。
+- 保存完了のステータス表示だけでは十分な証拠になりません。必ず一覧画面からノートを開き直して確認してください。
+- フィクスチャのクリーンアップ時には `Release checklist` と `CLI note` のデータを削除しますが、検証の証拠アーティファクト自体は削除せず残しておいてください。
