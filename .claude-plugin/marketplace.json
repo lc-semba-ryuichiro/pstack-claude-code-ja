@@ -7,7 +7,7 @@
   "plugins": [
     {
       "name": "pstack",
-      "source": "./pstack",
+      "source": "./",
       "description": "速く進みたいなら、まず深く掘り下げること。pstack は、より少ないコード量でより高品質なコードを書く手助けをします。自信を持って並列化できる、厳格なエージェントワークフロー。（非公式の日本語版・Claude Code 専用）"
     }
   ]
