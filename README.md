@@ -10,8 +10,8 @@ pstack は Cursor 向けに書かれたスキル集ですが、このリポジ�
 Claude Code で次を実行します。
 
 ```text
-/plugin marketplace add lc-semba-ryuichiro/pstack-ja
-/plugin install pstack@pstack-ja
+/plugin marketplace add lc-semba-ryuichiro/pstack-claude-code-ja
+/plugin install pstack@pstack-claude-code-ja
 ```
 
 使い方は [pstack/README.md](pstack/README.md) と [ガイド](pstack/docs/guide/README.md) を参照してください。

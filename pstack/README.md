@@ -17,11 +17,11 @@ AI が低品質で冗長なコード（slop code）を書きすぎていると�
 Claude Code で以下を実行します：
 
 ```bash
-/plugin marketplace add lc-semba-ryuichiro/pstack-ja
-/plugin install pstack@pstack-ja
+/plugin marketplace add lc-semba-ryuichiro/pstack-claude-code-ja
+/plugin install pstack@pstack-claude-code-ja
 ```
 
-Claude Code ではサードパーティ製マーケットプレイスの自動更新がデフォルトでオフになっているため、pstack はインストール時のバージョンのまま維持されます。自動更新を有効にするには、`/plugin` を実行して **marketplaces** タブを開き、`pstack-ja` を選択して **enable auto-update** を選んでください。手動で1回だけ更新する場合は、`claude plugin update pstack@pstack-ja` を実行します。
+Claude Code ではサードパーティ製マーケットプレイスの自動更新がデフォルトでオフになっているため、pstack はインストール時のバージョンのまま維持されます。自動更新を有効にするには、`/plugin` を実行して **marketplaces** タブを開き、`pstack-claude-code-ja` を選択して **enable auto-update** を選んでください。手動で1回だけ更新する場合は、`claude plugin update pstack@pstack-claude-code-ja` を実行します。
 
 ## はじめに
 
